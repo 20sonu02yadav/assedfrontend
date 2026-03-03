@@ -1,14 +1,12 @@
 // src/pages/Franchise.tsx
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link} from "react-router-dom";
 import {
   Building2,
   TrendingUp,
   Headset,
   BadgeDollarSign,
-  ChevronDown,
-  ArrowUp,
-  ShoppingCart,
+  
 } from "lucide-react";
 
 type InfoCard = {
@@ -30,8 +28,8 @@ const Franchise: React.FC = () => {
   const DEALER_IMAGE =
     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-hoang-nc-483165236-16057288.jpg";
 
-  const [cartCount] = useState<number>(0);
-  const [showTop, setShowTop] = useState(false);
+  //const [cartCount] = useState<number>(0);
+  const [_showTop, setShowTop] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 250);
@@ -69,21 +67,6 @@ const Franchise: React.FC = () => {
     ],
     []
   );
-
-  const navItems = useMemo(
-    () => [
-      { label: "HOME", to: "/" },
-      { label: "STORE", to: "/store" },
-      { label: "CATEGORIES", to: "/categories", dropdown: true },
-      { label: "FRANCHISE", to: "/franchise" },
-      { label: "SERVICES", to: "/services" },
-      { label: "BLOG", to: "/blog" },
-      { label: "ABOUT", to: "/about", right: true },
-      { label: "CONTACT US", to: "/contact", right: true },
-    ],
-    []
-  );
-
   return (
     <div className="fr-page">
       {/* ================= HEADER (Overlay like screenshot) ================= */}

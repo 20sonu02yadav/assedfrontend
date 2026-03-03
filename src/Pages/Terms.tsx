@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * Terms.tsx (single file)
@@ -13,7 +13,7 @@ import React, { useEffect, useState } from "react";
  */
 
 export default function Terms() {
-  const [showTop, setShowTop] = useState(false);
+  const [_showTop, setShowTop] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 650);
@@ -106,61 +106,6 @@ export default function Terms() {
         {/* FOOTER */}
       </div>
     </>
-  );
-}
-
-/* ========================= ICONS ========================= */
-function IconCartSmall() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M6 6h15l-2 8H7L6 6z" stroke="#fff" strokeWidth="2" strokeLinejoin="round" />
-      <path d="M6 6l-1-3H2" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="9" cy="19" r="1.6" fill="#fff" />
-      <circle cx="18" cy="19" r="1.6" fill="#fff" />
-    </svg>
-  );
-}
-function IconCartBig() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M6 6h15l-2 8H7L6 6z" stroke="#fff" strokeWidth="2" strokeLinejoin="round" />
-      <path d="M6 6l-1-3H2" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="9" cy="19" r="1.6" fill="#fff" />
-      <circle cx="18" cy="19" r="1.6" fill="#fff" />
-    </svg>
-  );
-}
-function IconUserSmall() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="12" cy="8" r="3.2" stroke="#fff" strokeWidth="2" />
-      <path d="M5 20c1.5-4 5-6 7-6s5.5 2 7 6" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-function IconFb() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M14 8h3V5h-3c-2.2 0-4 1.8-4 4v3H7v3h3v6h3v-6h3l1-3h-4V9c0-.6.4-1 1-1z" fill="#111" />
-    </svg>
-  );
-}
-function IconTw() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M19 7c-.6.3-1.3.5-2 .6.7-.4 1.2-1 1.4-1.8-.7.4-1.4.7-2.2.9-.6-.7-1.5-1.1-2.5-1.1-1.9 0-3.4 1.5-3.4 3.4 0 .3 0 .5.1.8-2.8-.1-5.2-1.5-6.9-3.6-.3.5-.4 1.1-.4 1.7 0 1.2.6 2.2 1.5 2.8-.5 0-1.1-.2-1.6-.4v.1c0 1.6 1.1 2.9 2.6 3.2-.3.1-.6.1-1 .1-.2 0-.5 0-.7-.1.5 1.4 1.8 2.4 3.3 2.4-1.2.9-2.7 1.4-4.4 1.4H3c1.6 1 3.4 1.6 5.4 1.6 6.5 0 10.1-5.4 10.1-10.1v-.5c.7-.5 1.2-1.1 1.6-1.8z"
-        fill="#111"
-      />
-    </svg>
-  );
-}
-function IconYt() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M21 12s0-3.2-.4-4.6c-.2-.8-.9-1.5-1.7-1.7C17.5 5.3 12 5.3 12 5.3s-5.5 0-6.9.4c-.8.2-1.5.9-1.7 1.7C3 8.8 3 12 3 12s0 3.2.4 4.6c.2.8.9 1.5 1.7 1.7 1.4.4 6.9.4 6.9.4s5.5 0 6.9-.4c.8-.2 1.5-.9 1.7-1.7.4-1.4.4-4.6.4-4.6z" fill="#111" />
-      <path d="M10.5 9.5v5l5-2.5-5-2.5z" fill="#fff" />
-    </svg>
   );
 }
 

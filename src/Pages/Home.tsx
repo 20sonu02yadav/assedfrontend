@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import{ useMemo, useRef} from "react";
 
 type Product = {
   id: string;
@@ -97,8 +97,7 @@ export default function Home() {
   const heroBg =
     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-nishantaneja-12105083.jpg";
 
-  const logo =
-    "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/cropped-TUNTURU-LOGO-scaled-1-2048x681.png";
+  
 
   const promo1 =
     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-theshuttervision-8811529.jpg";
@@ -143,8 +142,8 @@ export default function Home() {
   const brandsRef = useRef<HTMLDivElement | null>(null);
 
   // Dummy cart values (connect later)
-  const [cartCount] = useState(0);
-  const [cartTotal] = useState(0);
+  //const [cartCount] = useState(0);
+  //const [cartTotal] = useState(0);
   //const [floatingCartCount] = useState(0);
 
   // ✅ LOGO fallback
@@ -258,14 +257,7 @@ export default function Home() {
 
   //const goTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  const path =
-    typeof window !== "undefined" && window.location?.pathname ? window.location.pathname : "/";
-
-  const isActive = (href: string) => {
-    if (href === "/") return path === "/";
-    return path.startsWith(href);
-  };
-
+  
   return (
     <div className="home">
       <style>{`

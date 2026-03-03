@@ -4,8 +4,8 @@ import { loginUser, registerUser, setAuthToken, type Role } from "../services/ap
 
 export default function MyAccount() {
   // ✅ Header logo
-  const LOGO_URL =
-    "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/cropped-TUNTURU-LOGO-scaled-1-2048x681.png";
+  //const LOGO_URL =
+    //"https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/cropped-TUNTURU-LOGO-scaled-1-2048x681.png";
 
   // ✅ Background image
   const HERO_BG =
@@ -39,7 +39,7 @@ export default function MyAccount() {
     return regPassword !== regConfirmPassword;
   }, [regPassword, regConfirmPassword]);
 
-  const cartCount = 0;
+  //const cartCount = 0;
 
   const onLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,7 +124,7 @@ export default function MyAccount() {
     }
   };
 
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+  //const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
     <div className="page">

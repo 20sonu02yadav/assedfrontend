@@ -1,14 +1,14 @@
 // src/Pages/Store.tsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   fetchCategoryTree,
   fetchProducts,
 } from "../services/storeApi";
 import type {CategoryNode,ProductListItem} from "../services/storeApi"
 
-const LOGO_URL =
-  "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/cropped-TUNTURU-LOGO-scaled-1-2048x681.png";
+//const LOGO_URL =
+  //"https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/cropped-TUNTURU-LOGO-scaled-1-2048x681.png";
 
 const HERO_BG =
   "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2018/12/slide-image-free-img.jpg";
@@ -29,7 +29,7 @@ type OrderBy =
 
 type Pricing = "default" | "10_200000" | "10_20000" | "10_2000";
 
-const TOTAL_TOOLS_PARENT_NAME = "TOTAL TOOLS";
+//const TOTAL_TOOLS_PARENT_NAME = "TOTAL TOOLS";
 
 /**
  * ✅ FIXED: generic outside-click hook
@@ -65,7 +65,7 @@ export default function Store() {
 
   // header dropdown state
   const [showCategories, setShowCategories] = useState(false);
-  const [openSubmenuSlug, setOpenSubmenuSlug] = useState<string | null>(null);
+  const [_openSubmenuSlug, setOpenSubmenuSlug] = useState<string | null>(null);
 
   // ✅ refs (typed correctly)
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -74,7 +74,7 @@ export default function Store() {
   const priceRef = useRef<HTMLDivElement | null>(null);
 
   // data
-  const [categories, setCategories] = useState<CategoryNode[]>([]);
+  const [_categories, setCategories] = useState<CategoryNode[]>([]);
   const [products, setProducts] = useState<ProductListItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -123,26 +123,7 @@ export default function Store() {
       .finally(() => setLoading(false));
   }, [search]);
 
-  const totalToolsParent = useMemo(() => {
-    const findInTree = (nodes: CategoryNode[]): CategoryNode | null => {
-      for (const n of nodes) {
-        if ((n.name || "").trim().toUpperCase() === TOTAL_TOOLS_PARENT_NAME) {
-          return n;
-        }
-        const sub = findInTree(n.children || []);
-        if (sub) return sub;
-      }
-      return null;
-    };
-    return findInTree(categories);
-  }, [categories]);
-
-  const topLevelCategories = useMemo(() => {
-    const list = categories || [];
-    return list.filter(
-      (c) => (c.name || "").trim().toUpperCase() !== TOTAL_TOOLS_PARENT_NAME
-    );
-  }, [categories]);
+  
 
   const pricingRange = useMemo(() => {
     if (pricing === "10_200000") return { min: 10, max: 200000 };
@@ -198,15 +179,15 @@ export default function Store() {
     return list;
   }, [products, pricingRange, orderBy, sortBy]);
 
-  const cartCount = 0;
+  //const cartCount = 0;
 
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+  //const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  function goCategory(slug: string) {
-    setShowCategories(false);
-    setOpenSubmenuSlug(null);
-    navigate(`/category/${slug}`);
-  }
+  // function goCategory(slug: string) {
+  //   setShowCategories(false);
+  //   setOpenSubmenuSlug(null);
+  //   navigate(`/category/${slug}`);
+  // }
 
   function goProduct(slug: string) {
     navigate(`/product/${slug}`);
@@ -459,15 +440,6 @@ export default function Store() {
     </div>
   );
 }
-
-function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
-  return (
-    <Link to={to} style={styles.navA}>
-      {children}
-    </Link>
-  );
-}
-
 
 
 function RadioRow({

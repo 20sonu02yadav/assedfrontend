@@ -1,5 +1,5 @@
 // FAQ.tsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type FaqItem = { q: string; a: string };
 
@@ -39,9 +39,9 @@ const FAQS: FaqItem[] = [
 
 const FAQ: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-  const [showTop, setShowTop] = useState(false);
+  const [_showTop, setShowTop] = useState(false);
 
-  const year = useMemo(() => new Date().getFullYear(), []);
+  //const year = useMemo(() => new Date().getFullYear(), []);
 
   useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 400);
@@ -500,79 +500,6 @@ function ChevronIcon() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-    </svg>
-  );
-}
-
-function CartIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M6.5 6h15l-1.5 8.5H8.2L6.5 6Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M6.5 6 5.7 3.8H3"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <circle cx="9" cy="20" r="1.6" fill="currentColor" />
-      <circle cx="18" cy="20" r="1.6" fill="currentColor" />
-    </svg>
-  );
-}
-
-function UserIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="12" cy="8" r="3.2" stroke="currentColor" strokeWidth="2" />
-      <path
-        d="M5.5 20c1.6-4.1 11.4-4.1 13 0"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function UpIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 6l-6 6M12 6l6 6"
-        stroke="currentColor"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function FacebookIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M13.5 22v-8h2.7l.5-3H13.5V9.2c0-.8.3-1.4 1.5-1.4h1.9V5.1c-.3 0-1.5-.1-2.9-.1-2.9 0-4.7 1.8-4.7 5v2.9H6.8v3h2.5v8h4.2Z" />
-    </svg>
-  );
-}
-
-function TwitterIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M20.5 7.1c.01.16.01.32.01.48 0 4.86-3.7 10.46-10.46 10.46-2.08 0-4.01-.61-5.64-1.66.29.03.58.04.88.04 1.72 0 3.31-.59 4.57-1.58-1.61-.03-2.97-1.09-3.44-2.55.22.04.44.07.68.07.33 0 .66-.05.97-.13-1.68-.34-2.95-1.82-2.95-3.6v-.05c.5.28 1.07.45 1.67.47-1-.67-1.66-1.8-1.66-3.08 0-.68.18-1.32.51-1.87 1.82 2.24 4.55 3.71 7.63 3.87-.06-.27-.09-.56-.09-.84 0-2.02 1.64-3.66 3.66-3.66 1.05 0 2 .44 2.67 1.14.83-.16 1.61-.47 2.31-.9-.27.85-.85 1.56-1.6 2.01.74-.09 1.44-.29 2.09-.58-.5.74-1.12 1.38-1.84 1.9Z" />
-    </svg>
-  );
-}
-
-function YoutubeIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M21.6 7.2a3 3 0 0 0-2.1-2.1C17.7 4.6 12 4.6 12 4.6s-5.7 0-7.5.5A3 3 0 0 0 2.4 7.2 31.7 31.7 0 0 0 2 12a31.7 31.7 0 0 0 .4 4.8 3 3 0 0 0 2.1 2.1c1.8.5 7.5.5 7.5.5s5.7 0 7.5-.5a3 3 0 0 0 2.1-2.1A31.7 31.7 0 0 0 22 12a31.7 31.7 0 0 0-.4-4.8ZM10.3 15.2V8.8L15.8 12l-5.5 3.2Z" />
     </svg>
   );
 }

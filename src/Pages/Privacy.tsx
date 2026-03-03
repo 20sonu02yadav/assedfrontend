@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 
 /**
  * Privacy.tsx (single file)
@@ -13,7 +13,7 @@ import React, { useEffect, useState } from "react";
  */
 
 export default function Privacy() {
-  const [showTop, setShowTop] = useState(false);
+  const [_showTop, setShowTop] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 650);
@@ -197,29 +197,6 @@ export default function Privacy() {
     </>
   );
 }
-
-/* ========================= ICONS ========================= */
-function IconCartSmall() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M6 6h15l-2 8H7L6 6z" stroke="#fff" strokeWidth="2" strokeLinejoin="round" />
-      <path d="M6 6l-1-3H2" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="9" cy="19" r="1.6" fill="#fff" />
-      <circle cx="18" cy="19" r="1.6" fill="#fff" />
-    </svg>
-  );
-}
-
-function IconUserSmall() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="12" cy="8" r="3.2" stroke="#fff" strokeWidth="2" />
-      <path d="M5 20c1.5-4 5-6 7-6s5.5 2 7 6" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-
 
 /* ========================= CSS ========================= */
 const css = `

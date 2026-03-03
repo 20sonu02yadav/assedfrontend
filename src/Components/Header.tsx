@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchCategoryTree } from "../services/storeApi";
 import type { CategoryNode } from "../services/storeApi";

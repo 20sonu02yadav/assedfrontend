@@ -1,8 +1,8 @@
 
 import React, { useMemo, useState } from "react";
 
-const LOGO_URL =
-  "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/cropped-TUNTURU-LOGO-scaled-1-2048x681.png";
+// const LOGO_URL =
+//   "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/cropped-TUNTURU-LOGO-scaled-1-2048x681.png";
 
 const HERO_BG =
   "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=2400&q=80";
