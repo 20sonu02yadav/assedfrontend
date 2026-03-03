@@ -148,7 +148,7 @@ export default function Home() {
   //const [floatingCartCount] = useState(0);
 
   // ✅ LOGO fallback
-  const [logoOkHeader, setLogoOkHeader] = useState(true);
+  //const [logoOkHeader, setLogoOkHeader] = useState(true);
   //const [logoOkFooter, setLogoOkFooter] = useState(true);
 
   // ✅ Dummy Offers (no API)
@@ -311,89 +311,6 @@ export default function Home() {
           mix-blend-mode: multiply;
           pointer-events:none;
         }
-
-        /* ✅ HEADER EXACT LIKE SCREENSHOT */
-        .nav{
-        position:fixed;
-        top:0; left:0; right:0;
-        z-index:999;
-        height:82px;
-        display:flex;
-        align-items:center;
-        background: var(--navbg);
-        border-bottom:1px solid rgba(255,255,255,.06);
-        }
-        .navInner{
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          gap:18px;
-          color:#fff;
-          width:100%;
-        }
-        .navLeft{display:flex; align-items:center; gap:26px;}
-
-        .brand img{
-          height:38px;
-          width:auto;
-          display:block;
-          object-fit:contain;
-          filter: brightness(1.55) contrast(1.35) drop-shadow(0 2px 10px rgba(0,0,0,.55));
-        }
-        .brandFallback{
-          font-weight:900;
-          letter-spacing:1px;
-          font-size:24px;
-          color:#35b7ff;
-          text-shadow: 0 2px 12px rgba(0,0,0,.7);
-        }
-
-        .menu{
-        display:flex;
-        align-items:center;
-        gap:22px;
-        font-weight:800;
-        letter-spacing:.8px;
-        text-transform:uppercase;
-        font-size:15px;
-        }
-        .menu a{
-          opacity:.95;
-          padding: 6px 2px;
-        }
-        .menu a:hover{opacity:1}
-        .menu a.active{
-          color: var(--blue);
-          text-shadow: 0 0 12px rgba(59,130,246,.35);
-        }
-        .drop{display:inline-flex; align-items:center; gap:6px;}
-        .drop svg{opacity:.9}
-        .navRight{
-  display:flex;
-  align-items:center;
-  gap:28px;
-  font-weight:800;
-  text-transform:uppercase;
-  font-size:15px;
-}
-        .price{font-weight:900}
-        .iconRow{display:flex; align-items:center; gap:16px;}
-        .iconBtn{width:22px; height:22px; display:grid; place-items:center; opacity:.95;}
-        .cartIcon{position:relative}
-        .cartIcon .badge{
-  position:absolute;
-  top:-6px;
-  right:-6px;
-  width:17px;
-  height:17px;
-  border-radius:999px;
-  background:#fff;
-  color:#000;
-  font-size:10px;
-  font-weight:900;
-  display:grid;
-  place-items:center;
-}
 
         /* ✅ HERO TEXT */
         .heroContent{
@@ -613,60 +530,7 @@ export default function Home() {
         <div className="heroOverlay2" />
 
         {/* ✅ FIXED HEADER */}
-        <header className="nav">
-          <div className="container">
-            <div className="navInner">
-              <div className="navLeft">
-                <a className="brand" href="/" aria-label="Home">
-                  {logoOkHeader ? (
-                    <img src={logo} alt="Tunturu" onError={() => setLogoOkHeader(false)} />
-                  ) : (
-                    <span className="brandFallback">TU</span>
-                  )}
-                </a>
-
-                <nav className="menu">
-                  <a className={isActive("/") ? "active" : ""} href="/">HOME</a>
-                  <a className={isActive("/store") ? "active" : ""} href="/store">STORE</a>
-                  <a className={`drop ${isActive("/categories") ? "active" : ""}`} href="/categories">
-                    CATEGORIES
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
-                    </svg>
-                  </a>
-                  <a className={isActive("/franchise") ? "active" : ""} href="/franchise">FRANCHISE</a>
-                  <a className={isActive("/services") ? "active" : ""} href="/services">SERVICES</a>
-                  <a className={isActive("/blog") ? "active" : ""} href="/blog">BLOG</a>
-                </nav>
-              </div>
-
-              <div className="navRight">
-                <a className={isActive("/about") ? "active" : ""} href="/about">ABOUT</a>
-                <a className={isActive("/contact") ? "active" : ""} href="/contact">CONTACT US</a>
-                <div className="price">{inr(cartTotal)}</div>
-
-                <div className="iconRow">
-                  <a className="iconBtn cartIcon" href="/cart" aria-label="Cart">
-                    <span className="badge">{cartCount}</span>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 6h15l-1.5 9H7.5L6 6z" />
-                      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 6l-2-2H1" />
-                      <circle cx="9" cy="20" r="1.5" fill="currentColor" stroke="none" />
-                      <circle cx="18" cy="20" r="1.5" fill="currentColor" stroke="none" />
-                    </svg>
-                  </a>
-
-                  <a className="iconBtn" href="/account" aria-label="Account">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                      <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>
+       
 
         {/* HERO TEXT */}
         <div className="container heroContent">

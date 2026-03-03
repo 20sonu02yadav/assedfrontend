@@ -28,7 +28,7 @@ export default function Privacy() {
 
       <div className="pPage">
         {/* HEADER */}
-        <header className="pHeader">
+        {/* <header className="pHeader">
           <div className="pContainer pHeaderRow">
             <div className="pBrand">
               <img
@@ -66,7 +66,7 @@ export default function Privacy() {
               </div>
             </nav>
           </div>
-        </header>
+        </header> */}
 
         {/* HERO */}
         <section className="pHero">
@@ -192,68 +192,7 @@ export default function Privacy() {
         </section>
 
         {/* FOOTER */}
-        <footer className="pFooter" id="contact">
-          <div className="pContainer pFooterGrid">
-            <div className="pFooterCol">
-              <div className="pFooterLogoText">TUNTURU</div>
-              <div className="pFooterText">
-                <div>Email: Support@tunturu.co.in</div>
-                <div>Email: Sales@tunturu.co.in</div>
-                <div>Phone: +91 89616 12353</div>
-              </div>
-
-              <div className="pSocialRow">
-                <a className="pSocialBtn" href="#" aria-label="Facebook"><IconFb /></a>
-                <a className="pSocialBtn" href="#" aria-label="Twitter"><IconTw /></a>
-                <a className="pSocialBtn" href="#" aria-label="Youtube"><IconYt /></a>
-              </div>
-            </div>
-
-            <div className="pFooterCol">
-              <div className="pFooterHeading">Quick links</div>
-              <div className="pFooterLine" />
-              <a className="pFooterLink" href="/">Home</a>
-              <a className="pFooterLink" href="/about">About</a>
-              <a className="pFooterLink" href="/blog">Blog</a>
-              <a className="pFooterLink" href="#contact">Contact Us</a>
-            </div>
-
-            <div className="pFooterCol">
-              <div className="pFooterHeading">Our Polices</div>
-              <div className="pFooterLine" />
-              <a className="pFooterLink active" href="/privacy">Privacy Policy</a>
-              <a className="pFooterLink" href="/terms">Terms &amp; Conditions</a>
-              <a className="pFooterLink" href="/shipping">Shipping Policy</a>
-              <a className="pFooterLink" href="/refund">Refund &amp; Returns</a>
-              <a className="pFooterLink" href="/faqs">FAQs</a>
-            </div>
-          </div>
-
-          <div className="pFooterBottom">
-            <div className="pContainer pFooterBottomRow">
-              <div>Copyright © 2026 Tunturu</div>
-              <div>Powered by Tunturu</div>
-            </div>
-          </div>
-        </footer>
-
-        {/* Floating cart */}
-        <button className="pFloatCart" type="button" onClick={() => alert("Cart (future)")} aria-label="Cart">
-          <span className="pFloatBadge">0</span>
-          <IconCartBig />
-        </button>
-
-        {/* Back to top */}
-        {showTop && (
-          <button
-            className="pBackTop"
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            aria-label="Back to top"
-          >
-            <span className="pBackArrow">↑</span>
-          </button>
-        )}
+        
       </div>
     </>
   );
@@ -270,16 +209,7 @@ function IconCartSmall() {
     </svg>
   );
 }
-function IconCartBig() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M6 6h15l-2 8H7L6 6z" stroke="#fff" strokeWidth="2" strokeLinejoin="round" />
-      <path d="M6 6l-1-3H2" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="9" cy="19" r="1.6" fill="#fff" />
-      <circle cx="18" cy="19" r="1.6" fill="#fff" />
-    </svg>
-  );
-}
+
 function IconUserSmall() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -288,31 +218,8 @@ function IconUserSmall() {
     </svg>
   );
 }
-function IconFb() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M14 8h3V5h-3c-2.2 0-4 1.8-4 4v3H7v3h3v6h3v-6h3l1-3h-4V9c0-.6.4-1 1-1z" fill="#111" />
-    </svg>
-  );
-}
-function IconTw() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M19 7c-.6.3-1.3.5-2 .6.7-.4 1.2-1 1.4-1.8-.7.4-1.4.7-2.2.9-.6-.7-1.5-1.1-2.5-1.1-1.9 0-3.4 1.5-3.4 3.4 0 .3 0 .5.1.8-2.8-.1-5.2-1.5-6.9-3.6-.3.5-.4 1.1-.4 1.7 0 1.2.6 2.2 1.5 2.8-.5 0-1.1-.2-1.6-.4v.1c0 1.6 1.1 2.9 2.6 3.2-.3.1-.6.1-1 .1-.2 0-.5 0-.7-.1.5 1.4 1.8 2.4 3.3 2.4-1.2.9-2.7 1.4-4.4 1.4H3c1.6 1 3.4 1.6 5.4 1.6 6.5 0 10.1-5.4 10.1-10.1v-.5c.7-.5 1.2-1.1 1.6-1.8z"
-        fill="#111"
-      />
-    </svg>
-  );
-}
-function IconYt() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M21 12s0-3.2-.4-4.6c-.2-.8-.9-1.5-1.7-1.7C17.5 5.3 12 5.3 12 5.3s-5.5 0-6.9.4c-.8.2-1.5.9-1.7 1.7C3 8.8 3 12 3 12s0 3.2.4 4.6c.2.8.9 1.5 1.7 1.7 1.4.4 6.9.4 6.9.4s5.5 0 6.9-.4c.8-.2 1.5-.9 1.7-1.7.4-1.4.4-4.6.4-4.6z" fill="#111" />
-      <path d="M10.5 9.5v5l5-2.5-5-2.5z" fill="#fff" />
-    </svg>
-  );
-}
+
+
 
 /* ========================= CSS ========================= */
 const css = `
@@ -475,67 +382,6 @@ const css = `
     opacity: .9;
   }
   .pList li{ margin: 8px 0; }
-
-  /* Footer */
-  .pFooter{
-    background:#000;
-    color:#fff;
-    padding: 84px 0 0;
-  }
-  .pFooterGrid{
-    display:grid;
-    grid-template-columns: 1.25fr 1fr 1fr;
-    gap: 60px;
-    align-items: start;
-    padding-bottom: 70px;
-  }
-  @media (max-width: 980px){
-    .pFooterGrid{ grid-template-columns: 1fr; gap: 34px; }
-  }
-
-  .pFooterLogoText{
-    font-weight: 900;
-    font-size: 44px;
-    letter-spacing: 1px;
-    color: #2ea0ff;
-    margin-bottom: 18px;
-  }
-  .pFooterText{ opacity: .92; line-height: 2.0; font-size: 16px; }
-  .pFooterHeading{ font-weight: 900; font-size: 22px; margin-bottom: 8px; }
-  .pFooterLine{ width: 86px; height: 2px; background:#fff; opacity:.75; margin-bottom: 18px; }
-  .pFooterLink{
-    display:block;
-    color:#fff;
-    text-decoration:none;
-    opacity:.90;
-    padding: 7px 0;
-    font-size: 16px;
-  }
-  .pFooterLink:hover{ opacity: 1; text-decoration: underline; }
-  .pFooterLink.active{ color: #9db5ff; }
-
-  .pSocialRow{ margin-top: 18px; display:flex; gap:12px; }
-  .pSocialBtn{
-    width: 36px;
-    height: 36px;
-    border-radius: 999px;
-    background:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  .pFooterBottom{
-    border-top: 1px solid rgba(255,255,255,.08);
-    padding: 22px 0;
-  }
-  .pFooterBottomRow{
-    display:flex;
-    justify-content: space-between;
-    align-items:center;
-    gap: 12px;
-    opacity: .95;
-  }
 
   /* Floating buttons */
   .pFloatCart{

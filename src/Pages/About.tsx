@@ -130,43 +130,7 @@ export default function About() {
 
       <div className="aPage">
         {/* HEADER */}
-        <header className="aHeader">
-          <div className="aContainer aHeaderRow">
-            <div className="aBrand">
-              <img
-                src="/assets/logo.png"
-                alt="Tunturu"
-                className="aLogo"
-                onError={(e) => ((e.currentTarget as HTMLImageElement).style.display = "none")}
-              />
-              <div className="aBrandText">TUNTURU</div>
-            </div>
-
-            <nav className="aNav">
-              <a className="aNavLink" href="/">HOME</a>
-              <a className="aNavLink" href="/store">STORE</a>
-              <a className="aNavLink" href="/store">CATEGORIES</a>
-              <span className="aCaret">⌄</span>
-              <a className="aNavLink" href="/franchise">FRANCHISE</a>
-              <a className="aNavLink" href="/services">SERVICES</a>
-              <a className="aNavLink" href="/blog">BLOG</a>
-              <span className="aNavSpacer" />
-              <a className="aNavLink active" href="/about">ABOUT</a>
-              <a className="aNavLink" href="#contact">CONTACT US</a>
-
-              <div className="aHeaderIcons">
-                <div className="aPrice">₹0.00</div>
-                <div className="aCartMini" title="Cart">
-                  <span className="aCartCount">0</span>
-                  <IconCartSmall />
-                </div>
-                <div className="aUser" title="Account">
-                  <IconUserSmall />
-                </div>
-              </div>
-            </nav>
-          </div>
-        </header>
+        
 
         {/* HERO */}
         <section className="aHero">
@@ -332,68 +296,10 @@ export default function About() {
         </section>
 
         {/* FOOTER (same as screenshot) */}
-        <footer className="aFooter" id="contact">
-          <div className="aContainer aFooterGrid">
-            <div className="aFooterCol">
-              <div className="aFooterLogoText">TUNTURU</div>
-              <div className="aFooterText">
-                <div>Email: Support@tunturu.co.in</div>
-                <div>Email: Sales@tunturu.co.in</div>
-                <div>Phone: +91 89616 12353</div>
-              </div>
-
-              <div className="aSocialRow">
-                <a className="aSocialBtn" href="#" aria-label="Facebook"><IconFb /></a>
-                <a className="aSocialBtn" href="#" aria-label="Twitter"><IconTw /></a>
-                <a className="aSocialBtn" href="#" aria-label="Youtube"><IconYt /></a>
-              </div>
-            </div>
-
-            <div className="aFooterCol">
-              <div className="aFooterHeading">Quick links</div>
-              <div className="aFooterLine" />
-              <a className="aFooterLink" href="/">Home</a>
-              <a className="aFooterLink" href="/about">About</a>
-              <a className="aFooterLink" href="/blog">Blog</a>
-              <a className="aFooterLink" href="#contact">Contact Us</a>
-            </div>
-
-            <div className="aFooterCol">
-              <div className="aFooterHeading">Our Polices</div>
-              <div className="aFooterLine" />
-              <a className="aFooterLink" href="#">Privacy Policy</a>
-              <a className="aFooterLink" href="#">Terms &amp; Conditions</a>
-              <a className="aFooterLink" href="#">Shipping Policy</a>
-              <a className="aFooterLink" href="#">Refund &amp; Returns</a>
-              <a className="aFooterLink" href="#">FAQs</a>
-            </div>
-          </div>
-
-          <div className="aFooterBottom">
-            <div className="aContainer aFooterBottomRow">
-              <div>Copyright © 2026 Tunturu</div>
-              <div>Powered by Tunturu</div>
-            </div>
-          </div>
-        </footer>
+       
 
         {/* Floating cart button */}
-        <button className="aFloatCart" type="button" onClick={() => alert("Cart (future)")} aria-label="Cart">
-          <span className="aFloatBadge">0</span>
-          <IconCartBig />
-        </button>
-
-        {/* Back-to-top */}
-        {showTop && (
-          <button
-            className="aBackTop"
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            aria-label="Back to top"
-          >
-            <span className="aBackArrow">↑</span>
-          </button>
-        )}
+        
       </div>
     </>
   );
@@ -635,55 +541,6 @@ const css = `
   @media (max-width: 900px){
     .aContainer{ width: calc(100% - 24px); }
   }
-
-  /* Header (same as screenshot) */
-  .aHeader{
-    position:absolute;
-    top:0; left:0; right:0;
-    z-index:50;
-    background: rgba(0,0,0,.22);
-    backdrop-filter: blur(2px);
-  }
-  .aHeaderRow{
-    height: 86px;
-    display:flex;
-    align-items:center;
-    gap: 18px;
-  }
-  .aBrand{ display:flex; align-items:center; gap: 10px; min-width: 150px; }
-  .aLogo{ height:40px; width:auto; display:block; }
-  .aBrandText{ font-weight: 900; letter-spacing: 1px; color:#2ea0ff; display:none; }
-
-  .aNav{
-    display:flex; align-items:center; gap: 22px;
-    width: 100%;
-    color:#fff;
-  }
-  .aNavLink{
-    color:#fff; text-decoration:none;
-    font-weight: 700;
-    letter-spacing: .2px;
-    font-size: 14px;
-    text-transform: uppercase;
-    opacity: .95;
-  }
-  .aNavLink:hover{ opacity:.85; }
-  .aNavLink.active{ color: #8fb0ff; }
-  .aCaret{ color:#fff; opacity:.9; margin-left:-12px; margin-right: 2px; }
-  .aNavSpacer{ flex:1; }
-
-  .aHeaderIcons{ display:flex; align-items:center; gap:16px; white-space:nowrap; }
-  .aPrice{ font-weight:800; color:#fff; }
-  .aCartMini{ position:relative; display:flex; align-items:center; cursor:pointer; }
-  .aCartCount{
-    position:absolute; top:-10px; right:-10px;
-    background:#fff; color:#111;
-    width:20px; height:20px; border-radius:999px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:12px; font-weight:900;
-  }
-  .aUser{ display:flex; align-items:center; justify-content:center; cursor:pointer; }
-
   @media (max-width: 980px){
     .aNavLink, .aCaret, .aNavSpacer{ display:none; }
     .aBrandText{ display:block; }

@@ -28,47 +28,6 @@ export default function Terms() {
 
       <div className="tPage">
         {/* HEADER */}
-        <header className="tHeader">
-          <div className="tContainer tHeaderRow">
-            <div className="tBrand">
-              {/* ✅ Logo Added (will show if file exists) */}
-              <img
-                src="https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/cropped-TUNTURU-LOGO-scaled-1-2048x681.png"
-                alt="Tunturu"
-                className="tLogo"
-              />
-              <span className="tBrandSup">®</span>
-            </div>
-
-            <nav className="tNav">
-              <a className="tNavLink" href="/">HOME</a>
-              <a className="tNavLink" href="/store">STORE</a>
-              <a className="tNavLink" href="/store">CATEGORIES</a>
-              <span className="tCaret">⌄</span>
-              <a className="tNavLink" href="/franchise">FRANCHISE</a>
-              <a className="tNavLink" href="/services">SERVICES</a>
-              <a className="tNavLink" href="/blog">BLOG</a>
-
-              <span className="tNavSpacer" />
-
-              <a className="tNavLink" href="/about">ABOUT</a>
-              <a className="tNavLink" href="#contact">CONTACT US</a>
-
-              <div className="tHeaderIcons">
-                <div className="tPrice">₹0.00</div>
-
-                <div className="tCartMini" title="Cart">
-                  <span className="tCartCount">0</span>
-                  <IconCartSmall />
-                </div>
-
-                <div className="tUser" title="Account">
-                  <IconUserSmall />
-                </div>
-              </div>
-            </nav>
-          </div>
-        </header>
 
         {/* HERO */}
         <section className="tHero">
@@ -145,68 +104,6 @@ export default function Terms() {
         </section>
 
         {/* FOOTER */}
-        <footer className="tFooter" id="contact">
-          <div className="tContainer tFooterGrid">
-            <div className="tFooterCol">
-              <div className="tFooterLogoText">TUNTURU</div>
-              <div className="tFooterText">
-                <div>Email: Support@tunturu.co.in</div>
-                <div>Email: Sales@tunturu.co.in</div>
-                <div>Phone: +91 89616 12353</div>
-              </div>
-
-              <div className="tSocialRow">
-                <a className="tSocialBtn" href="#" aria-label="Facebook"><IconFb /></a>
-                <a className="tSocialBtn" href="#" aria-label="Twitter"><IconTw /></a>
-                <a className="tSocialBtn" href="#" aria-label="Youtube"><IconYt /></a>
-              </div>
-            </div>
-
-            <div className="tFooterCol">
-              <div className="tFooterHeading">Quick links</div>
-              <div className="tFooterLine" />
-              <a className="tFooterLink" href="/">Home</a>
-              <a className="tFooterLink" href="/about">About</a>
-              <a className="tFooterLink" href="/blog">Blog</a>
-              <a className="tFooterLink" href="#contact">Contact Us</a>
-            </div>
-
-            <div className="tFooterCol">
-              <div className="tFooterHeading">Our Polices</div>
-              <div className="tFooterLine" />
-              <a className="tFooterLink" href="/privacy">Privacy Policy</a>
-              <a className="tFooterLink active" href="/terms">Terms &amp; Conditions</a>
-              <a className="tFooterLink" href="/shipping">Shipping Policy</a>
-              <a className="tFooterLink" href="/refund">Refund &amp; Returns</a>
-              <a className="tFooterLink" href="/faqs">FAQs</a>
-            </div>
-          </div>
-
-          <div className="tFooterBottom">
-            <div className="tContainer tFooterBottomRow">
-              <div>Copyright © 2026 Tunturu</div>
-              <div>Powered by Tunturu</div>
-            </div>
-          </div>
-        </footer>
-
-        {/* Floating cart */}
-        <button className="tFloatCart" type="button" onClick={() => alert("Cart (future)")} aria-label="Cart">
-          <span className="tFloatBadge">0</span>
-          <IconCartBig />
-        </button>
-
-        {/* Back to top */}
-        {showTop && (
-          <button
-            className="tBackTop"
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            aria-label="Back to top"
-          >
-            <span className="tBackArrow">↑</span>
-          </button>
-        )}
       </div>
     </>
   );
@@ -431,66 +328,6 @@ const css = `
   }
   .tList li{ margin: 10px 0; }
 
-  /* Footer */
-  .tFooter{
-    background:#000;
-    color:#fff;
-    padding: 84px 0 0;
-  }
-  .tFooterGrid{
-    display:grid;
-    grid-template-columns: 1.25fr 1fr 1fr;
-    gap: 60px;
-    align-items: start;
-    padding-bottom: 70px;
-  }
-  @media (max-width: 980px){
-    .tFooterGrid{ grid-template-columns: 1fr; gap: 34px; }
-  }
-  .tFooterLogoText{
-    font-weight: 900;
-    font-size: 44px;
-    letter-spacing: 1px;
-    color: #2ea0ff;
-    margin-bottom: 18px;
-  }
-  .tFooterText{ opacity: .92; line-height: 2.0; font-size: 16px; }
-
-  .tFooterHeading{ font-weight: 900; font-size: 22px; margin-bottom: 8px; }
-  .tFooterLine{ width: 86px; height: 2px; background:#fff; opacity:.75; margin-bottom: 18px; }
-  .tFooterLink{
-    display:block;
-    color:#fff;
-    text-decoration:none;
-    opacity:.90;
-    padding: 7px 0;
-    font-size: 16px;
-  }
-  .tFooterLink:hover{ opacity: 1; text-decoration: underline; }
-  .tFooterLink.active{ color: #9db5ff; }
-
-  .tSocialRow{ margin-top: 18px; display:flex; gap:12px; }
-  .tSocialBtn{
-    width: 36px;
-    height: 36px;
-    border-radius: 999px;
-    background:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  .tFooterBottom{
-    border-top: 1px solid rgba(255,255,255,.08);
-    padding: 22px 0;
-  }
-  .tFooterBottomRow{
-    display:flex;
-    justify-content: space-between;
-    align-items:center;
-    gap: 12px;
-    opacity: .95;
-  }
 
   /* Floating */
   .tFloatCart{

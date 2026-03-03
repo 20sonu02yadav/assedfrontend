@@ -131,7 +131,7 @@ export default function MyAccount() {
       {/* =========================
           HEADER (same style)
       ========================== */}
-      <header className="siteHeader">
+      {/* <header className="siteHeader">
         <div className="headerInner">
           <a className="brand" href="/">
             <img className="brandLogo" src={LOGO_URL} alt="Tunturu" />
@@ -179,7 +179,7 @@ export default function MyAccount() {
             </div>
           </div>
         </div>
-      </header>
+      </header> */}
 
       {/* =========================
           HERO
@@ -361,82 +361,6 @@ export default function MyAccount() {
       {/* =========================
           FOOTER (same look)
       ========================== */}
-      <footer className="footer">
-        <div className="footerInner">
-          <div className="footerCol">
-            <div className="footerBrand">TUNTURU</div>
-            <div className="footerText">Email: Support@tunturu.co.in</div>
-            <div className="footerText">Email: Sales@tunturu.co.in</div>
-            <div className="footerText">Phone: +91 89616 12353</div>
-
-            <div className="social">
-              <a className="socialBtn" href="#" aria-label="Facebook">
-                f
-              </a>
-              <a className="socialBtn" href="#" aria-label="Twitter">
-                t
-              </a>
-              <a className="socialBtn" href="#" aria-label="YouTube">
-                ▶
-              </a>
-            </div>
-          </div>
-
-          <div className="footerCol">
-            <div className="footerHeading">Quick links</div>
-            <div className="footerLine" />
-            <a className="footerLink" href="/">
-              Home
-            </a>
-            <a className="footerLink" href="/about">
-              About
-            </a>
-            <a className="footerLink" href="/blog">
-              Blog
-            </a>
-            <a className="footerLink" href="/contact">
-              Contact Us
-            </a>
-          </div>
-
-          <div className="footerCol">
-            <div className="footerHeading">Our Polices</div>
-            <div className="footerLine" />
-            <a className="footerLink" href="/privacy-policy">
-              Privacy Policy
-            </a>
-            <a className="footerLink" href="/terms">
-              Terms &amp; Conditions
-            </a>
-            <a className="footerLink" href="/shipping-policy">
-              Shipping Policy
-            </a>
-            <a className="footerLink" href="/refund-returns">
-              Refund &amp; Returns
-            </a>
-            <a className="footerLink active" href="/faqs">
-              FAQs
-            </a>
-          </div>
-        </div>
-
-        <div className="footerBottom">
-          <div className="footerBottomInner">
-            <div>Copyright © 2026 Tunturu</div>
-            <div>Powered by Tunturu</div>
-          </div>
-        </div>
-      </footer>
-
-      <button className="floatUp" onClick={scrollToTop} aria-label="Scroll to top">
-        ⌃
-      </button>
-
-      <button className="floatCart" aria-label="Cart">
-        <span className="floatBadge">{cartCount}</span>
-        🛒
-      </button>
-
       {/* Styles */}
       <style>{`
         :root{
@@ -683,33 +607,6 @@ export default function MyAccount() {
           color:#ef4444;
           font-weight:700;
         }
-
-        /* FOOTER */
-        .footer{
-          background:#070707;
-          color:#fff;
-          padding:54px 0 0;
-        }
-        .footerInner{
-          max-width:1320px;
-          margin:0 auto;
-          padding:0 22px 42px;
-          display:grid;
-          grid-template-columns: 1.2fr 1fr 1fr;
-          gap:50px;
-        }
-        .footerBrand{
-          font-size:44px;
-          font-weight:900;
-          letter-spacing:2px;
-          color:#0ea5e9;
-          margin-bottom:18px;
-        }
-        .footerText{
-          font-size:18px;
-          margin:10px 0;
-          opacity:0.95;
-        }
         .social{
           display:flex;
           gap:12px;
@@ -727,88 +624,6 @@ export default function MyAccount() {
           justify-content:center;
           text-decoration:none;
         }
-        .footerHeading{
-          font-size:26px;
-          font-weight:800;
-          margin-bottom:10px;
-        }
-        .footerLine{
-          width:70px;
-          height:2px;
-          background:#93c5fd;
-          margin-bottom:14px;
-        }
-        .footerLink{
-          display:block;
-          text-decoration:none;
-          color:#fff;
-          font-size:18px;
-          margin:14px 0;
-          opacity:0.95;
-        }
-        .footerLink:hover{ opacity:1; text-decoration:underline; }
-        .footerLink.active{ color:#60a5fa; }
-        .footerBottom{
-          border-top:1px solid rgba(255,255,255,0.08);
-          padding:20px 0;
-        }
-        .footerBottomInner{
-          max-width:1320px;
-          margin:0 auto;
-          padding:0 22px;
-          display:flex;
-          justify-content:space-between;
-          font-size:18px;
-          opacity:0.95;
-        }
-
-        /* FLOAT BUTTONS */
-        .floatUp{
-          position:fixed;
-          left:22px;
-          bottom:22px;
-          width:58px;
-          height:58px;
-          border-radius:999px;
-          border:none;
-          background:#8ea6ff;
-          color:#0b0b0b;
-          font-size:26px;
-          font-weight:900;
-          cursor:pointer;
-          box-shadow:0 10px 24px rgba(0,0,0,0.25);
-          z-index:60;
-        }
-        .floatCart{
-          position:fixed;
-          right:22px;
-          bottom:22px;
-          width:74px;
-          height:74px;
-          border-radius:999px;
-          border:none;
-          background:#0b76c5;
-          color:#fff;
-          font-size:28px;
-          cursor:pointer;
-          box-shadow:0 10px 24px rgba(0,0,0,0.25);
-          z-index:60;
-        }
-        .floatBadge{
-          position:absolute;
-          top:10px;
-          left:12px;
-          width:24px;
-          height:24px;
-          border-radius:999px;
-          background:#22c55e;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          font-size:13px;
-          font-weight:900;
-        }
-
         /* RESPONSIVE */
         @media (max-width: 1024px){
           .nav{ display:none; }

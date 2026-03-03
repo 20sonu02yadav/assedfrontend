@@ -22,56 +22,7 @@ export default function RefundReturns() {
       <style>{css}</style>
 
       {/* HEADER */}
-      <header className="tt-header">
-        <div className="tt-header-inner">
-          <a className="tt-logo" href="/">
-            {/* Replace with your logo path */}
-            <img
-              src="/assets/tunturu-logo.png"
-              alt="Tunturu"
-              onError={(e) => {
-                // fallback if logo not found
-                (e.currentTarget as HTMLImageElement).style.display = "none";
-              }}
-            />
-            <span className="tt-logo-fallback">TUNTURU®</span>
-          </a>
-
-          <nav className="tt-nav">
-            <a href="/">HOME</a>
-            <a href="/store">STORE</a>
-
-            <div className="tt-dropdown">
-              <a href="/categories" className="tt-dropbtn">
-                CATEGORIES <span className="tt-caret">▾</span>
-              </a>
-              <div className="tt-dropdown-menu">
-                <a href="/categories/hand-tools">Hand Tools</a>
-                <a href="/categories/power-tools">Power Tools</a>
-                <a href="/categories/safety">Safety</a>
-              </div>
-            </div>
-
-            <a href="/franchise">FRANCHISE</a>
-            <a href="/services">SERVICES</a>
-            <a href="/blog">BLOG</a>
-
-            <div className="tt-nav-right">
-              <a href="/about">ABOUT</a>
-              <a href="/contact">CONTACT US</a>
-
-              <div className="tt-price">₹0.00</div>
-
-              <a className="tt-icon" href="/cart" aria-label="Cart">
-                🛒<span className="tt-badge">0</span>
-              </a>
-              <a className="tt-icon" href="/account" aria-label="Account">
-                👤
-              </a>
-            </div>
-          </nav>
-        </div>
-      </header>
+  
 
       {/* HERO */}
       <section className="rr-hero">
@@ -126,65 +77,9 @@ export default function RefundReturns() {
         </div>
       </main>
 
-      {/* FLOATING BUTTONS */}
-      <button className="tt-scrolltop" onClick={scrollToTop} aria-label="Scroll to top">
-        ↑
-      </button>
-
-      <a className="tt-fab-cart" href="/cart" aria-label="Cart">
-        <span className="tt-fab-badge">0</span>
-        🛒
-      </a>
 
       {/* FOOTER */}
-      <footer className="tt-footer">
-        <div className="tt-footer-inner">
-          <div className="tt-footer-col">
-            <div className="tt-footer-logo">
-              <span className="tt-footer-logo-text">TUNTURU®</span>
-            </div>
-            <div className="tt-footer-info">
-              <div>Email: Support@tunturu.co.in</div>
-              <div>Email: Sales@tunturu.co.in</div>
-              <div>Phone: +91 89616 12353</div>
-            </div>
-
-            <div className="tt-social">
-              <a href="#" aria-label="Facebook">f</a>
-              <a href="#" aria-label="Twitter">𝕏</a>
-              <a href="#" aria-label="YouTube">▶</a>
-            </div>
-          </div>
-
-          <div className="tt-footer-col">
-            <h4>
-              Quick links <span className="tt-underline" />
-            </h4>
-            <a href="/">Home</a>
-            <a href="/about">About</a>
-            <a href="/blog">Blog</a>
-            <a href="/contact">Contact Us</a>
-          </div>
-
-          <div className="tt-footer-col">
-            <h4>
-              Our Polices <span className="tt-underline" />
-            </h4>
-            <a href="/privacy">Privacy Policy</a>
-            <a href="/terms">Terms &amp; Conditions</a>
-            <a href="/shipping">Shipping Policy</a>
-            <a className="tt-active-link" href="/refund-returns">
-              Refund &amp; Returns
-            </a>
-            <a href="/faqs">FAQs</a>
-          </div>
-        </div>
-
-        <div className="tt-footer-bottom">
-          <div>Copyright © 2026 Tunturu</div>
-          <div>Powered by Tunturu</div>
-        </div>
-      </footer>
+      
     </div>
   );
 }
@@ -430,54 +325,6 @@ const css = `
   justify-content:center;
 }
 
-/* FOOTER */
-.tt-footer{
-  background:#000;
-  color:#fff;
-  padding: 70px 0 0;
-}
-.tt-footer-inner{
-  width: min(1400px, calc(100% - 100px));
-  margin: 0 auto;
-  display:grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
-  gap: 70px;
-  padding-bottom: 60px;
-}
-.tt-footer-col a{
-  color:#fff;
-  text-decoration:none;
-  display:block;
-  margin: 12px 0;
-  font-size: 16px;
-}
-.tt-footer-col a:hover{ opacity:.85; }
-.tt-footer-col h4{
-  margin: 0 0 18px;
-  font-size: 22px;
-  font-weight: 900;
-  position: relative;
-  display:inline-block;
-}
-.tt-underline{
-  display:block;
-  width: 62px;
-  height: 2px;
-  background: #7b8cff;
-  margin-top: 10px;
-}
-.tt-footer-logo-text{
-  font-weight: 900;
-  font-size: 44px;
-  letter-spacing: 1px;
-  color:#0db2ff;
-}
-.tt-footer-info{
-  margin-top: 14px;
-  line-height: 1.9;
-  font-size: 18px;
-  color:#fff;
-}
 .tt-social{
   display:flex;
   gap: 10px;

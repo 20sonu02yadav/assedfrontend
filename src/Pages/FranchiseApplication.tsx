@@ -1,13 +1,5 @@
-import React, { useMemo, useState } from "react";
 
-/**
- * FranchiseApplication.tsx
- * - Header EXACT style (transparent + dark overlay strip + menu items)
- * - Hero title: "Franchise Application"
- * - Form layout same as screenshot (grey form container, rounded inputs)
- * - Footer same like your screenshot
- * - Floating cart + scroll-to-top
- */
+import React, { useMemo, useState } from "react";
 
 const LOGO_URL =
   "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/cropped-TUNTURU-LOGO-scaled-1-2048x681.png";
@@ -19,32 +11,134 @@ type TypeOfBusiness = "Proprietorship" | "Partnership" | "Pvt Ltd" | "Ltd Co" | 
 type NatureOfBusiness = "Retail" | "Wholesale" | "Distribution" | "Online" | "Other";
 type YesNo = "Yes" | "No";
 
+const API_BASE = (import.meta as any).env?.VITE_API_BASE || "http://127.0.0.1:8000";
+const ENDPOINT = `${API_BASE}/api/franchise-applications/`;
+
 export default function FranchiseApplication() {
   const yearsOptions = useMemo(
     () => ["Less than 1", "1-2", "3-5", "6-10", "10+"] as const,
     []
   );
 
+  // radio states
   const [typeOfBusiness, setTypeOfBusiness] = useState<TypeOfBusiness>("Proprietorship");
   const [natureOfBusiness, setNatureOfBusiness] = useState<NatureOfBusiness>("Retail");
   const [warehouse, setWarehouse] = useState<YesNo>("No");
   const [yearsInOperation, setYearsInOperation] = useState<(typeof yearsOptions)[number]>("Less than 1");
+
+  // field states
+  const [registeredBusinessName, setRegisteredBusinessName] = useState("");
+  const [tradingName, setTradingName] = useState("");
+  const [gstin, setGstin] = useState("");
+  const [city, setCity] = useState("");
+  const [stateName, setStateName] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [primaryContactPerson, setPrimaryContactPerson] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [email, setEmail] = useState("");
+  const [alternateContactPerson, setAlternateContactPerson] = useState("");
+  const [mainProductCategories, setMainProductCategories] = useState("");
+  const [geographicalCoverage, setGeographicalCoverage] = useState("");
+  const [numberOfEmployees, setNumberOfEmployees] = useState("");
+  const [annualTurnover, setAnnualTurnover] = useState("");
+  const [warehouseDetails, setWarehouseDetails] = useState("");
+  const [existingDealerships, setExistingDealerships] = useState("");
+
   const [confirm, setConfirm] = useState(false);
 
-  const onSubmit = (e: React.FormEvent) => {
+  // ui states
+  const [submitting, setSubmitting] = useState(false);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSuccessMsg(null);
+    setErrorMsg(null);
+
     if (!confirm) {
-      alert("Please confirm that the information provided is accurate.");
+      setErrorMsg("Please confirm that the information provided is accurate.");
       return;
     }
-    alert("Application submitted (demo). Connect your API here.");
+
+    const payload = {
+      registered_business_name: registeredBusinessName,
+      trading_name: tradingName,
+      type_of_business: typeOfBusiness,
+      gstin,
+      city,
+      state: stateName,
+      postal_code: postalCode,
+      primary_contact_person: primaryContactPerson,
+      designation,
+      email,
+      alternate_contact_person: alternateContactPerson,
+      years_in_operation: yearsInOperation,
+      nature_of_business: natureOfBusiness,
+      main_product_categories: mainProductCategories,
+      geographical_coverage: geographicalCoverage,
+      number_of_employees: numberOfEmployees,
+      annual_turnover: annualTurnover,
+      warehouse_facility: warehouse,
+      warehouse_details: warehouseDetails,
+      existing_dealerships: existingDealerships,
+      confirm: true,
+    };
+
+    try {
+      setSubmitting(true);
+
+      const res = await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        // DRF validation object -> show best message
+        const firstKey = data && typeof data === "object" ? Object.keys(data)[0] : null;
+        const firstVal =
+          firstKey && Array.isArray(data[firstKey]) ? data[firstKey][0] : data?.detail || "Submission failed";
+        setErrorMsg(String(firstVal));
+        return;
+      }
+
+      setSuccessMsg("Application submitted successfully!");
+      // reset form
+      setRegisteredBusinessName("");
+      setTradingName("");
+      setGstin("");
+      setCity("");
+      setStateName("");
+      setPostalCode("");
+      setPrimaryContactPerson("");
+      setDesignation("");
+      setEmail("");
+      setAlternateContactPerson("");
+      setMainProductCategories("");
+      setGeographicalCoverage("");
+      setNumberOfEmployees("");
+      setAnnualTurnover("");
+      setWarehouseDetails("");
+      setExistingDealerships("");
+      setConfirm(false);
+      setTypeOfBusiness("Proprietorship");
+      setNatureOfBusiness("Retail");
+      setWarehouse("No");
+      setYearsInOperation("Less than 1");
+    } catch (err: any) {
+      setErrorMsg(err?.message || "Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div style={styles.page}>
-      <SiteHeader />
+     
 
-      {/* HERO */}
       <section style={{ ...styles.hero, backgroundImage: `url(${HERO_BG})` }}>
         <div style={styles.heroDim} />
         <div style={styles.heroContent}>
@@ -52,108 +146,130 @@ export default function FranchiseApplication() {
         </div>
       </section>
 
-      {/* FORM */}
       <section style={styles.bodyWrap}>
         <form onSubmit={onSubmit} style={styles.formOuter}>
           <div style={styles.formInner}>
-            {/* Registered Business Name */}
+
+            {errorMsg ? <div style={styles.alertError}>{errorMsg}</div> : null}
+            {successMsg ? <div style={styles.alertSuccess}>{successMsg}</div> : null}
+
             <div style={styles.field}>
               <label style={styles.label}>
                 Registered Business Name <span style={styles.req}>*</span>
               </label>
-              <input required style={styles.input} />
+              <input
+                required
+                style={styles.input}
+                value={registeredBusinessName}
+                onChange={(e) => setRegisteredBusinessName(e.target.value)}
+              />
             </div>
 
-            {/* Trading Name */}
             <div style={styles.field}>
               <label style={styles.label}>Trading Name</label>
-              <input style={styles.input} />
+              <input
+                style={styles.input}
+                value={tradingName}
+                onChange={(e) => setTradingName(e.target.value)}
+              />
             </div>
 
-            {/* Type of Business */}
             <div style={styles.field}>
               <label style={styles.label}>
                 Type of Business <span style={styles.req}>*</span>
               </label>
-
               <div style={styles.radioCol}>
-                {(["Proprietorship", "Partnership", "Pvt Ltd", "Ltd Co", "Other"] as TypeOfBusiness[]).map(
-                  (v) => (
-                    <label key={v} style={styles.radioRow}>
-                      <input
-                        type="radio"
-                        name="typeOfBusiness"
-                        checked={typeOfBusiness === v}
-                        onChange={() => setTypeOfBusiness(v)}
-                      />
-                      <span style={styles.radioText}>{v}</span>
-                    </label>
-                  )
-                )}
+                {(["Proprietorship", "Partnership", "Pvt Ltd", "Ltd Co", "Other"] as TypeOfBusiness[]).map((v) => (
+                  <label key={v} style={styles.radioRow}>
+                    <input
+                      type="radio"
+                      name="typeOfBusiness"
+                      checked={typeOfBusiness === v}
+                      onChange={() => setTypeOfBusiness(v)}
+                    />
+                    <span style={styles.radioText}>{v}</span>
+                  </label>
+                ))}
               </div>
             </div>
 
-            {/* GSTIN */}
             <div style={styles.field}>
               <label style={styles.label}>GSTIN (Tax Identification Number)</label>
-              <input style={styles.input} />
+              <input style={styles.input} value={gstin} onChange={(e) => setGstin(e.target.value)} />
             </div>
 
-            {/* City */}
             <div style={styles.field}>
               <label style={styles.label}>
                 City <span style={styles.req}>*</span>
               </label>
-              <input required style={styles.input} />
+              <input required style={styles.input} value={city} onChange={(e) => setCity(e.target.value)} />
             </div>
 
-            {/* State */}
             <div style={styles.field}>
               <label style={styles.label}>
                 State <span style={styles.req}>*</span>
               </label>
-              <input required style={styles.input} />
+              <input required style={styles.input} value={stateName} onChange={(e) => setStateName(e.target.value)} />
             </div>
 
-            {/* Postal Code */}
             <div style={styles.field}>
               <label style={styles.label}>
                 Postal Code <span style={styles.req}>*</span>
               </label>
-              <input required style={styles.input} />
+              <input
+                required
+                style={styles.input}
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value)}
+              />
             </div>
 
-            {/* Primary Contact Person */}
             <div style={styles.field}>
               <label style={styles.label}>
                 Primary Contact Person <span style={styles.req}>*</span>
               </label>
-              <input required style={styles.input} />
+              <input
+                required
+                style={styles.input}
+                value={primaryContactPerson}
+                onChange={(e) => setPrimaryContactPerson(e.target.value)}
+              />
             </div>
 
-            {/* Designation */}
             <div style={styles.field}>
               <label style={styles.label}>
                 Designation <span style={styles.req}>*</span>
               </label>
-              <input required style={styles.input} />
+              <input
+                required
+                style={styles.input}
+                value={designation}
+                onChange={(e) => setDesignation(e.target.value)}
+              />
             </div>
 
-            {/* Email */}
             <div style={styles.field}>
               <label style={styles.label}>
                 Email Address <span style={styles.req}>*</span>
               </label>
-              <input required type="email" style={styles.input} />
+              <input
+                required
+                type="email"
+                style={styles.input}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
 
-            {/* Alternate Contact */}
             <div style={styles.field}>
               <label style={styles.label}>Alternate Contact Person</label>
-              <input style={styles.input} />
+              <input
+                style={styles.input}
+                value={alternateContactPerson}
+                onChange={(e) => setAlternateContactPerson(e.target.value)}
+              />
             </div>
 
-            {/* Years in Operation */}
             <div style={styles.field}>
               <label style={styles.label}>
                 Years in Operation <span style={styles.req}>*</span>
@@ -172,7 +288,6 @@ export default function FranchiseApplication() {
               </select>
             </div>
 
-            {/* Nature of Business */}
             <div style={styles.field}>
               <label style={styles.label}>
                 Nature of Business <span style={styles.req}>*</span>
@@ -192,35 +307,49 @@ export default function FranchiseApplication() {
               </div>
             </div>
 
-            {/* Main Product Categories */}
             <div style={styles.field}>
               <label style={styles.label}>
                 Main Product Categories <span style={styles.req}>*</span>
               </label>
-              <textarea required rows={5} style={styles.textarea} />
+              <textarea
+                required
+                rows={5}
+                style={styles.textarea}
+                value={mainProductCategories}
+                onChange={(e) => setMainProductCategories(e.target.value)}
+              />
             </div>
 
-            {/* Geographical Coverage */}
             <div style={styles.field}>
               <label style={styles.label}>
                 Geographical Coverage <span style={styles.req}>*</span>
               </label>
-              <input required style={styles.input} />
+              <input
+                required
+                style={styles.input}
+                value={geographicalCoverage}
+                onChange={(e) => setGeographicalCoverage(e.target.value)}
+              />
             </div>
 
-            {/* Number of Employees */}
             <div style={styles.field}>
               <label style={styles.label}>Number of Employees</label>
-              <input style={styles.input} />
+              <input
+                style={styles.input}
+                value={numberOfEmployees}
+                onChange={(e) => setNumberOfEmployees(e.target.value)}
+              />
             </div>
 
-            {/* Annual Turnover */}
             <div style={styles.field}>
               <label style={styles.label}>Annual Turnover</label>
-              <input style={styles.input} />
+              <input
+                style={styles.input}
+                value={annualTurnover}
+                onChange={(e) => setAnnualTurnover(e.target.value)}
+              />
             </div>
 
-            {/* Storage/Warehouse */}
             <div style={styles.field}>
               <label style={styles.label}>
                 Storage/Warehouse Facility <span style={styles.req}>*</span>
@@ -228,31 +357,33 @@ export default function FranchiseApplication() {
               <div style={styles.radioCol}>
                 {(["Yes", "No"] as YesNo[]).map((v) => (
                   <label key={v} style={styles.radioRow}>
-                    <input
-                      type="radio"
-                      name="warehouse"
-                      checked={warehouse === v}
-                      onChange={() => setWarehouse(v)}
-                    />
+                    <input type="radio" name="warehouse" checked={warehouse === v} onChange={() => setWarehouse(v)} />
                     <span style={styles.radioText}>{v}</span>
                   </label>
                 ))}
               </div>
             </div>
 
-            {/* If yes details */}
             <div style={styles.field}>
               <label style={styles.label}>If Yes specify size/details</label>
-              <textarea rows={5} style={styles.textarea} />
+              <textarea
+                rows={5}
+                style={styles.textarea}
+                value={warehouseDetails}
+                onChange={(e) => setWarehouseDetails(e.target.value)}
+              />
             </div>
 
-            {/* Existing Dealerships */}
             <div style={styles.field}>
               <label style={styles.label}>Existing Dealerships / Brands Represented</label>
-              <textarea rows={4} style={styles.textarea} />
+              <textarea
+                rows={4}
+                style={styles.textarea}
+                value={existingDealerships}
+                onChange={(e) => setExistingDealerships(e.target.value)}
+              />
             </div>
 
-            {/* Confirm + Submit */}
             <div style={styles.field}>
               <label style={styles.label}>
                 I confirm that the information provided is accurate. <span style={styles.req}>*</span>
@@ -263,162 +394,14 @@ export default function FranchiseApplication() {
                 <span style={styles.radioText}>I confirm that the information provided is accurate.</span>
               </label>
 
-              <button type="submit" style={styles.submitBtn}>
-                SUBMIT APPLICATION
+              <button type="submit" style={styles.submitBtn} disabled={submitting}>
+                {submitting ? "SUBMITTING..." : "SUBMIT APPLICATION"}
               </button>
             </div>
           </div>
         </form>
       </section>
-
-      <SiteFooter />
-      <ScrollToTopButton />
-      <FloatingCartButton />
     </div>
-  );
-}
-
-/* ============================ HEADER (same like screenshot) ============================ */
-function SiteHeader() {
-  return (
-    <header style={styles.header}>
-      {/* Dark transparent strip behind nav (like your screenshot) */}
-      <div style={styles.headerStrip} />
-
-      <div style={styles.headerInner}>
-        <a href="/" style={styles.logoWrap}>
-          <img src={LOGO_URL} alt="Tunturu" style={styles.logoImg} />
-        </a>
-
-        <nav style={styles.nav}>
-          <a style={styles.navLink} href="/">
-            HOME
-          </a>
-          <a style={styles.navLink} href="/store">
-            STORE
-          </a>
-
-          <div style={styles.navDrop}>
-            <a style={styles.navLink} href="/categories">
-              CATEGORIES
-            </a>
-            <span style={styles.navDropIcon}>⌄</span>
-          </div>
-
-          <a style={styles.navLink} href="/franchise">
-            FRANCHISE
-          </a>
-          <a style={styles.navLink} href="/services">
-            SERVICES
-          </a>
-          <a style={styles.navLink} href="/blog">
-            BLOG
-          </a>
-        </nav>
-
-        <div style={styles.headerRight}>
-          <a style={styles.navLink} href="/about">
-            ABOUT
-          </a>
-          <a style={styles.navLink} href="/contact">
-            CONTACT US
-          </a>
-          <span style={styles.headerMeta}>₹0.00</span>
-          <span style={styles.headerIcon} title="Cart">
-            🛒
-          </span>
-          <span style={styles.headerIcon} title="Account">
-            👤
-          </span>
-        </div>
-      </div>
-    </header>
-  );
-}
-
-/* ============================ FOOTER (same like screenshot) ============================ */
-function SiteFooter() {
-  return (
-    <footer style={styles.footer}>
-      <div style={styles.footerTop}>
-        <div style={styles.footerCol}>
-          <img src={LOGO_URL} alt="Tunturu" style={{ ...styles.logoImg, height: 44, width: "auto" }} />
-          <div style={{ height: 18 }} />
-          <div style={styles.footerText}>Email: Support@tunturu.co.in</div>
-          <div style={styles.footerText}>Email: Sales@tunturu.co.in</div>
-          <div style={styles.footerText}>Phone: +91 89616 12353</div>
-
-          <div style={styles.socialRow}>
-            <span style={styles.socialIcon}>f</span>
-            <span style={styles.socialIcon}>t</span>
-            <span style={styles.socialIcon}>▶</span>
-          </div>
-        </div>
-
-        <div style={styles.footerCol}>
-          <div style={styles.footerTitle}>Quick links</div>
-          <div style={styles.footerTitleLine} />
-          <a style={styles.footerLink} href="/">
-            Home
-          </a>
-          <a style={styles.footerLink} href="/about">
-            About
-          </a>
-          <a style={styles.footerLink} href="/blog">
-            Blog
-          </a>
-          <a style={styles.footerLink} href="/contact">
-            Contact Us
-          </a>
-        </div>
-
-        <div style={styles.footerCol}>
-          <div style={styles.footerTitle}>Our Polices</div>
-          <div style={styles.footerTitleLine} />
-          <a style={styles.footerLink} href="/privacy-policy">
-            Privacy Policy
-          </a>
-          <a style={styles.footerLink} href="/terms-conditions">
-            Terms &amp; Conditions
-          </a>
-          <a style={styles.footerLink} href="/shipping-policy">
-            Shipping Policy
-          </a>
-          <a style={styles.footerLink} href="/refund-returns">
-            Refund &amp; Returns
-          </a>
-          <a style={styles.footerLink} href="/faqs">
-            FAQs
-          </a>
-        </div>
-      </div>
-
-      <div style={styles.footerBottom}>
-        <div style={styles.footerBottomInner}>
-          <div style={styles.footerBottomText}>Copyright © 2026 Tunturu</div>
-          <div style={styles.footerBottomText}>Powered by Tunturu</div>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-/* ============================ Floating Buttons ============================ */
-function FloatingCartButton() {
-  return (
-    <button type="button" aria-label="Cart" style={styles.cartFab} onClick={() => {}}>
-      <div style={styles.cartBadge}>0</div>
-      <span style={{ fontSize: 22 }}>🛒</span>
-    </button>
-  );
-}
-
-function ScrollToTopButton() {
-  const onClick = () => window.scrollTo({ top: 0, behavior: "smooth" });
-  return (
-    <button type="button" aria-label="Scroll to top" style={styles.topFab} onClick={onClick}>
-      <span style={{ fontSize: 18 }}>↑</span>
-    </button>
   );
 }
 

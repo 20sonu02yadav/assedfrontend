@@ -218,142 +218,6 @@ export default function Store() {
       <div style={{ ...styles.hero, backgroundImage: `url(${HERO_BG})` }}>
         <div style={styles.heroOverlay} />
 
-        <div style={styles.headerWrap}>
-          <div style={styles.header}>
-            <Link to="/" style={styles.logoLink} aria-label="Tunturu Home">
-              <img src={LOGO_URL} alt="Tunturu" style={styles.logoImg} />
-            </Link>
-
-            <nav style={styles.nav}>
-              <NavLink to="/">HOME</NavLink>
-              <NavLink to="/store">STORE</NavLink>
-
-              {/* Categories dropdown */}
-              <div
-                ref={dropdownRef}
-                style={styles.dropdownWrap}
-                onClick={() => setShowCategories((prev) => !prev)}
-              >
-                <span style={styles.navA}>
-                  CATEGORIES <span style={styles.caret}>⌄</span>
-                </span>
-
-                {showCategories && (
-                  <div
-                    style={styles.dropdownMenu}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {/* TOTAL TOOLS with submenu */}
-                    {totalToolsParent && (
-                      <div style={{ position: "relative" }}>
-                        <div
-                          style={styles.dropdownItemWithArrow}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenSubmenuSlug((s) =>
-                              s === totalToolsParent.slug
-                                ? null
-                                : totalToolsParent.slug
-                            );
-                          }}
-                        >
-                          {TOTAL_TOOLS_PARENT_NAME} <span>›</span>
-                        </div>
-
-                        {openSubmenuSlug === totalToolsParent.slug && (
-                          <div style={styles.subMenu}>
-                            {(totalToolsParent.children || []).map((child) => (
-                              <button
-                                key={child.slug}
-                                style={styles.subMenuBtn}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  goCategory(child.slug);
-                                }}
-                              >
-                                {child.name.toUpperCase()}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* other categories */}
-                    {topLevelCategories.map((c) => (
-                      <button
-                        key={c.slug}
-                        style={styles.dropdownBtn}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (c.children && c.children.length) {
-                            setOpenSubmenuSlug((s) =>
-                              s === c.slug ? null : c.slug
-                            );
-                          } else {
-                            goCategory(c.slug);
-                          }
-                        }}
-                      >
-                        {c.name.toUpperCase()}
-                        {c.children?.length ? (
-                          <span style={{ opacity: 0.6 }}>›</span>
-                        ) : null}
-
-                        {openSubmenuSlug === c.slug && c.children?.length ? (
-                          <div
-                            style={styles.subMenuAlt}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {c.children.map((child) => (
-                              <button
-                                key={child.slug}
-                                style={styles.subMenuBtn}
-                                onClick={() => goCategory(child.slug)}
-                              >
-                                {child.name.toUpperCase()}
-                              </button>
-                            ))}
-                          </div>
-                        ) : null}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <NavLink to="/franchise">FRANCHISE</NavLink>
-              <NavLink to="/services">SERVICES</NavLink>
-              <NavLink to="/blog">BLOG</NavLink>
-            </nav>
-
-            <div style={styles.headerRight}>
-              <NavLink to="/about">ABOUT</NavLink>
-              <NavLink to="/contact">CONTACT US</NavLink>
-
-              <div style={styles.price}>₹0.00</div>
-
-              <div style={styles.iconGroup}>
-                <div
-                  style={styles.cartIconWrap}
-                  title="Cart"
-                  onClick={() => navigate("/cart")}
-                >
-                  <span style={styles.cartBadge}>{cartCount}</span>
-                  <span style={styles.iconText}>🛒</span>
-                </div>
-                <div
-                  style={styles.userIconWrap}
-                  title="Account"
-                  onClick={() => navigate("/my-account")}
-                >
-                  <span style={styles.iconText}>👤</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div style={styles.heroCenter}>
           <div style={styles.heroTitle}>Store</div>
         </div>
@@ -588,60 +452,10 @@ export default function Store() {
       </div>
 
       {/* Floating buttons */}
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        style={styles.scrollTopBtn}
-        aria-label="Scroll to top"
-      >
-        ⬆
-      </button>
-
-      <button style={styles.floatingCart} aria-label="Cart">
-        <span style={styles.floatingBadge}>0</span>
-        🛒
-      </button>
+      
 
       {/* Footer */}
-      <footer style={styles.footer}>
-        <div style={styles.footerTop}>
-          <div style={styles.footerCol}>
-            <div style={styles.footerLogo}>TUNTURU</div>
-            <div style={styles.footerText}>Email: Support@tunturu.co.in</div>
-            <div style={styles.footerText}>Email: Sales@tunturu.co.in</div>
-            <div style={styles.footerText}>Phone: +91 89616 12353</div>
-
-            <div style={styles.socialRow}>
-              <span style={styles.socialIcon}>f</span>
-              <span style={styles.socialIcon}>𝕏</span>
-              <span style={styles.socialIcon}>▶</span>
-            </div>
-          </div>
-
-          <div style={styles.footerCol}>
-            <div style={styles.footerHeading}>Quick links</div>
-            <div style={styles.footerUnderline} />
-            <FooterLink to="/">Home</FooterLink>
-            <FooterLink to="/about">About</FooterLink>
-            <FooterLink to="/blog">Blog</FooterLink>
-            <FooterLink to="/contact">Contact Us</FooterLink>
-          </div>
-
-          <div style={styles.footerCol}>
-            <div style={styles.footerHeading}>Our Polices</div>
-            <div style={styles.footerUnderline} />
-            <FooterLink to="/privacy">Privacy Policy</FooterLink>
-            <FooterLink to="/terms">Terms &amp; Conditions</FooterLink>
-            <FooterLink to="/shipping">Shipping Policy</FooterLink>
-            <FooterLink to="/refund">Refund &amp; Returns</FooterLink>
-            <FooterLink to="/faqs">FAQs</FooterLink>
-          </div>
-        </div>
-
-        <div style={styles.footerBottom}>
-          <div style={styles.footerBottomText}>Copyright © 2026 Tunturu</div>
-          <div style={styles.footerBottomText}>Powered by Tunturu</div>
-        </div>
-      </footer>
+      
     </div>
   );
 }
@@ -654,13 +468,7 @@ function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
   );
 }
 
-function FooterLink({ to, children }: { to: string; children: React.ReactNode }) {
-  return (
-    <Link to={to} style={styles.footerLink}>
-      {children}
-    </Link>
-  );
-}
+
 
 function RadioRow({
   label,

@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
+import Header from "./Components/Header";
 import Home from "./Pages/Home";
 import BlogPage from "./Pages/Blog";
 import Services from "./Pages/Services";
@@ -29,7 +29,8 @@ function App() {
       <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
 
         {/* ✅ ALL ROUTES */}
-        <div style={{ flex: 1 }}>
+         <div style={{ position: "relative" }}>
+          <Header />
           <Routes>
 
             {/* ✅ MAIN ROUTES */}

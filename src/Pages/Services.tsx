@@ -104,6 +104,8 @@ export default function Services() {
 
       <div className="tPage">
         {/* HEADER (transparent over hero) */}
+
+{/*         
         <header className="tHeader">
           <div className="tContainer tHeaderRow">
             <div className="tBrand">
@@ -143,7 +145,7 @@ export default function Services() {
               </div>
             </nav>
           </div>
-        </header>
+        </header> */}
 
         {/* HERO */}
         <section className="tHero">
@@ -225,69 +227,7 @@ export default function Services() {
         </section>
 
         {/* FOOTER */}
-        <footer className="tFooter" id="contact">
-          <div className="tContainer tFooterGrid">
-            <div className="tFooterCol">
-              <div className="tFooterLogoRow">
-                <div className="tFooterLogoText">TUNTURU</div>
-              </div>
-
-              <div className="tFooterText">
-                <div>Email: Support@tunturu.co.in</div>
-                <div>Email: Sales@tunturu.co.in</div>
-                <div>Phone: +91 89616 12353</div>
-              </div>
-
-              <div className="tSocialRow">
-                <a className="tSocialBtn" href="#" aria-label="Facebook"><IconFb /></a>
-                <a className="tSocialBtn" href="#" aria-label="Twitter"><IconTw /></a>
-                <a className="tSocialBtn" href="#" aria-label="Youtube"><IconYt /></a>
-              </div>
-            </div>
-
-            <div className="tFooterCol">
-              <div className="tFooterHeading">Quick links</div>
-              <div className="tFooterLine" />
-              <a className="tFooterLink" href="/">Home</a>
-              <a className="tFooterLink" href="/about">About</a>
-              <a className="tFooterLink" href="/blog">Blog</a>
-              <a className="tFooterLink" href="#contact">Contact Us</a>
-            </div>
-
-            <div className="tFooterCol">
-              <div className="tFooterHeading">Our Polices</div>
-              <div className="tFooterLine" />
-              <a className="tFooterLink" href="#">Privacy Policy</a>
-              <a className="tFooterLink" href="#">Terms &amp; Conditions</a>
-              <a className="tFooterLink" href="#">Shipping Policy</a>
-              <a className="tFooterLink" href="#">Refund &amp; Returns</a>
-              <a className="tFooterLink" href="#">FAQs</a>
-            </div>
-          </div>
-        </footer>
-
-        {/* Floating cart button (like screenshot) */}
-        <button
-          className="tFloatCart"
-          type="button"
-          onClick={() => alert("Cart (future)")}
-          aria-label="Cart"
-        >
-          <span className="tFloatBadge">0</span>
-          <IconCartBig />
-        </button>
-
-        {/* Back to top (bottom-left) */}
-        {showTop && (
-          <button
-            className="tBackTop"
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            aria-label="Back to top"
-          >
-            <span className="tBackArrow">↑</span>
-          </button>
-        )}
+        
       </div>
     </>
   );
@@ -768,61 +708,7 @@ const css = `
   }
   .tCTAButton:hover{ transform: translateY(-1px); }
 
-  /* FOOTER */
-  .tFooter{
-    background: #000;
-    color: #fff;
-    padding: 84px 0 70px;
-  }
-  .tFooterGrid{
-    display:grid;
-    grid-template-columns: 1.25fr 1fr 1fr;
-    gap: 60px;
-    align-items: start;
-  }
-  @media (max-width: 980px){
-    .tFooterGrid{ grid-template-columns: 1fr; gap: 34px; }
-  }
-  .tFooterLogoText{
-    font-weight: 900;
-    font-size: 44px;
-    letter-spacing: 1px;
-    color: #2ea0ff;
-    margin-bottom: 18px;
-  }
-  .tFooterText{
-    color:#fff;
-    opacity: .92;
-    line-height: 2.0;
-    font-size: 16px;
-  }
-  .tFooterHeading{
-    font-weight: 900;
-    font-size: 22px;
-    margin-bottom: 8px;
-  }
-  .tFooterLine{
-    width: 86px;
-    height: 2px;
-    background: #fff;
-    opacity: .75;
-    margin-bottom: 18px;
-  }
-  .tFooterLink{
-    display:block;
-    color:#fff;
-    text-decoration:none;
-    opacity: .90;
-    padding: 7px 0;
-    font-size: 16px;
-  }
-  .tFooterLink:hover{ opacity: 1; text-decoration: underline; }
 
-  .tSocialRow{
-    margin-top: 18px;
-    display:flex;
-    gap: 12px;
-  }
   .tSocialBtn{
     width: 36px;
     height: 36px;

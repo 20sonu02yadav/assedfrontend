@@ -19,8 +19,8 @@ type InfoCard = {
 
 const Franchise: React.FC = () => {
   // ✅ Header logo URL (as you provided)
-  const LOGO_URL =
-    "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/cropped-TUNTURU-LOGO-scaled-1-2048x681.png";
+  // const LOGO_URL =
+  //   "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/cropped-TUNTURU-LOGO-scaled-1-2048x681.png";
 
   // ✅ Replace this with your exact franchise hero image URL (WP / CDN)
   const HERO_IMAGE =
@@ -87,7 +87,7 @@ const Franchise: React.FC = () => {
   return (
     <div className="fr-page">
       {/* ================= HEADER (Overlay like screenshot) ================= */}
-      <header className="fr-header">
+      {/* <header className="fr-header">
         <div className="fr-header__inner">
           <Link to="/" className="fr-logo">
             <img src={LOGO_URL} alt="Tunturu" />
@@ -145,7 +145,7 @@ const Franchise: React.FC = () => {
             </div>
           </nav>
         </div>
-      </header>
+      </header> */}
 
       {/* ================= HERO ================= */}
       <section
@@ -245,10 +245,10 @@ const Franchise: React.FC = () => {
               </ul>
 
               <div className="fr-eligible__btns">
-                <Link to="/franchise-owner" className="fr-pillBtn">
+                <Link to="/franchise-application" className="fr-pillBtn">
                   BECOME FRANCHISE OWNER
                 </Link>
-                <Link to="/dealer-channel-partner" className="fr-pillBtn">
+                <Link to="/dealer" className="fr-pillBtn">
                   BECOME DEALER CHANNEL PARTNER
                 </Link>
               </div>
@@ -264,87 +264,8 @@ const Franchise: React.FC = () => {
       </section>
 
       {/* ================= FOOTER (same layout) ================= */}
-      <footer className="fr-footer">
-        <div className="fr-footer__top">
-          <div className="fr-container fr-footer__grid">
-            <div className="fr-footer__col">
-              <img className="fr-footer__logo" src={LOGO_URL} alt="Tunturu" />
-              <div className="fr-footer__text">
-                <div>Email: Support@tunturu.co.in</div>
-                <div>Email: Sales@tunturu.co.in</div>
-                <div>Phone: +91 89616 12353</div>
-              </div>
-
-              <div className="fr-social">
-                <a className="fr-social__dot" href="#" aria-label="Facebook">
-                  f
-                </a>
-                <a className="fr-social__dot" href="#" aria-label="Twitter">
-                  t
-                </a>
-                <a className="fr-social__dot" href="#" aria-label="YouTube">
-                  ▶
-                </a>
-              </div>
-            </div>
-
-            <div className="fr-footer__col">
-              <div className="fr-footer__heading">Quick links</div>
-              <div className="fr-footer__underline" />
-              <div className="fr-footer__links">
-                <Link to="/">Home</Link>
-                <Link to="/about">About</Link>
-                <Link to="/blog">Blog</Link>
-                <Link to="/contact">Contact Us</Link>
-              </div>
-            </div>
-
-            <div className="fr-footer__col">
-              <div className="fr-footer__heading">Our Polices</div>
-              <div className="fr-footer__underline" />
-              <div className="fr-footer__links">
-                <Link to="/privacy-policy">Privacy Policy</Link>
-                <Link to="/terms-conditions">Terms &amp; Conditions</Link>
-                <Link to="/shipping-policy">Shipping Policy</Link>
-                <Link to="/refund-returns">Refund &amp; Returns</Link>
-                <Link to="/faqs">FAQs</Link>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="fr-footer__bottom">
-          <div className="fr-container fr-footer__bottomInner">
-            <div>Copyright © 2026 Tunturu</div>
-            <div>Powered by Tunturu</div>
-          </div>
-        </div>
-      </footer>
 
       {/* ================= FLOATING BUTTONS (like screenshot) ================= */}
-      <button
-        className={"fr-floatCart"}
-        type="button"
-        aria-label="Open cart"
-        onClick={() => {
-          // put your cart open logic here
-        }}
-      >
-        <span className="fr-floatBadge">{cartCount}</span>
-        <ShoppingCart size={22} />
-      </button>
-
-      {showTop && (
-        <button
-          className="fr-floatTop"
-          type="button"
-          aria-label="Back to top"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        >
-          <ArrowUp size={22} />
-        </button>
-      )}
-
       {/* ================= STYLES ================= */}
       <style>{`
         .fr-page{

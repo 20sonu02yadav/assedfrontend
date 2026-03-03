@@ -3,8 +3,8 @@ import React, { useEffect, useMemo, useState } from "react";
 
 type FaqItem = { q: string; a: string };
 
-const HEADER_LOGO_URL =
-  "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/cropped-TUNTURU-LOGO-scaled-1-2048x681.png";
+// const HEADER_LOGO_URL =
+//   "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/cropped-TUNTURU-LOGO-scaled-1-2048x681.png";
 
 // Hero image (similar “support/call center” look)
 const HERO_BG =
@@ -55,7 +55,7 @@ const FAQ: React.FC = () => {
   return (
     <div className="tt-page">
       {/* ===================== HEADER ===================== */}
-      <header className="tt-header">
+      {/* <header className="tt-header">
         <div className="tt-header__inner">
           <a className="tt-brand" href="/" aria-label="Tunturu Home">
             <img className="tt-brand__logo" src={HEADER_LOGO_URL} alt="Tunturu" />
@@ -96,7 +96,7 @@ const FAQ: React.FC = () => {
             </div>
           </div>
         </div>
-      </header>
+      </header> */}
 
       {/* ===================== HERO ===================== */}
       <section
@@ -136,88 +136,6 @@ const FAQ: React.FC = () => {
       </main>
 
       {/* ===================== FOOTER ===================== */}
-      <footer className="tt-footer">
-        <div className="tt-footer__inner">
-          <div className="tt-footcol tt-footcol--brand">
-            <img className="tt-footer__logo" src={HEADER_LOGO_URL} alt="Tunturu" />
-            <div className="tt-foottext">
-              <div>Email: Support@tunturu.co.in</div>
-              <div>Email: Sales@tunturu.co.in</div>
-              <div>Phone: +91 89616 12353</div>
-            </div>
-
-            <div className="tt-social">
-              <a href="#" aria-label="Facebook" className="tt-socialbtn">
-                <FacebookIcon />
-              </a>
-              <a href="#" aria-label="Twitter" className="tt-socialbtn">
-                <TwitterIcon />
-              </a>
-              <a href="#" aria-label="YouTube" className="tt-socialbtn">
-                <YoutubeIcon />
-              </a>
-            </div>
-          </div>
-
-          <div className="tt-footcol">
-            <div className="tt-foothead">Quick links</div>
-            <div className="tt-footline" />
-            <a className="tt-footlink" href="/">
-              Home
-            </a>
-            <a className="tt-footlink" href="/about">
-              About
-            </a>
-            <a className="tt-footlink" href="/blog">
-              Blog
-            </a>
-            <a className="tt-footlink" href="/contact">
-              Contact Us
-            </a>
-          </div>
-
-          <div className="tt-footcol">
-            <div className="tt-foothead">Our Polices</div>
-            <div className="tt-footline" />
-            <a className="tt-footlink" href="/privacy-policy">
-              Privacy Policy
-            </a>
-            <a className="tt-footlink" href="/terms-conditions">
-              Terms &amp; Conditions
-            </a>
-            <a className="tt-footlink" href="/shipping-policy">
-              Shipping Policy
-            </a>
-            <a className="tt-footlink" href="/refund-returns">
-              Refund &amp; Returns
-            </a>
-            <a className="tt-footlink tt-footlink--active" href="/faqs">
-              FAQs
-            </a>
-          </div>
-        </div>
-
-        <div className="tt-footer__bottom">
-          <div>Copyright © {year} Tunturu</div>
-          <div>Powered by Tunturu</div>
-        </div>
-      </footer>
-
-      {/* Floating cart button (right) */}
-      <button className="tt-floatcart" aria-label="Floating cart">
-        <CartIcon />
-        <span className="tt-badge tt-badge--float">0</span>
-      </button>
-
-      {/* Back to top (left) */}
-      <button
-        className={`tt-top ${showTop ? "show" : ""}`}
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        aria-label="Back to top"
-      >
-        <UpIcon />
-      </button>
-
       {/* ===================== STYLES ===================== */}
       <style>{`
         :root{
@@ -428,27 +346,6 @@ const FAQ: React.FC = () => {
           font-size: 16px;
           line-height: 1.6;
           box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-        }
-
-        /* FOOTER */
-        .tt-footer{
-          background: #000;
-          color: #fff;
-          padding: 60px 18px 0;
-        }
-        .tt-footer__inner{
-          max-width: 1200px;
-          margin: 0 auto;
-          display: grid;
-          grid-template-columns: 1.2fr 0.8fr 0.8fr;
-          gap: 36px;
-          align-items: start;
-        }
-        .tt-footer__logo{
-          height: 44px;
-          width: auto;
-          margin-bottom: 18px;
-          filter: drop-shadow(0 2px 12px rgba(0,0,0,0.4));
         }
         .tt-foottext{
           line-height: 1.9;
