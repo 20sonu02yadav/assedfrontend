@@ -1,0 +1,8 @@
+/* Make the app full width/height */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  text-align: initial; /* don't force center text */
+}
