@@ -11,7 +11,7 @@ type TypeOfBusiness = "Proprietorship" | "Partnership" | "Pvt Ltd" | "Ltd Co" | 
 type NatureOfBusiness = "Retail" | "Wholesale" | "Distribution" | "Online" | "Other";
 type YesNo = "Yes" | "No";
 
-const API_BASE = (import.meta as any).env?.VITE_API_BASE || "https://tunturu.backend.tunturu.cloud";
+const API_BASE = (import.meta as any).env?.VITE_API_BASE || "http://127.0.0.1:8000";
 const ENDPOINT = `${API_BASE}/api/franchise-applications/`;
 
 export default function FranchiseApplication() {
