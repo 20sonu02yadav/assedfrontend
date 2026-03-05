@@ -2,25 +2,20 @@
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  /* IMPORTANT: remove Vite starter light/dark forced theme */
   color-scheme: normal;
   color: #111;
   background-color: #ffffff;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Remove default link styles if you want (optional) */
 a {
   color: inherit;
   text-decoration: none;
 }
 
-/* ✅ KEY FIXES */
 html, body {
   width: 100%;
   height: 100%;
@@ -28,14 +23,9 @@ html, body {
 
 body {
   margin: 0;
-  display: block;          /* ✅ remove flex */
+  display: block;
   min-width: 320px;
-  min-height: 100vh;       /* keep full height */
-  background: #ffffff;     /* avoid dark background */
+  min-height: 100vh;
+  background: #ffffff;
   color: #111;
-}
-
-/* Optional: buttons default */
-button {
-  font-family: inherit;
 }

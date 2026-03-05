@@ -6,7 +6,7 @@ export type CategoryNode = {
   slug: string;
   parent: number | null;
   icon_url?: string | null;
-  children: CategoryNode[];
+  children?: CategoryNode[];
 };
 
 export type ProductListItem = {
@@ -27,6 +27,8 @@ export type ProductListItem = {
   image: string | null;
 };
 
+export type ProductImage = { id: number; image_url: string; sort_order: number };
+
 export type ProductDetail = {
   id: number;
   title: string;
@@ -43,31 +45,39 @@ export type ProductDetail = {
   discount_percent: number;
   is_sale: boolean;
   description: string;
-  specs: Record<string, string> | null;
-  images: { id: number; image_url: string; sort_order: number }[];
+  specs: any;
+  images: ProductImage[];
 };
 
-export async function fetchCategoryTree() {
-  const res = await api.get<CategoryNode[]>("/store/categories/");
+export type Review = {
+  id: number;
+  rating: number;
+  name: string;
+  email: string;
+  comment: string;
+  created_at: string;
+};
+
+export async function fetchCategoryTree(): Promise<CategoryNode[]> {
+  const res = await api.get("/store/categories/");
   return res.data;
 }
 
 export async function fetchProducts(params?: {
   category?: string;
   parent?: string;
-  search?: string;
   pricing?: "low" | "high";
-}) {
-  const res = await api.get<ProductListItem[]>("/store/products/", { params });
+}): Promise<ProductListItem[]> {
+  const res = await api.get("/store/products/", { params });
   return res.data;
 }
 
-export async function fetchProductDetail(slug: string) {
-  const res = await api.get<ProductDetail>(`/store/products/${slug}/`);
+export async function fetchProductDetail(slug: string): Promise<ProductDetail> {
+  const res = await api.get(`/store/products/${slug}/`);
   return res.data;
 }
 
-export async function fetchReviews(slug: string) {
+export async function fetchReviews(slug: string): Promise<Review[]> {
   const res = await api.get(`/store/products/${slug}/reviews/`);
   return res.data;
 }

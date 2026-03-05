@@ -1,5 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import Header from "./Components/Header";
+import Footer from "./Components/Footer";
+
 import Home from "./Pages/Home";
 import BlogPage from "./Pages/Blog";
 import Services from "./Pages/Services";
@@ -19,68 +22,120 @@ import Dealer from "./Pages/Dealer";
 import CategoryProducts from "./Pages/CategoryProducts";
 import ProductDetailPage from "./Pages/ProductDetailPage";
 
-import Footer from "./Components/Footer"; // ✅ IMPORT FOOTER
+import AccountDashboard from "./Pages/AccountDashboard";
+import Orders from "./Pages/Orders";
+import Checkout from "./Pages/Checkout";
+
+import { AuthProvider } from "./auth/AuthContext";
+import ProtectedRoute from "./auth/ProtectedRoute";
 
 import "./App.css";
 
 function App() {
   return (
-    <Router>
-      <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-
-        {/* ✅ ALL ROUTES */}
-         <div style={{ position: "relative" }}>
+    <AuthProvider>
+      <Router>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            minHeight: "100vh",
+            width: "100%",
+            overflowX: "hidden",
+          }}
+        >
+          {/* HEADER */}
           <Header />
-          <Routes>
 
-            {/* ✅ MAIN ROUTES */}
-            <Route path="/" element={<Home />} />
-            <Route path="/store" element={<Store />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/my-account" element={<MyAccount />} />
+          {/* MAIN ROUTES */}
+          <div style={{ flex: 1, width: "100%" }}>
+            <Routes>
+              {/* PUBLIC ROUTES */}
+              <Route path="/" element={<Home />} />
+              <Route path="/store" element={<Store />} />
+              <Route path="/my-account" element={<MyAccount />} />
 
-            {/* ✅ CATEGORY & PRODUCT */}
-            <Route path="/category/:slug" element={<CategoryProducts />} />
-            <Route path="/product/:slug" element={<ProductDetailPage />} />
+              {/* CATEGORY & PRODUCT */}
+              <Route path="/category/:slug" element={<CategoryProducts />} />
+              <Route path="/product/:slug" element={<ProductDetailPage />} />
 
-            {/* ✅ STATIC PAGES */}
-            <Route path="/about" element={<About />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/contact" element={<ContactPage />} />
+              {/* PROTECTED ROUTES */}
+              <Route
+                path="/cart"
+                element={
+                  <ProtectedRoute>
+                    <Cart />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* ✅ POLICIES */}
-            <Route path="/privacy-policy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/shipping-policy" element={<ShippingPolicy />} />
-            <Route path="/refund-returns" element={<RefundReturns />} />
-            <Route path="/faqs" element={<FAQ />} />
+              <Route
+                path="/checkout"
+                element={
+                  <ProtectedRoute>
+                    <Checkout />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* ✅ FRANCHISE */}
-            <Route path="/franchise" element={<Franchise />} />
-            <Route path="/franchise-application" element={<FranchiseApplication />} />
+              <Route
+                path="/orders"
+                element={
+                  <ProtectedRoute>
+                    <Orders />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* ✅ DEALER */}
-            <Route path="/dealer" element={<Dealer />} />
+              <Route
+                path="/account-dashboard"
+                element={
+                  <ProtectedRoute>
+                    <AccountDashboard />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* ✅ 404 PAGE */}
-            <Route
-              path="*"
-              element={
-                <h1 style={{ textAlign: "center", marginTop: "100px" }}>
-                  404 - Page Not Found
-                </h1>
-              }
-            />
+              {/* STATIC PAGES */}
+              <Route path="/about" element={<About />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/contact" element={<ContactPage />} />
 
-          </Routes>
+              {/* POLICIES */}
+              <Route path="/privacy-policy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/shipping-policy" element={<ShippingPolicy />} />
+              <Route path="/refund-returns" element={<RefundReturns />} />
+              <Route path="/faqs" element={<FAQ />} />
+
+              {/* FRANCHISE */}
+              <Route path="/franchise" element={<Franchise />} />
+              <Route
+                path="/franchise-application"
+                element={<FranchiseApplication />}
+              />
+
+              {/* DEALER */}
+              <Route path="/dealer" element={<Dealer />} />
+
+              {/* 404 PAGE */}
+              <Route
+                path="*"
+                element={
+                  <h1 style={{ textAlign: "center", marginTop: "100px" }}>
+                    404 - Page Not Found
+                  </h1>
+                }
+              />
+            </Routes>
+          </div>
+
+          {/* FOOTER */}
+          <Footer />
         </div>
-
-        {/* ✅ GLOBAL FOOTER (Will show on every page automatically) */}
-        <Footer />
-
-      </div>
-    </Router>
+      </Router>
+    </AuthProvider>
   );
 }
 
