@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getCart, type Cart } from "../services/cartApi";
 import { useNavigate } from "react-router-dom";
 

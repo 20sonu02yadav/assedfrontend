@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { addToCart } from "../services/cartApi";
 import { createReview, fetchProductDetail, fetchReviews, type ProductDetail, type Review } from "../services/storeApi";
