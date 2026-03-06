@@ -7,6 +7,7 @@ export type OrderItem = {
   product_image?: string | null;
   price: string;
   quantity: number;
+  line_total?: string;
 };
 
 export type OrderHistory = {

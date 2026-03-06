@@ -81,8 +81,11 @@ export default function CheckoutPage() {
           alert("Payment Success ✅ Order created!");
 
           const orderId = result?.order?.id;
-          if (orderId) navigate(`/orders/${orderId}`);
-          else navigate("/orders");
+          if (orderId) {
+            navigate(`/orders/${orderId}`);
+          } else {
+            navigate("/orders");
+          }
         },
         theme: { color: "#111" },
       };
@@ -121,7 +124,6 @@ export default function CheckoutPage() {
           alignItems: "start",
         }}
       >
-        {/* LEFT */}
         <div style={{ display: "grid", gap: 16 }}>
           <AddressManager
             selectedId={selectedAddressId}
@@ -150,7 +152,7 @@ export default function CheckoutPage() {
                     }}
                   >
                     <img
-                      src={it.product_image || "https://via.placeholder.com/160x160?text=No+Image"}
+                      src={it.product_image || "https://dummyimage.com/160x160/f3f4f6/111827&text=No+Image"}
                       alt={it.product_title}
                       style={{
                         width: 90,
@@ -179,7 +181,6 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        {/* RIGHT */}
         <div
           style={{
             border: "1px solid #e5e7eb",
