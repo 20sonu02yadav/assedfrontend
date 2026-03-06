@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
-
+import OrderDetailPage from "./Pages/OrderDetail";
 import Home from "./Pages/Home";
 import BlogPage from "./Pages/Blog";
 import Services from "./Pages/Services";
@@ -86,6 +86,14 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+              path="/orders/:id"
+              element={
+                <ProtectedRoute>
+                  <OrderDetailPage />
+                </ProtectedRoute>
+              }
+            />
 
               <Route
                 path="/account-dashboard"

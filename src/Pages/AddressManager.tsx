@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   createAddress,
   deleteAddress,
-  listAddresses, // ✅ fetchAddresses -> listAddresses
+  listAddresses,
   updateAddress,
   type Address,
 } from "../services/addressApi";
@@ -12,11 +12,24 @@ type Props = {
   selectedId?: number | null;
 };
 
+type AddressForm = {
+  full_name: string;
+  phone: string;
+  line1: string;
+  line2: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  country: string;
+  label: string;
+  is_default: boolean;
+};
+
 export default function AddressManager({ onSelect, selectedId }: Props) {
   const [items, setItems] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<AddressForm>({
     full_name: "",
     phone: "",
     line1: "",
@@ -25,21 +38,23 @@ export default function AddressManager({ onSelect, selectedId }: Props) {
     state: "",
     postal_code: "",
     country: "India",
-    label: "", // ✅ optional (Home/Office forced nahi)
+    label: "",
     is_default: false,
   });
 
   async function load() {
     setLoading(true);
     try {
-      const data: Address[] = await listAddresses(); // ✅ typed
+      const data: Address[] = await listAddresses();
       setItems(data);
 
-      // ✅ auto select default
-      const def = data.find((a: Address) => a.is_default); // ✅ no implicit any
+      const def = data.find((a: Address) => a.is_default);
       if ((selectedId === null || selectedId === undefined) && def && onSelect) {
         onSelect(def.id);
       }
+    } catch (error) {
+      console.error("Failed to load addresses:", error);
+      setItems([]);
     } finally {
       setLoading(false);
     }
@@ -47,46 +62,57 @@ export default function AddressManager({ onSelect, selectedId }: Props) {
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function addNew(e: React.FormEvent) {
     e.preventDefault();
 
-    // ✅ clean payload (label empty ho to mat bhejo)
-    const payload: any = {
+    const payload = {
       ...form,
-      label: form.label?.trim() ? form.label.trim() : undefined,
+      label: form.label.trim() ? form.label.trim() : undefined,
     };
 
-    await createAddress(payload);
+    try {
+      await createAddress(payload as Omit<Address, "id" | "created_at">);
 
-    setForm({
-      full_name: "",
-      phone: "",
-      line1: "",
-      line2: "",
-      city: "",
-      state: "",
-      postal_code: "",
-      country: "India",
-      label: "",
-      is_default: false,
-    });
+      setForm({
+        full_name: "",
+        phone: "",
+        line1: "",
+        line2: "",
+        city: "",
+        state: "",
+        postal_code: "",
+        country: "India",
+        label: "",
+        is_default: false,
+      });
 
-    await load();
+      await load();
+    } catch (error) {
+      console.error("Failed to create address:", error);
+      alert("Failed to add address");
+    }
   }
 
   async function setDefault(id: number) {
-    // NOTE: Agar backend me default set logic hai to patch ok.
-    // If backend expects "make others false", handle backend side.
-    await updateAddress(id, { is_default: true });
-    await load();
+    try {
+      await updateAddress(id, { is_default: true });
+      await load();
+    } catch (error) {
+      console.error("Failed to update address:", error);
+      alert("Failed to update address");
+    }
   }
 
   async function remove(id: number) {
-    await deleteAddress(id);
-    await load();
+    try {
+      await deleteAddress(id);
+      await load();
+    } catch (error) {
+      console.error("Failed to delete address:", error);
+      alert("Failed to delete address");
+    }
   }
 
   return (
@@ -107,11 +133,20 @@ export default function AddressManager({ onSelect, selectedId }: Props) {
                   style={{
                     padding: 12,
                     borderRadius: 12,
-                    border: selectedId === a.id ? "2px solid #0b76c5" : "1px solid #e5e7eb",
+                    border:
+                      selectedId === a.id
+                        ? "2px solid #0b76c5"
+                        : "1px solid #e5e7eb",
                     background: "#fff",
                   }}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: 10,
+                    }}
+                  >
                     <div>
                       <div style={{ fontWeight: 900 }}>
                         {a.label ? `${a.label} • ` : ""}
@@ -119,9 +154,11 @@ export default function AddressManager({ onSelect, selectedId }: Props) {
                       </div>
 
                       <div style={{ color: "#374151", marginTop: 4 }}>
-                        {a.phone} <br />
+                        {a.phone}
+                        <br />
                         {a.line1}
-                        {a.line2 ? `, ${a.line2}` : ""} <br />
+                        {a.line2 ? `, ${a.line2}` : ""}
+                        <br />
                         {a.city}, {a.state} - {a.postal_code}
                         {a.country ? `, ${a.country}` : ""}
                       </div>
@@ -230,11 +267,20 @@ export default function AddressManager({ onSelect, selectedId }: Props) {
               />
             </div>
 
-            <label style={{ display: "flex", gap: 10, alignItems: "center", fontWeight: 800 }}>
+            <label
+              style={{
+                display: "flex",
+                gap: 10,
+                alignItems: "center",
+                fontWeight: 800,
+              }}
+            >
               <input
                 type="checkbox"
                 checked={form.is_default}
-                onChange={(e) => setForm({ ...form, is_default: e.target.checked })}
+                onChange={(e) =>
+                  setForm({ ...form, is_default: e.target.checked })
+                }
               />
               Make this default
             </label>

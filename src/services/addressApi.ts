@@ -1,3 +1,4 @@
+// src/services/addressApi.ts
 import { api } from "./api";
 
 export type Address = {
@@ -9,36 +10,33 @@ export type Address = {
   city: string;
   state: string;
   postal_code: string;
-  country?: string;
-  label?: string;       // ✅ Home/Office ko optional rakho
-  is_default?: boolean;
-  created_at?: string;
+  country: string;
+  is_default: boolean;
+  created_at: string;
+  label?: string; // optional
 };
 
 export async function listAddresses(): Promise<Address[]> {
   const res = await api.get("/addresses/");
-  // backend may return {results: []} if paginated
-  return Array.isArray(res.data) ? res.data : res.data?.results || [];
+  return res.data;
 }
+
+// optional backward compatibility
 export const fetchAddresses = listAddresses;
-export async function createAddress(payload: Omit<Address, "id">) {
+
+export async function createAddress(
+  payload: Omit<Address, "id" | "created_at">
+) {
   const res = await api.post("/addresses/", payload);
-  return res.data as Address;
+  return res.data;
 }
 
 export async function updateAddress(id: number, payload: Partial<Address>) {
   const res = await api.patch(`/addresses/${id}/`, payload);
-  return res.data as Address;
+  return res.data;
 }
 
 export async function deleteAddress(id: number) {
   const res = await api.delete(`/addresses/${id}/`);
-  return res.data;
-}
-
-export async function setDefaultAddress(id: number) {
-  // if you don't have this endpoint, skip this function.
-  // but best is to keep it.
-  const res = await api.post(`/addresses/${id}/set-default/`);
   return res.data;
 }
