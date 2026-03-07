@@ -1,134 +1,1003 @@
-import  { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  createReview,
+  fetchCategoryTree,
+  fetchProductDetail,
+  fetchProducts,
+  fetchReviews,
+  type CategoryNode,
+  type ProductDetail,
+  type ProductListItem,
+  type Review,
+} from "../services/storeApi";
 import { addToCart } from "../services/cartApi";
-import { createReview, fetchProductDetail, fetchReviews, type ProductDetail, type Review } from "../services/storeApi";
+
+const HERO_BG =
+  "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2018/12/slide-image-free-img.jpg";
+
+function money(v?: string | number) {
+  const n = Number(v || 0);
+  return `₹${n.toFixed(2)}`;
+}
+
+function flattenTree(nodes: CategoryNode[]): CategoryNode[] {
+  const out: CategoryNode[] = [];
+
+  const walk = (list: CategoryNode[]) => {
+    list.forEach((node) => {
+      out.push(node);
+      if (node.children?.length) {
+        walk(node.children);
+      }
+    });
+  };
+
+  walk(nodes);
+  return out;
+}
 
 export default function ProductDetailPage() {
-  const { slug } = useParams();
+  const params = useParams();
+  const slug = params.slug ?? "";
+  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [relatedProducts, setRelatedProducts] = useState<ProductListItem[]>([]);
+  const [selectedImage, setSelectedImage] = useState("");
+  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
+  const [isZooming, setIsZooming] = useState(false);
 
-  const [rating, setRating] = useState(5);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [comment, setComment] = useState("");
+  const [qty, setQty] = useState(1);
+  const [busyCart, setBusyCart] = useState(false);
+  const [activeTab, setActiveTab] = useState<"description" | "reviews">("description");
+
+  const [reviewForm, setReviewForm] = useState({
+    rating: 5,
+    name: "",
+    email: "",
+    comment: "",
+  });
+  const [reviewBusy, setReviewBusy] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
-    setLoading(true);
-    Promise.all([fetchProductDetail(slug), fetchReviews(slug)])
-      .then(([p, r]) => {
-        setProduct(p);
-        setReviews(r);
-      })
-      .finally(() => setLoading(false));
+
+    let mounted = true;
+
+    async function loadPage() {
+      setLoading(true);
+
+      try {
+        const [detail, revs, tree] = await Promise.all([
+          fetchProductDetail(slug),
+          fetchReviews(slug),
+          fetchCategoryTree(),
+        ]);
+
+        if (!mounted) return;
+
+        setProduct(detail);
+        setReviews(revs);
+        setSelectedImage(detail.images?.[0]?.image_url || "");
+
+        const flat = flattenTree(tree);
+        const currentCat = flat.find((c) => c.slug === detail.category_slug);
+
+        let related: ProductListItem[] = [];
+
+        if (currentCat) {
+          const map = new Map<number, ProductListItem>();
+
+          // same category products
+          const sameCategoryProducts = await fetchProducts({
+            category: currentCat.slug,
+          });
+          sameCategoryProducts.forEach((p) => {
+            if (p.slug !== detail.slug) map.set(p.id, p);
+          });
+
+          // if current category is subcategory, include parent category direct + sibling subcategory products
+          if (currentCat.parent !== null) {
+            const parentCat = flat.find((c) => c.id === currentCat.parent);
+
+            if (parentCat) {
+              const [parentDirectProducts, parentChildrenProducts] = await Promise.all([
+                fetchProducts({ category: parentCat.slug }),
+                fetchProducts({ parent: parentCat.slug }),
+              ]);
+
+              [...parentDirectProducts, ...parentChildrenProducts].forEach((p) => {
+                if (p.slug !== detail.slug) map.set(p.id, p);
+              });
+            }
+          } else {
+            // top-level category: include child subcategory products too
+            const childProducts = await fetchProducts({ parent: currentCat.slug });
+            childProducts.forEach((p) => {
+              if (p.slug !== detail.slug) map.set(p.id, p);
+            });
+          }
+
+          related = Array.from(map.values());
+        } else {
+          const fallback = await fetchProducts({ category: detail.category_slug });
+          related = fallback.filter((p) => p.slug !== detail.slug);
+        }
+
+        setRelatedProducts(related.slice(0, 10));
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    loadPage();
+
+    return () => {
+      mounted = false;
+    };
   }, [slug]);
 
-  if (loading) return <div style={{ padding: 40 }}>Loading...</div>;
-  if (!product) return <div style={{ padding: 40 }}>Product not found.</div>;
+  const reviewAverage = useMemo(() => {
+    if (!reviews.length) return 0;
+    const total = reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0);
+    return total / reviews.length;
+  }, [reviews]);
 
-  const mainImg = product.images?.[0]?.image_url;
+  async function handleAddToCart(productId: number, count: number) {
+    try {
+      setBusyCart(true);
+      await addToCart(productId, count);
+      alert("Added to cart ✅");
+    } catch {
+      alert("Please login to add to cart.");
+    } finally {
+      setBusyCart(false);
+    }
+  }
+
+  async function handleReviewSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!slug) return;
+
+    try {
+      setReviewBusy(true);
+
+      await createReview(slug, {
+        rating: reviewForm.rating,
+        name: reviewForm.name,
+        email: reviewForm.email,
+        comment: reviewForm.comment,
+      });
+
+      const latest = await fetchReviews(slug);
+      setReviews(latest);
+
+      setReviewForm({
+        rating: 5,
+        name: "",
+        email: "",
+        comment: "",
+      });
+
+      alert("Review submitted ✅");
+    } catch {
+      alert("Failed to submit review.");
+    } finally {
+      setReviewBusy(false);
+    }
+  }
+
+  if (!slug) {
+    return <div style={{ padding: 40 }}>Invalid product URL.</div>;
+  }
+
+  if (loading) {
+    return <div style={{ padding: 40 }}>Loading product...</div>;
+  }
+
+  if (!product) {
+    return <div style={{ padding: 40 }}>Product not found.</div>;
+  }
+
+  const mainImage =
+    selectedImage ||
+    product.images?.[0]?.image_url ||
+    "https://dummyimage.com/600x600/f3f4f6/111827&text=No+Image";
+
+  const specsList: string[] = Array.isArray(product.specs)
+    ? product.specs
+    : typeof product.specs === "object" && product.specs !== null
+    ? Object.entries(product.specs).map(([k, v]) => `${k}: ${String(v)}`)
+    : [];
 
   return (
-    <div style={{ maxWidth: 1200, margin: "40px auto", padding: 16 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
-        <div>
-          <img
-            src={mainImg || "https://via.placeholder.com/800x600?text=No+Image"}
-            alt={product.title}
-            style={{ width: "100%", borderRadius: 14, objectFit: "cover" }}
-          />
-        </div>
+    <div style={styles.page}>
+      {/* HERO */}
+      <div style={{ ...styles.hero, backgroundImage: `url(${HERO_BG})` }}>
+        <div style={styles.heroOverlay} />
 
-        <div>
-          <h1 style={{ marginTop: 0 }}>{product.title}</h1>
-          <div style={{ color: "#6b7280" }}>{product.brand} • {product.sku}</div>
+        <div style={styles.heroCenter}>
+          <div style={styles.heroTitle}>Products</div>
 
-          <div style={{ marginTop: 10, fontSize: 18 }}>
-            <b>₹{Number(product.sale_price).toFixed(2)}</b>{" "}
-            <span style={{ textDecoration: "line-through", color: "#9ca3af" }}>
-              ₹{Number(product.mrp).toFixed(2)}
+          <div style={styles.heroCrumb}>
+            <span style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
+              Home
             </span>
-          </div>
-
-          <button
-            style={{ marginTop: 14 }}
-            onClick={async () => {
-              try {
-                await addToCart(product.id, 1);
-                alert("Added to cart ✅");
-              } catch {
-                alert("Please login to add to cart.");
-              }
-            }}
-          >
-            Add to Cart
-          </button>
-
-          <div style={{ marginTop: 18 }}>
-            <h3>Description</h3>
-            <p style={{ lineHeight: 1.6 }}>{product.description || "No description"}</p>
-          </div>
-
-          <div style={{ marginTop: 18 }}>
-            <h3>Specs</h3>
-            <pre style={{ background: "#f9fafb", padding: 12, borderRadius: 10, overflow: "auto" }}>
-              {JSON.stringify(product.specs, null, 2)}
-            </pre>
+            <span style={{ margin: "0 10px" }}>›</span>
+            <span style={{ cursor: "pointer" }} onClick={() => navigate("/store")}>
+              Store
+            </span>
+            <span style={{ margin: "0 10px" }}>›</span>
+            <span>{product.category_name}</span>
+            <span style={{ margin: "0 10px" }}>›</span>
+            <span>{product.title}</span>
           </div>
         </div>
       </div>
 
-      <hr style={{ margin: "30px 0" }} />
+      <div style={styles.container}>
+        {/* TOP SECTION */}
+        <div style={styles.topGrid}>
+          {/* LEFT */}
+          <div>
+            {product.is_sale ? <div style={styles.saleBadge}>Sale!</div> : null}
 
-      <h2>Reviews</h2>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
-        <div>
-          {reviews.length === 0 && <p>No reviews yet.</p>}
-          {reviews.map((r) => (
-            <div key={r.id} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, marginBottom: 10 }}>
-              <b>{r.name}</b> — ⭐ {r.rating}
-              <div style={{ color: "#6b7280", fontSize: 13 }}>{new Date(r.created_at).toLocaleString()}</div>
-              <p style={{ marginBottom: 0 }}>{r.comment}</p>
+            <div
+              style={styles.mainImageWrap}
+              onMouseMove={(e) => {
+                const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                setZoomPos({ x, y });
+              }}
+              onMouseEnter={() => setIsZooming(true)}
+              onMouseLeave={() => setIsZooming(false)}
+            >
+              <img
+                src={mainImage}
+                alt={product.title}
+                style={{
+                  ...styles.mainImage,
+                  transform: isZooming ? "scale(1.9)" : "scale(1)",
+                  transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
+                }}
+              />
+              <div style={styles.zoomIcon}>⌕</div>
             </div>
-          ))}
+
+            {product.images?.length > 1 ? (
+              <div style={styles.thumbRow}>
+                {product.images.map((img) => (
+                  <button
+                    key={img.id}
+                    style={{
+                      ...styles.thumbBtn,
+                      border:
+                        selectedImage === img.image_url
+                          ? "2px solid #0b76c5"
+                          : "1px solid #e5e7eb",
+                    }}
+                    onClick={() => setSelectedImage(img.image_url)}
+                  >
+                    <img src={img.image_url} alt="thumb" style={styles.thumbImg} />
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
+          {/* RIGHT */}
+          <div>
+            <h1 style={styles.title}>{product.title}</h1>
+
+            <div style={styles.priceRow}>
+              <span style={styles.oldPrice}>{money(product.mrp)}</span>
+              <span style={styles.salePrice}>{money(product.sale_price)}</span>
+              {product.discount_percent ? (
+                <span style={styles.discount}>{product.discount_percent}% OFF</span>
+              ) : null}
+            </div>
+
+            <div style={styles.gstText}>
+              GST ({product.gst_percent}%) <b>{money(product.gst_amount)}</b>
+            </div>
+
+            <div style={styles.cartRow}>
+              <div style={styles.qtyWrap}>
+                <button
+                  onClick={() => setQty((q) => Math.max(1, q - 1))}
+                  style={styles.qtyBtn}
+                >
+                  −
+                </button>
+                <div style={styles.qtyValue}>{qty}</div>
+                <button onClick={() => setQty((q) => q + 1)} style={styles.qtyBtn}>
+                  +
+                </button>
+              </div>
+
+              <button
+                style={styles.addCartBtn}
+                disabled={busyCart}
+                onClick={() => handleAddToCart(product.id, qty)}
+              >
+                {busyCart ? "Adding..." : "Add To Cart"}
+              </button>
+            </div>
+
+            <div style={styles.metaBlock}>
+              <div style={styles.metaLine}>
+                <span>SKU:</span> {product.sku || "-"}
+              </div>
+              <div style={styles.metaLine}>
+                <span>Category:</span> {product.category_name || "-"}
+              </div>
+              <div style={styles.metaLine}>
+                <span>Brand:</span> {product.brand || "-"}
+              </div>
+            </div>
+
+            <div style={styles.reviewSummary}>
+              {reviews.length === 0 ? (
+                "There are no reviews yet."
+              ) : (
+                <>
+                  {reviews.length} review(s) • Average rating: {reviewAverage.toFixed(1)} / 5
+                </>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div>
-          <h3>Write a Review</h3>
+        {/* BOTTOM */}
+        <div style={styles.bottomGrid}>
+          <div>
+            <div style={styles.tabRow}>
+              <button
+                onClick={() => setActiveTab("description")}
+                style={{
+                  ...styles.tabBtn,
+                  borderBottom:
+                    activeTab === "description" ? "2px solid #111" : "2px solid transparent",
+                  fontWeight: activeTab === "description" ? 900 : 500,
+                }}
+              >
+                Description
+              </button>
 
-          <label>Rating</label>
-          <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
-            {[5,4,3,2,1].map((x) => <option key={x} value={x}>{x}</option>)}
-          </select>
+              <button
+                onClick={() => setActiveTab("reviews")}
+                style={{
+                  ...styles.tabBtn,
+                  borderBottom:
+                    activeTab === "reviews" ? "2px solid #111" : "2px solid transparent",
+                  fontWeight: activeTab === "reviews" ? 900 : 500,
+                }}
+              >
+                Reviews ({reviews.length})
+              </button>
+            </div>
 
-          <div style={{ marginTop: 10 }}>
-            <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-          </div>
-          <div style={{ marginTop: 10 }}>
-            <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          </div>
-          <div style={{ marginTop: 10 }}>
-            <textarea placeholder="Comment" value={comment} onChange={(e) => setComment(e.target.value)} rows={4} />
+            {activeTab === "description" ? (
+              <div style={styles.descriptionBox}>
+                {product.description ? (
+                  <div style={styles.descriptionText}>
+                    {product.description.split("\n").map((line, index) => (
+                      <div key={index} style={{ marginBottom: 10 }}>
+                        {line}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+
+                {specsList.length > 0 ? (
+                  <div style={styles.specsList}>
+                    {specsList.map((item, idx) => (
+                      <div key={idx} style={styles.specLine}>
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <div style={styles.reviewsList}>
+                {reviews.length === 0 ? (
+                  <div style={styles.noReviewText}>There are no reviews yet.</div>
+                ) : (
+                  reviews.map((r) => (
+                    <div key={r.id} style={styles.reviewCard}>
+                      <div style={styles.reviewHeader}>
+                        <b>{r.name}</b>
+                        <span style={styles.reviewRating}>{"★".repeat(r.rating)}</span>
+                      </div>
+                      <div style={styles.reviewDate}>
+                        {new Date(r.created_at).toLocaleString()}
+                      </div>
+                      <div style={styles.reviewComment}>{r.comment}</div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
 
-          <button
-            style={{ marginTop: 10 }}
-            onClick={async () => {
-              if (!slug) return;
-              await createReview(slug, { rating, name, email, comment });
-              const r = await fetchReviews(slug);
-              setReviews(r);
-              setName(""); setEmail(""); setComment(""); setRating(5);
-              alert("Review submitted ✅");
-            }}
-          >
-            Submit Review
-          </button>
+          <div style={styles.reviewFormCard}>
+            <div style={styles.formTitle}>
+              Be the first to review “{product.title}”
+            </div>
+            <div style={styles.formSub}>
+              Your email address will not be published. Required fields are marked *
+            </div>
+
+            <form onSubmit={handleReviewSubmit}>
+              <label style={styles.label}>Your rating *</label>
+              <select
+                value={reviewForm.rating}
+                onChange={(e) =>
+                  setReviewForm((prev) => ({
+                    ...prev,
+                    rating: Number(e.target.value),
+                  }))
+                }
+                style={styles.input}
+              >
+                <option value={5}>★★★★★</option>
+                <option value={4}>★★★★</option>
+                <option value={3}>★★★</option>
+                <option value={2}>★★</option>
+                <option value={1}>★</option>
+              </select>
+
+              <label style={styles.label}>Your review *</label>
+              <textarea
+                value={reviewForm.comment}
+                onChange={(e) =>
+                  setReviewForm((prev) => ({
+                    ...prev,
+                    comment: e.target.value,
+                  }))
+                }
+                style={{ ...styles.input, minHeight: 110, resize: "vertical" }}
+              />
+
+              <div style={styles.formRow}>
+                <div>
+                  <label style={styles.label}>Name *</label>
+                  <input
+                    value={reviewForm.name}
+                    onChange={(e) =>
+                      setReviewForm((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }))
+                    }
+                    style={styles.input}
+                  />
+                </div>
+
+                <div>
+                  <label style={styles.label}>Email *</label>
+                  <input
+                    type="email"
+                    value={reviewForm.email}
+                    onChange={(e) =>
+                      setReviewForm((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }))
+                    }
+                    style={styles.input}
+                  />
+                </div>
+              </div>
+
+              <label style={styles.checkboxRow}>
+                <input type="checkbox" />
+                <span>
+                  Save my name, email, and website in this browser for the next time I
+                  comment.
+                </span>
+              </label>
+
+              <button type="submit" disabled={reviewBusy} style={styles.submitBtn}>
+                {reviewBusy ? "SUBMITTING..." : "SUBMIT"}
+              </button>
+            </form>
+          </div>
         </div>
+
+        {/* RELATED */}
+        {relatedProducts.length > 0 && (
+          <div style={styles.relatedSection}>
+            <h2 style={styles.relatedTitle}>Related products</h2>
+
+            <div style={styles.relatedGrid}>
+              {relatedProducts.map((p) => (
+                <div key={p.id} style={styles.relatedCard}>
+                  {p.is_sale ? <div style={styles.smallSaleBadge}>Sale!</div> : null}
+
+                  <div
+                    style={{ cursor: "pointer" }}
+                    onClick={() => navigate(`/product/${p.slug}`)}
+                  >
+                    <img
+                      src={
+                        p.image ||
+                        "https://dummyimage.com/380x320/f3f4f6/111827&text=No+Image"
+                      }
+                      alt={p.title}
+                      style={styles.relatedImg}
+                    />
+
+                    <div style={styles.relatedCategory}>
+                      {p.short_category_label || p.category_name}
+                    </div>
+
+                    <div style={styles.relatedName}>{p.title}</div>
+
+                    <div style={styles.relatedPriceRow}>
+                      <span style={styles.relatedOldPrice}>{money(p.mrp)}</span>
+                      <span style={styles.relatedPrice}>{money(p.sale_price)}</span>
+                      {p.discount_percent ? (
+                        <span style={styles.relatedDiscount}>{p.discount_percent}% OFF</span>
+                      ) : null}
+                    </div>
+
+                    <div style={styles.relatedGst}>
+                      GST ({p.gst_percent}%) {money(p.gst_amount)}
+                    </div>
+                  </div>
+
+                  <button
+                    style={styles.relatedCartBtn}
+                    onClick={() => handleAddToCart(p.id, 1)}
+                  >
+                    ADD TO CART
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
+const styles: Record<string, React.CSSProperties> = {
+  page: {
+    minHeight: "100vh",
+    background: "#f3f6f9",
+    fontFamily: "Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+    color: "#111",
+  },
+
+  hero: {
+    position: "relative",
+    height: 320,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    overflow: "hidden",
+  },
+  heroOverlay: {
+    position: "absolute",
+    inset: 0,
+    background: "rgba(0,0,0,0.35)",
+    zIndex: 1,
+  },
+  heroCenter: {
+    position: "absolute",
+    zIndex: 2,
+    inset: 0,
+    display: "grid",
+    placeItems: "center",
+    textAlign: "center",
+  },
+  heroTitle: {
+    color: "#fff",
+    fontSize: 72,
+    fontWeight: 800,
+    lineHeight: 1,
+    textShadow: "0 10px 30px rgba(0,0,0,0.35)",
+  },
+  heroCrumb: {
+    marginTop: 14,
+    color: "#fff",
+    fontSize: 15,
+    fontWeight: 600,
+    opacity: 0.95,
+  },
+
+  container: {
+    maxWidth: 1880,
+    margin: "0 auto",
+    padding: "26px 16px 40px",
+  },
+
+  topGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 28,
+    alignItems: "start",
+  },
+
+  saleBadge: {
+    display: "inline-block",
+    background: "#fff",
+    borderRadius: 999,
+    padding: "6px 12px",
+    fontSize: 14,
+    boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
+    marginBottom: 10,
+  },
+
+  mainImageWrap: {
+    position: "relative",
+    width: "100%",
+    height: 520,
+    overflow: "hidden",
+    borderRadius: 20,
+    background: "#fff",
+    display: "grid",
+    placeItems: "center",
+  },
+  mainImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "contain",
+    transition: "transform 0.18s ease",
+  },
+  zoomIcon: {
+    position: "absolute",
+    right: 18,
+    top: 18,
+    fontSize: 22,
+    color: "#555",
+    background: "rgba(255,255,255,0.95)",
+    width: 34,
+    height: 34,
+    borderRadius: 999,
+    display: "grid",
+    placeItems: "center",
+  },
+
+  thumbRow: {
+    display: "flex",
+    gap: 10,
+    marginTop: 12,
+    flexWrap: "wrap",
+  },
+  thumbBtn: {
+    width: 82,
+    height: 82,
+    borderRadius: 10,
+    background: "#fff",
+    padding: 6,
+    cursor: "pointer",
+  },
+  thumbImg: {
+    width: "100%",
+    height: "100%",
+    objectFit: "contain",
+  },
+
+  title: {
+    fontSize: 28,
+    fontWeight: 500,
+    lineHeight: 1.35,
+    margin: "40px 0 24px",
+  },
+
+  priceRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: 14,
+    flexWrap: "wrap",
+  },
+  oldPrice: {
+    textDecoration: "line-through",
+    color: "#9ca3af",
+    fontSize: 20,
+  },
+  salePrice: {
+    fontSize: 36,
+    fontWeight: 900,
+  },
+  discount: {
+    color: "red",
+    fontSize: 20,
+    fontWeight: 700,
+  },
+  gstText: {
+    marginTop: 16,
+    fontSize: 22,
+    color: "#374151",
+  },
+
+  cartRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: 18,
+    marginTop: 42,
+    marginBottom: 42,
+    flexWrap: "wrap",
+  },
+  qtyWrap: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 22,
+    padding: "0 10px",
+  },
+  qtyBtn: {
+    border: "none",
+    background: "transparent",
+    cursor: "pointer",
+    fontSize: 30,
+    fontWeight: 900,
+    width: 30,
+    height: 30,
+  },
+  qtyValue: {
+    fontSize: 18,
+    fontWeight: 700,
+    minWidth: 30,
+    textAlign: "center",
+  },
+  addCartBtn: {
+    minWidth: 230,
+    height: 54,
+    border: "none",
+    borderRadius: 16,
+    background: "#1d8fe1",
+    color: "#fff",
+    fontWeight: 800,
+    fontSize: 22,
+    cursor: "pointer",
+    padding: "0 24px",
+  },
+
+  metaBlock: {
+    borderTop: "1px solid #d7d7d7",
+    paddingTop: 16,
+    display: "flex",
+    gap: 18,
+    flexWrap: "wrap",
+    fontSize: 16,
+    color: "#374151",
+  },
+  metaLine: {
+    display: "flex",
+    gap: 6,
+    alignItems: "center",
+  },
+  reviewSummary: {
+    marginTop: 36,
+    fontSize: 18,
+    color: "#374151",
+  },
+
+  bottomGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 30,
+    marginTop: 30,
+    alignItems: "start",
+  },
+
+  tabRow: {
+    display: "flex",
+    gap: 24,
+    marginBottom: 20,
+    borderBottom: "1px solid #e5e7eb",
+  },
+  tabBtn: {
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    padding: "10px 0",
+    fontSize: 16,
+  },
+
+  descriptionBox: {
+    paddingRight: 20,
+  },
+  descriptionText: {
+    fontSize: 18,
+    lineHeight: 1.75,
+    color: "#1f2937",
+  },
+  specsList: {
+    marginTop: 18,
+    display: "grid",
+    gap: 8,
+  },
+  specLine: {
+    fontSize: 18,
+    color: "#1f2937",
+    lineHeight: 1.6,
+  },
+
+  reviewsList: {
+    display: "grid",
+    gap: 14,
+  },
+  noReviewText: {
+    fontSize: 18,
+    color: "#374151",
+  },
+  reviewCard: {
+    background: "#fff",
+    border: "1px solid #e5e7eb",
+    borderRadius: 14,
+    padding: 16,
+  },
+  reviewHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: 12,
+    alignItems: "center",
+  },
+  reviewRating: {
+    color: "#f59e0b",
+    fontWeight: 900,
+  },
+  reviewDate: {
+    marginTop: 6,
+    color: "#6b7280",
+    fontSize: 14,
+  },
+  reviewComment: {
+    marginTop: 10,
+    fontSize: 16,
+    lineHeight: 1.7,
+  },
+
+  reviewFormCard: {
+    background: "#fff",
+    border: "1px solid #d1d5db",
+    padding: 24,
+  },
+  formTitle: {
+    fontSize: 22,
+    lineHeight: 1.45,
+    marginBottom: 10,
+  },
+  formSub: {
+    color: "#374151",
+    marginBottom: 22,
+    lineHeight: 1.6,
+  },
+  label: {
+    display: "block",
+    marginBottom: 8,
+    fontSize: 16,
+    marginTop: 14,
+  },
+  input: {
+    width: "100%",
+    border: "1px solid #c7cdd6",
+    borderRadius: 16,
+    minHeight: 44,
+    padding: "10px 14px",
+    fontSize: 16,
+    boxSizing: "border-box",
+    background: "#fff",
+  },
+  formRow: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 12,
+  },
+  checkboxRow: {
+    display: "flex",
+    gap: 10,
+    alignItems: "flex-start",
+    marginTop: 16,
+    color: "#374151",
+    lineHeight: 1.5,
+  },
+  submitBtn: {
+    marginTop: 18,
+    border: "none",
+    background: "#0b76c5",
+    color: "#fff",
+    borderRadius: 999,
+    padding: "12px 26px",
+    fontWeight: 900,
+    cursor: "pointer",
+  },
+
+  relatedSection: {
+    marginTop: 44,
+  },
+  relatedTitle: {
+    fontSize: 34,
+    fontWeight: 900,
+    marginBottom: 20,
+  },
+  relatedGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
+    gap: 24,
+  },
+  relatedCard: {
+    position: "relative",
+    background: "transparent",
+  },
+  smallSaleBadge: {
+    position: "absolute",
+    top: 4,
+    left: 4,
+    background: "#fff",
+    borderRadius: 999,
+    padding: "4px 10px",
+    fontSize: 14,
+    boxShadow: "0 4px 10px rgba(0,0,0,0.10)",
+    zIndex: 2,
+  },
+  relatedImg: {
+    width: "100%",
+    height: 320,
+    objectFit: "contain",
+    background: "#fff",
+  },
+  relatedCategory: {
+    marginTop: 12,
+    color: "#9ca3af",
+    textAlign: "center",
+    textTransform: "uppercase",
+    fontSize: 13,
+  },
+  relatedName: {
+    marginTop: 8,
+    fontWeight: 800,
+    textAlign: "center",
+    fontSize: 18,
+    lineHeight: 1.45,
+    minHeight: 52,
+  },
+  relatedPriceRow: {
+    marginTop: 10,
+    display: "flex",
+    justifyContent: "center",
+    gap: 8,
+    flexWrap: "wrap",
+    alignItems: "center",
+  },
+  relatedOldPrice: {
+    textDecoration: "line-through",
+    color: "#9ca3af",
+    fontSize: 15,
+  },
+  relatedPrice: {
+    fontWeight: 900,
+    fontSize: 20,
+  },
+  relatedDiscount: {
+    color: "red",
+    fontWeight: 700,
+    fontSize: 14,
+  },
+  relatedGst: {
+    marginTop: 6,
+    textAlign: "center",
+    fontWeight: 700,
+    fontSize: 15,
+  },
+  relatedCartBtn: {
+    margin: "14px auto 0",
+    display: "block",
+    minWidth: 150,
+    height: 42,
+    border: "none",
+    borderRadius: 999,
+    background: "#0b76c5",
+    color: "#fff",
+    fontWeight: 900,
+    cursor: "pointer",
+  },
+};

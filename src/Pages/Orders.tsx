@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fetchOrders, type Order } from "../services/orderApi";
 import { useNavigate } from "react-router-dom";
 
