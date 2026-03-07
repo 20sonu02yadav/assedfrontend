@@ -1,16 +1,7 @@
-import{ useMemo, useRef} from "react";
-
-type Product = {
-  id: string;
-  name: string;
-  category?: string;
-  image: string;
-  price: number;
-  oldPrice?: number;
-  discountPercent?: number;
-  href?: string;
-  badge?: string; // "SALE"
-};
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { addToCart } from "../services/cartApi";
+import { fetchProducts, type ProductListItem } from "../services/storeApi";
 
 type Offer = {
   id: string;
@@ -46,58 +37,17 @@ function Stars({ count = 5 }: { count?: number }) {
   );
 }
 
-function FeaturedCard({ p }: { p: Product }) {
-  return (
-    <article className="fpCard">
-      <a className="fpImgWrap" href={p.href ?? "#"} onClick={(e) => !p.href && e.preventDefault()}>
-        <img className="fpImg" src={p.image} alt={p.name} loading="lazy" />
-        <span className="fpSale">{p.badge ?? "SALE"}</span>
-        <span className="fpEye" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"
-            />
-            <circle cx="12" cy="12" r="3" strokeWidth="2" />
-          </svg>
-        </span>
-      </a>
-
-      <div className="fpBody">
-        <div className="fpCat">{p.category ?? "UNCATEGORIZED"}</div>
-
-        <h3 className="fpTitle" title={p.name}>
-          <a href={p.href ?? "#"} onClick={(e) => !p.href && e.preventDefault()}>
-            {p.name.toUpperCase()}
-          </a>
-        </h3>
-
-        <div className="fpPriceRow">
-          {p.oldPrice ? <span className="fpOld">{inr(p.oldPrice)}</span> : null}
-          <span className="fpNow">{inr(p.price)}</span>
-          {p.discountPercent ? <span className="fpOff">{`-${p.discountPercent}%`}</span> : null}
-        </div>
-
-        <button className="fpBtn" type="button">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 10V8a6 6 0 0112 0v2" />
-            <rect x="5" y="10" width="14" height="12" rx="2" strokeWidth="2" />
-          </svg>
-          ADD TO CART
-        </button>
-      </div>
-    </article>
-  );
-}
+type QuickViewState = {
+  open: boolean;
+  product: ProductListItem | null;
+  qty: number;
+};
 
 export default function Home() {
-  // Hero BG (FULL show)
+  const navigate = useNavigate();
+
   const heroBg =
     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-nishantaneja-12105083.jpg";
-
-  
 
   const promo1 =
     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-theshuttervision-8811529.jpg";
@@ -107,7 +57,7 @@ export default function Home() {
     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-matreding-6835302.jpg";
 
   const specialEditionBg =
-    "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/cta-bg.jpg";
+    "/image.png";
 
   const brandLogos = useMemo(
     () => [
@@ -116,41 +66,18 @@ export default function Home() {
       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.29-PM.jpeg", alt: "DuCaR" },
       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.32-PM.jpeg", alt: "Mr Light" },
       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.35-PM.jpeg", alt: "Gravis" },
-
-
-
-
-
       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.30-PM.jpeg", alt: "PHILIPS" },
       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.38-PM.jpeg", alt: "AMEROCOOK" },
       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.26-PM.jpeg", alt: "SMART LIGHT" },
       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.40-PM.jpeg", alt: "ZIG GAK" },
       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.35-PM.jpeg", alt: "ENGLISH ROYAL" },
-
-
-      
-      { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.16-PM.jpeg", alt: "PHILIPS ACCOSSIRALSE" },
+      { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.16-PM.jpeg", alt: "PHILIPS ACCESSORIES" },
       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.20-PM.jpeg", alt: "PHILIPS BATTERIES" },
       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.23-PM.jpeg", alt: "PHILIPS FLASHLIGHT" },
-      { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.40-PM.jpeg", alt: "ZIG GAK" },
-      { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.35-PM.jpeg", alt: "ENGLISH ROYAL" },
-
     ],
     []
   );
 
-  const brandsRef = useRef<HTMLDivElement | null>(null);
-
-  // Dummy cart values (connect later)
-  //const [cartCount] = useState(0);
-  //const [cartTotal] = useState(0);
-  //const [floatingCartCount] = useState(0);
-
-  // ✅ LOGO fallback
-  //const [logoOkHeader, setLogoOkHeader] = useState(true);
-  //const [logoOkFooter, setLogoOkFooter] = useState(true);
-
-  // ✅ Dummy Offers (no API)
   const offers: Offer[] = useMemo(
     () => [
       {
@@ -158,7 +85,7 @@ export default function Home() {
         title: "20% Off",
         desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac dictum.",
         image: promo1,
-        href: "/discounted-products",
+        href: "/store",
         cta: "SHOP NOW",
       },
       {
@@ -181,105 +108,100 @@ export default function Home() {
     [promo1, promo2, promo3]
   );
 
-  // ✅ Dummy Featured Products (no API)
-  const featured: Product[] = useMemo(
-    () => [
-      {
-        id: "p1",
-        name: "TOTAL TOOLS SOFT BRISTLE BRUSH TACS1401",
-        category: "UNCATEGORIZED",
-        image:
-          "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/premium_photo-1683140705462-11ed388653cf-1.jpg",
-        price: 340,
-        oldPrice: 425,
-        discountPercent: 20,
-        badge: "SALE",
-        href: "/product/tacs1401",
-      },
-      {
-        id: "p2",
-        name: "TOTAL TOOLS 4 STEP HOUSEHOLD LADDER THLAD06041",
-        category: "LADDER",
-        image: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/ladder.png",
-        price: 4232,
-        oldPrice: 5290,
-        discountPercent: 20,
-        badge: "SALE",
-        href: "/product/thlad06041",
-      },
-      {
-        id: "p3",
-        name: "TOTAL TOOLS IMPACT SCREWDRIVER BITS TACIM71SL625",
-        category: "POWER TOOLS ACCESSORIES",
-        image: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/bits.png",
-        price: 60,
-        oldPrice: 75,
-        discountPercent: 20,
-        badge: "SALE",
-        href: "/product/tacim71sl625",
-      },
-      {
-        id: "p4",
-        name: "TOTAL TOOLS HAMMER THTH0166",
-        category: "HAND TOOLS",
-        image: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/hammer.png",
-        price: 380,
-        oldPrice: 475,
-        discountPercent: 20,
-        badge: "SALE",
-        href: "/product/thth0166",
-      },
-      {
-        id: "p5",
-        name: "TOTAL TOOLS MEASURING TAPE TMT12603",
-        category: "MEASURING",
-        image: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/tape.png",
-        price: 120,
-        oldPrice: 150,
-        discountPercent: 20,
-        badge: "SALE",
-        href: "/product/tmt12603",
-      },
-      {
-        id: "p6",
-        name: "TOTAL TOOLS SCREWDRIVER SET THT250614",
-        category: "HAND TOOLS",
-        image: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/screwdriver.png",
-        price: 299,
-        oldPrice: 375,
-        discountPercent: 20,
-        badge: "SALE",
-        href: "/product/tht250614",
-      },
-    ],
-    []
-  );
+  const brandsRef = useRef<HTMLDivElement | null>(null);
 
-  //const goTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+  const [featured, setFeatured] = useState<ProductListItem[]>([]);
+  const [featuredLoading, setFeaturedLoading] = useState(true);
+  const [busyId, setBusyId] = useState<number | null>(null);
+  const [qtyMap, setQtyMap] = useState<Record<number, number>>({});
+  const [quickView, setQuickView] = useState<QuickViewState>({
+    open: false,
+    product: null,
+    qty: 1,
+  });
 
-  
+  useEffect(() => {
+    async function loadFeatured() {
+      setFeaturedLoading(true);
+      try {
+        const data = await fetchProducts();
+        const topSix = data.slice(0, 6);
+        setFeatured(topSix);
+
+        const nextQty: Record<number, number> = {};
+        topSix.forEach((p) => {
+          nextQty[p.id] = 1;
+        });
+        setQtyMap(nextQty);
+      } catch {
+        setFeatured([]);
+      } finally {
+        setFeaturedLoading(false);
+      }
+    }
+
+    loadFeatured();
+  }, []);
+
+  useEffect(() => {
+    if (!quickView.open) return;
+
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [quickView.open]);
+
+  function setQty(productId: number, qty: number) {
+    setQtyMap((prev) => ({
+      ...prev,
+      [productId]: Math.max(1, qty),
+    }));
+  }
+
+  async function handleAddToCart(productId: number, qty: number) {
+    try {
+      setBusyId(productId);
+      await addToCart(productId, qty);
+      alert("Added to cart ✅");
+    } catch {
+      alert("Please login to add to cart.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   return (
     <div className="home">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap');
 
         :root{
-        --blue:#2ea3f2;
-        --blue2:#1b76c4;
-        --navbg: linear-gradient(90deg,#07293b 0%, #08344c 60%, #0b3d57 100%);
-        --border: rgba(255,255,255,.08);
+          --blue:#2ea3f2;
+          --blue2:#1b76c4;
         }
 
         *{box-sizing:border-box}
-        body{margin:0; font-family:Lato, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;}
+        body{
+          margin:0;
+          font-family:Lato, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+          background:#f3f5f7;
+        }
         a{text-decoration:none; color:inherit}
-        .container{width:min(1320px, 94%); margin:0 auto}
+        .container{
+        width:100%;
+        max-width:1600px;
+        margin:auto;
+        padding-left:40px;
+        padding-right:40px;
+      }
 
-        /* ✅ HERO */
         .hero{
           position:relative;
-          height: 100vh;
-          min-height: 720px;
+          height:100vh;
+          min-height:720px;
           overflow:hidden;
           background:#061b27;
         }
@@ -288,7 +210,7 @@ export default function Home() {
           inset:0;
           width:100%;
           height:100%;
-          object-fit: cover; /* FULL IMAGE visible */
+          object-fit:cover;
           object-position:center;
         }
         .heroOverlay{
@@ -304,19 +226,20 @@ export default function Home() {
           pointer-events:none;
         }
 
-        /* ✅ HERO TEXT */
         .heroContent{
-          position:relative;
-          z-index:2;
-          height:100%;
-          display:flex;
-          align-items:center;
-          padding-top:76px; /* prevent header overlap */
-        }
+        position:relative;
+        z-index:2;
+        height:100%;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        text-align:center;
+      }
         .heroText{
           color:#fff;
-          max-width: 760px;
-          padding-top: 60px;
+          max-width:760px;
+          margin:auto;
+          text-align:center;
         }
         .heroH1{font-size:64px; margin:0 0 12px; font-weight:900; line-height:1.05}
         .heroH3{margin:0 0 28px; font-size:26px; font-weight:800; opacity:.95}
@@ -324,10 +247,9 @@ export default function Home() {
           background:#fff; color:#111; border:none;
           padding:12px 22px; border-radius:999px;
           font-weight:900; cursor:pointer;
-          box-shadow: 0 10px 20px rgba(0,0,0,.18);
+          box-shadow:0 10px 20px rgba(0,0,0,.18);
         }
 
-        /* TITLES */
         .section{padding:60px 0}
         .titleWrap{display:flex; flex-direction:column; gap:10px; margin-bottom:34px}
         .titleWrap.center{align-items:center}
@@ -335,80 +257,81 @@ export default function Home() {
         .title{margin:0; font-size:48px; font-weight:900; color:#0b0b0b}
         .underline{width:180px; height:3px; background:#8aa0ff}
 
-        /* BRANDS */
-.brandsBox{
-  background:#fff;
-  padding:60px 0;   /* more vertical space */
-}
+        .brandsBox{
+          width:100%;
+          background:#fff;
+          padding:60px 0;
+        }
+        .brandsRow{
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:18px;
+        }
+        .brandsScroll{
+          overflow-x:auto;
+          overflow-y:hidden;
+          display:flex;
+          align-items:center;
+          justify-content:flex-start;
+          gap:80px;
+          padding:20px 0;
+          height:160px;
+          flex:1;
+          scroll-behavior:smooth;
+        }
+        .brandsScroll::-webkit-scrollbar{height:0}
+        .brandLogo{
+          min-width:240px;
+          height:160px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+        }
+        .brandLogo img{
+          max-height:150px;
+          max-width:220px;
+          object-fit:contain;
+        }
+        .brandArrow{
+          width:60px;
+          height:60px;
+          border-radius:50%;
+          border:none;
+          background:linear-gradient(135deg,#3b82f6,#2563eb);
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          cursor:pointer;
+          transition:all .3s ease;
+          box-shadow:0 10px 25px rgba(0,0,0,.15);
+          color:#fff;
+          flex:0 0 auto;
+        }
+        .brandArrow:hover{
+          transform:translateY(-4px);
+          box-shadow:0 18px 35px rgba(0,0,0,.25);
+        }
 
-.brandsRow{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-.brandsScroll{
-  overflow-x:auto;
-  overflow-y:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:80px;          /* more gap */
-  padding:20px 0;
-  height:160px;      /* 🔥 increased height */
-}
-
-.brandsScroll::-webkit-scrollbar{
-  height:0;
-}
-
-.brandLogo{
-  min-width:240px;   /* bigger width */
-  height:160px;      /* bigger logo box */
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.brandArrow{
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  border:none;
-  background:linear-gradient(135deg,#3b82f6,#2563eb);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  transition:all .3s ease;
-  box-shadow:0 10px 25px rgba(0,0,0,.15);
-}
-
-.brandArrow svg{
-  width:22px;
-  height:22px;
-  stroke:#fff;
-}
-
-.brandArrow:hover{
-  transform:translateY(-4px);
-  box-shadow:0 18px 35px rgba(0,0,0,.25);
-}
-
-.brandLogo img{
-  max-height:150px;   /* proportional */
-  max-width:220px;
-  object-fit:contain;
-}
-
-        /* PROMOS */
         .promoGrid{display:grid; grid-template-columns:repeat(3,1fr); gap:28px}
         .promo{
           border-radius:22px; overflow:hidden; position:relative;
           min-height:420px; background-size:cover; background-position:center;
-          box-shadow: var(--shadow);
+          box-shadow:0 10px 25px rgba(0,0,0,.08);
         }
-        .promo::before{content:""; position:absolute; inset:0; background:rgba(0,0,0,.55)}
-        .promoBody{position:absolute; left:36px; right:36px; bottom:36px; color:#fff}
+        .promo::before{
+          content:"";
+          position:absolute;
+          inset:0;
+          background:rgba(0,0,0,.55);
+        }
+        .promoBody{
+          position:absolute;
+          left:36px;
+          right:36px;
+          bottom:36px;
+          color:#fff;
+        }
         .promoH{margin:0 0 10px; font-weight:900; font-size:34px}
         .promoSub{margin:0 0 18px; opacity:.92; line-height:1.7; font-size:16px}
         .promoBtn{
@@ -417,53 +340,158 @@ export default function Home() {
           font-weight:900; cursor:pointer;
         }
 
-        /* FEATURED PRODUCTS */
         .fpSection{background:#f3f5f7; padding:70px 0}
         .fpGrid{display:grid; grid-template-columns:repeat(3,1fr); gap:28px}
         .fpCard{
-          background:#fff; border-radius:18px; overflow:hidden;
-          border:1px solid #e7e7e7; box-shadow: 0 10px 25px rgba(0,0,0,.08);
+          background:#fff;
+          border-radius:24px;
+          overflow:hidden;
+          border:1px solid #e7e7e7;
+          box-shadow:0 10px 25px rgba(0,0,0,.08);
+          position:relative;
         }
-        .fpImgWrap{position:relative; background:#f1f1f1; height:290px; display:block}
-        .fpImg{width:100%; height:100%; object-fit:contain; padding:26px}
-        .fpSale{position:absolute; top:14px; left:14px; background:#e74b3c; color:#fff; font-weight:900; font-size:12px; padding:6px 12px; border-radius:6px}
-        .fpEye{position:absolute; top:14px; right:14px; width:36px; height:36px; border-radius:999px; background:#fff; display:grid; place-items:center; color:#444; box-shadow: 0 8px 16px rgba(0,0,0,.12)}
+        .fpImgWrap{
+          position:relative;
+          background:#f7f7f7;
+          height:320px;
+          display:block;
+          cursor:pointer;
+        }
+        .fpImg{
+          width:100%;
+          height:100%;
+          object-fit:contain;
+          padding:20px;
+        }
+        .fpSale{
+          position:absolute;
+          top:14px;
+          left:14px;
+          background:#e74b3c;
+          color:#fff;
+          font-weight:900;
+          font-size:12px;
+          padding:8px 14px;
+          border-radius:8px;
+        }
+        .fpEye{
+          position:absolute;
+          top:14px;
+          right:14px;
+          width:58px;
+          height:58px;
+          border-radius:999px;
+          background:#fff;
+          display:grid;
+          place-items:center;
+          color:#444;
+          box-shadow:0 8px 16px rgba(0,0,0,.12);
+          border:none;
+          cursor:pointer;
+        }
         .fpBody{padding:18px 18px 20px}
-        .fpCat{color:#9aa1aa; font-size:12px; font-weight:900; margin-bottom:8px}
-        .fpTitle{margin:0 0 14px; font-size:22px; font-weight:900; line-height:1.2; color:#1f2937; min-height:86px}
-        .fpPriceRow{display:flex; align-items:flex-end; gap:10px; margin-bottom:16px}
-        .fpOld{color:#9aa1aa; text-decoration:line-through; font-weight:900}
-        .fpNow{font-weight:900; font-size:22px; color:#111827}
-        .fpOff{font-size:12px; font-weight:900; background:#ffe9ea; color:#e74b3c; padding:4px 8px; border-radius:6px}
+        .fpCat{
+          color:#9aa1aa;
+          font-size:12px;
+          font-weight:900;
+          margin-bottom:10px;
+          text-transform:uppercase;
+        }
+        .fpTitle{
+          margin:0 0 14px;
+          font-size:22px;
+          font-weight:900;
+          line-height:1.25;
+          color:#1f2937;
+          min-height:84px;
+          cursor:pointer;
+        }
+        .fpPriceRow{
+          display:flex;
+          align-items:flex-end;
+          gap:10px;
+          margin-bottom:8px;
+          flex-wrap:wrap;
+        }
+        .fpOld{
+          color:#9aa1aa;
+          text-decoration:line-through;
+          font-weight:900;
+          font-size:16px;
+        }
+        .fpNow{
+          font-weight:900;
+          font-size:22px;
+          color:#111827;
+        }
+        .fpOff{
+          font-size:12px;
+          font-weight:900;
+          background:#ffe9ea;
+          color:#e74b3c;
+          padding:4px 8px;
+          border-radius:6px;
+        }
+        .fpGst{
+          font-size:14px;
+          font-weight:800;
+          color:#4b5563;
+          margin-bottom:16px;
+        }
         .fpBtn{
-          width:100%; background:var(--blue2); color:#fff; border:none;
-          padding:14px 12px; border-radius:10px;
-          font-weight:900; cursor:pointer;
-          display:flex; align-items:center; justify-content:center; gap:10px;
+          width:100%;
+          background:linear-gradient(90deg,#4f86ff,#1d4ed8);
+          color:#fff;
+          border:none;
+          padding:16px 12px;
+          border-radius:14px;
+          font-weight:900;
+          cursor:pointer;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          gap:10px;
         }
+        .fpBtn:disabled{opacity:.7; cursor:not-allowed}
 
-        /* SPECIAL EDITION */
-        .specialBannerWrap{background:#fff; padding:70px 0 20px}
-        .specialBanner{
-          border-radius:22px; overflow:hidden; min-height:430px;
-          background-image:url(${specialEditionBg});
-          background-size:cover; background-position:center; position:relative;
+        .specialBannerWrap{
+          width:100%;
+          padding:70px 40px;
         }
-        .specialBanner::before{content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(0,0,0,.68) 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.05) 100%)}
-        .specialContent{position:absolute; left:60px; top:60px; max-width:520px; color:#fff}
-        .smallLabel{font-weight:900; opacity:.9; margin-bottom:12px}
+        .specialBanner{
+          border-radius:28px;
+          overflow:hidden;
+          min-height:430px;
+          background-image:url(${specialEditionBg});
+          background-size:cover;
+          background-position:center;
+          position:relative;
+        }
+        .specialBanner::before{
+          content:"";
+          position:absolute;
+          inset:0;
+          background:linear-gradient(90deg, rgba(0,0,0,.68) 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.05) 100%);
+        }
+        .specialContent{
+          position:absolute;
+          left:60px;
+          top:60px;
+          max-width:520px;
+          color:#fff;
+          z-index:2;
+        }
+        .smallLabel{font-weight:900; opacity:.9; margin-bottom:12px; font-size:18px}
         .specialH{margin:0 0 14px; font-size:52px; font-weight:900}
-        .specialP{margin:0 0 20px; line-height:1.7; opacity:.92}
+        .specialP{margin:0 0 20px; line-height:1.8; opacity:.92; font-size:17px}
         .specialStrong{margin:0 0 24px; font-weight:900; font-size:20px}
 
-        /* FEATURES */
         .features{background:#f3f5f7; padding:70px 0}
         .featGrid{display:grid; grid-template-columns:repeat(4,1fr); gap:24px; text-align:center}
         .featItem h4{margin:14px 0 10px; font-size:20px; font-weight:900}
         .featItem p{margin:0; color:#555; line-height:1.8; max-width:280px; margin-inline:auto}
         .featIcon{width:48px; height:48px; margin:0 auto; color:#111; opacity:.9}
 
-        /* REVIEWS */
         .reviews{padding:70px 0; background:#fff}
         .reviewGrid{display:grid; grid-template-columns:repeat(4,1fr); gap:28px; margin-top:30px; text-align:center}
         .avatar{width:90px; height:90px; border-radius:999px; object-fit:cover; margin-bottom:16px}
@@ -473,45 +501,359 @@ export default function Home() {
         .star.on{opacity:1}
         .rText{margin:0; color:#444; line-height:2; padding:0 14px}
 
-        
-
-        /* FLOATING */
         .floatTop{
           position:fixed; left:22px; bottom:22px;
           width:56px; height:56px; border-radius:999px;
           background:#9aa8ff; display:grid; place-items:center;
           box-shadow:0 12px 22px rgba(0,0,0,.18); cursor:pointer; z-index:999;
-        }
-        .floatCart{
-          position:fixed; right:22px; bottom:22px;
-          width:66px; height:66px; border-radius:999px;
-          background:#0ea5e9; display:grid; place-items:center;
-          box-shadow:0 16px 26px rgba(0,0,0,.18); cursor:pointer; z-index:999;
-        }
-        .floatCart .cBadge{
-          position:absolute; top:-6px; left:-6px;
-          width:26px; height:26px; border-radius:999px;
-          background:#14b8a6; color:#fff; font-weight:900;
-          display:grid; place-items:center; border:3px solid #fff; font-size:12px;
+          border:none;
         }
 
-        @media (max-width:1080px){
-          .heroH1{font-size:48px}
-          .title{font-size:40px}
-          .promoGrid{grid-template-columns:1fr}
-          .fpGrid{grid-template-columns:repeat(2,1fr)}
-          .reviewGrid{grid-template-columns:repeat(2,1fr)}
-          .featGrid{grid-template-columns:repeat(2,1fr)}
-          .specialContent{left:26px; right:26px; top:26px}
+        /* QUICK VIEW */
+        .qvOverlay{
+          position:fixed;
+          inset:0;
+          background:rgba(0,0,0,.55);
+          z-index:9999;
+          display:grid;
+          place-items:center;
+          padding:20px;
         }
-        @media (max-width:720px){
-          .menu{display:none}
-          .heroText{padding-top: 40px}
-          .heroH1{font-size:38px}
-          .heroH3{font-size:20px}
-          .fpGrid{grid-template-columns:1fr}
-          .reviewGrid{grid-template-columns:1fr}
-          .footerGrid{grid-template-columns:1fr}
+        .qvCard{
+          width:min(1380px, 96vw);
+          background:#fff;
+          position:relative;
+          padding:28px;
+          box-sizing:border-box;
+        }
+        .qvClose{
+          position:absolute;
+          top:18px;
+          right:18px;
+          border:none;
+          background:transparent;
+          cursor:pointer;
+          font-size:34px;
+          line-height:1;
+          color:#1f2937;
+        }
+        .qvGrid{
+          display:grid;
+          grid-template-columns:0.9fr 1.1fr;
+          gap:28px;
+          align-items:start;
+        }
+        .qvMainImage{
+          width:100%;
+          height:560px;
+          object-fit:contain;
+          background:#fff;
+        }
+        .qvThumbRow{
+          margin-top:18px;
+          display:flex;
+          justify-content:center;
+        }
+        .qvThumb{
+          width:110px;
+          height:90px;
+          object-fit:contain;
+          background:#fff;
+        }
+        .qvPriceRow{
+          display:flex;
+          align-items:center;
+          gap:10px;
+          flex-wrap:wrap;
+          margin-top:10px;
+        }
+        .qvOld{
+          font-size:22px;
+          color:#9ca3af;
+          text-decoration:line-through;
+          font-weight:900;
+        }
+        .qvNow{
+          font-size:30px;
+          font-weight:900;
+          color:#1f2937;
+        }
+        .qvActionRow{
+          display:flex;
+          align-items:center;
+          gap:16px;
+          margin-top:18px;
+          flex-wrap:wrap;
+        }
+        .qvQty{
+          display:inline-flex;
+          align-items:center;
+          border:1px solid #d1d5db;
+          height:42px;
+        }
+        .qvQtyBtn{
+          width:46px;
+          height:40px;
+          border:none;
+          background:#fff;
+          cursor:pointer;
+          font-size:24px;
+        }
+        .qvQtyValue{
+          min-width:46px;
+          text-align:center;
+          font-size:18px;
+        }
+        .qvAdd{
+          min-width:390px;
+          height:54px;
+          border:none;
+          border-radius:999px;
+          background:#0b86d7;
+          color:#fff;
+          font-weight:900;
+          font-size:18px;
+          cursor:pointer;
+          padding:0 24px;
+        }
+        .qvDivider{
+          height:1px;
+          background:#e5e7eb;
+          margin-top:18px;
+          margin-bottom:16px;
+        }
+        .qvMeta{
+          display:flex;
+          gap:28px;
+          flex-wrap:wrap;
+          font-size:16px;
+          color:#1f2937;
+        }
+        .qvShare{
+          display:flex;
+          align-items:center;
+          gap:16px;
+          margin-top:26px;
+          font-size:16px;
+          color:#374151;
+        }
+        .qvShareIcon{
+          font-weight:800;
+          font-size:18px;
+        }
+
+        /* ===== RESPONSIVE STYLES ADDED ===== */
+        @media (max-width: 1280px) {
+          .heroH1 { font-size: 56px; }
+          .title { font-size: 42px; }
+          .specialH { font-size: 44px; }
+        }
+
+        @media (max-width: 1080px) {
+          .heroH1 { font-size: 48px; }
+          .hero { min-height: 600px; }
+          .heroText { max-width: 600px; }
+          
+          .title { font-size: 40px; }
+          
+          .promoGrid { grid-template-columns: repeat(2, 1fr); }
+          .promo { min-height: 380px; }
+          
+          .fpGrid { grid-template-columns: repeat(2, 1fr); }
+          
+          .reviewGrid { grid-template-columns: repeat(2, 1fr); }
+          
+          .featGrid { grid-template-columns: repeat(2, 1fr); }
+          
+          .specialContent { left: 40px; top: 40px; max-width: 450px; }
+          .specialH { font-size: 40px; }
+          
+          .qvGrid { grid-template-columns: 1fr; }
+          .qvMainImage { height: 400px; }
+          .qvAdd { min-width: 250px; }
+          
+          .brandsScroll { gap: 40px; }
+          .brandLogo { min-width: 180px; }
+        }
+
+        @media (max-width: 768px) {
+          .hero { min-height: 500px; }
+          .heroText { padding-top: 30px; }
+          .heroH1 { font-size: 38px; }
+          .heroH3 { font-size: 20px; margin-bottom: 20px; }
+          
+          .title { font-size: 34px; }
+          .section { padding: 40px 0; }
+          
+          .promoGrid { grid-template-columns: 1fr; }
+          .promo { min-height: 320px; }
+          .promoBody { left: 24px; right: 24px; bottom: 24px; }
+          .promoH { font-size: 28px; }
+          .promoSub { font-size: 15px; }
+          
+          .fpSection { padding: 40px 0; }
+          .fpGrid { gap: 20px; }
+          .fpImgWrap { height: 260px; }
+          .fpTitle { font-size: 18px; min-height: auto; }
+          .fpNow { font-size: 18px; }
+          
+          .brandsBox { padding: 30px 0; }
+          .brandsRow { gap: 10px; }
+          .brandsScroll { gap: 20px; height: 120px; }
+          .brandLogo { min-width: 140px; height: 120px; }
+          .brandLogo img { max-height: 100px; max-width: 140px; }
+          .brandArrow { width: 44px; height: 44px; }
+          
+          .specialBannerWrap { padding: 40px 0 10px; }
+          .specialBanner { min-height: 350px; }
+          .specialContent { left: 24px; top: 24px; right: 24px; max-width: 100%; }
+          .specialH { font-size: 32px; }
+          .specialP { font-size: 15px; }
+          .specialStrong { font-size: 16px; }
+          
+          .features { padding: 40px 0; }
+          .featGrid { gap: 16px; }
+          .featItem h4 { font-size: 18px; }
+          .featItem p { font-size: 14px; }
+          
+          .reviews { padding: 40px 0; }
+          .reviewGrid { gap: 20px; }
+          .avatar { width: 70px; height: 70px; }
+          .rName { font-size: 16px; }
+          .rText { font-size: 14px; line-height: 1.6; }
+          
+          .floatTop { width: 48px; height: 48px; left: 16px; bottom: 16px; }
+          
+          .qvCard { padding: 20px; }
+          .qvMainImage { height: 300px; }
+          .qvClose { font-size: 28px; top: 12px; right: 12px; }
+          .qvNow { font-size: 24px; }
+          .qvOld { font-size: 18px; }
+          .qvQtyBtn { width: 40px; height: 36px; font-size: 20px; }
+          .qvAdd { min-width: 200px; height: 48px; font-size: 16px; }
+          .qvMeta { gap: 16px; font-size: 14px; }
+        }
+
+        @media (max-width: 480px) {
+          .hero { min-height: 450px; }
+          .heroH1 { font-size: 30px; }
+          .heroH3 { font-size: 18px; }
+          .heroBtn { padding: 10px 18px; font-size: 14px; }
+          
+          .title { font-size: 28px; }
+          .underline { width: 120px; }
+          
+          .promo { min-height: 280px; }
+          .promoBody { left: 18px; right: 18px; bottom: 18px; }
+          .promoH { font-size: 24px; }
+          .promoSub { font-size: 14px; margin-bottom: 12px; }
+          .promoBtn { padding: 10px 18px; font-size: 13px; }
+          
+          .fpGrid { grid-template-columns: 1fr; }
+          .fpImgWrap { height: 240px; }
+          .fpEye { width: 48px; height: 48px; }
+          .fpSale { font-size: 11px; padding: 6px 12px; }
+          .fpCat { font-size: 11px; }
+          .fpTitle { font-size: 16px; }
+          .fpPriceRow { gap: 6px; }
+          .fpOld { font-size: 14px; }
+          .fpNow { font-size: 16px; }
+          .fpOff { font-size: 11px; padding: 3px 6px; }
+          .fpGst { font-size: 12px; }
+          .fpBtn { padding: 14px 10px; font-size: 14px; }
+          
+          .brandsBox { padding: 20px 0; }
+          .brandsScroll { gap: 15px; height: 100px; }
+          .brandLogo { min-width: 120px; height: 100px; }
+          .brandLogo img { max-height: 80px; max-width: 120px; }
+          .brandArrow { width: 38px; height: 38px; }
+          
+          .specialBanner { min-height: 300px; }
+          .specialContent { left: 18px; top: 18px; }
+          .smallLabel { font-size: 14px; }
+          .specialH { font-size: 26px; margin-bottom: 8px; }
+          .specialP { font-size: 13px; line-height: 1.5; margin-bottom: 12px; }
+          .specialStrong { font-size: 14px; margin-bottom: 16px; }
+          
+          .featGrid { grid-template-columns: 1fr; gap: 20px; }
+          .featIcon { width: 40px; height: 40px; }
+          .featItem h4 { font-size: 16px; margin: 8px 0 4px; }
+          .featItem p { font-size: 13px; max-width: 100%; }
+          
+          .reviewGrid { grid-template-columns: 1fr; }
+          .avatar { width: 60px; height: 60px; }
+          .star { font-size: 16px; }
+          .rText { font-size: 13px; }
+          
+          .qvCard { padding: 16px; }
+          .qvMainImage { height: 220px; }
+          .qvPriceRow { gap: 6px; }
+          .qvNow { font-size: 22px; }
+          .qvOld { font-size: 16px; }
+          .qvActionRow { gap: 10px; }
+          .qvQty { height: 38px; }
+          .qvQtyBtn { width: 36px; height: 36px; font-size: 18px; }
+          .qvQtyValue { min-width: 36px; font-size: 16px; }
+          .qvAdd { min-width: 100%; height: 44px; font-size: 15px; padding: 0 16px; }
+          .qvMeta { gap: 10px; font-size: 12px; }
+          .qvShare { gap: 10px; font-size: 14px; margin-top: 16px; }
+          .qvShareIcon { font-size: 16px; }
+          
+          .floatTop { width: 42px; height: 42px; left: 12px; bottom: 12px; }
+        }
+
+        /* Fix for very small devices */
+        @media (max-width: 360px) {
+          .heroH1 { font-size: 26px; }
+          .heroH3 { font-size: 16px; }
+          
+          .title { font-size: 24px; }
+          
+          .brandLogo { min-width: 100px; }
+          .brandLogo img { max-width: 90px; }
+          
+          .promoH { font-size: 22px; }
+        }
+
+        @media (max-width:768px){
+
+        .hero{
+          height:420px;
+          min-height:420px;
+        }
+
+        }
+
+        @media (max-width:480px){
+
+        .hero{
+          height:360px;
+          min-height:360px;
+        }
+
+
+        }
+
+        @media (max-width:768px){
+
+      .heroH1{
+        font-size:36px;
+      }
+
+      .heroH3{
+        font-size:18px;
+      }
+
+      .heroBtn{
+        margin-top:10px;
+      }
+
+      }
+
+        /* Landscape mode fixes */
+        @media (max-height: 600px) and (orientation: landscape) {
+          .hero { min-height: 400px; }
+          .heroText { padding-top: 20px; }
         }
       `}</style>
 
@@ -521,15 +863,11 @@ export default function Home() {
         <div className="heroOverlay" />
         <div className="heroOverlay2" />
 
-        {/* ✅ FIXED HEADER */}
-       
-
-        {/* HERO TEXT */}
         <div className="container heroContent">
           <div className="heroText">
             <h1 className="heroH1">Tunturu Tools India</h1>
             <h3 className="heroH3">25% Off On All Products</h3>
-            <button className="heroBtn" type="button" onClick={() => (window.location.href = "/store")}>
+            <button className="heroBtn" type="button" onClick={() => navigate("/store")}>
               SHOP TOOL
             </button>
           </div>
@@ -571,7 +909,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SPECIAL OFFERS (dummy) */}
+      {/* SPECIAL OFFERS */}
       <section className="section">
         <div className="container">
           <div className="titleWrap left">
@@ -585,7 +923,7 @@ export default function Home() {
                 <div className="promoBody">
                   <h3 className="promoH">{o.title}</h3>
                   <p className="promoSub">{o.desc}</p>
-                  <button className="promoBtn" onClick={() => (window.location.href = o.href)}>
+                  <button className="promoBtn" onClick={() => navigate(o.href)}>
                     {o.cta}
                   </button>
                 </div>
@@ -595,7 +933,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FEATURED PRODUCTS (dummy) */}
+      {/* FEATURED PRODUCTS */}
       <section className="fpSection">
         <div className="container">
           <div className="titleWrap center">
@@ -603,11 +941,105 @@ export default function Home() {
             <div className="underline" />
           </div>
 
-          <div className="fpGrid">
-            {featured.map((p) => (
-              <FeaturedCard key={p.id} p={p} />
-            ))}
-          </div>
+          {featuredLoading ? (
+            <div style={{ textAlign: "center", padding: "30px 0", fontWeight: 900 }}>
+              Loading products...
+            </div>
+          ) : (
+            <div className="fpGrid">
+              {featured.map((p) => {
+                const qty = qtyMap[p.id] || 1;
+
+                return (
+                  <article className="fpCard" key={p.id}>
+                    <a
+                      className="fpImgWrap"
+                      href={`/product/${p.slug}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigate(`/product/${p.slug}`);
+                      }}
+                    >
+                      <img
+                        className="fpImg"
+                        src={
+                          p.image ||
+                          "https://dummyimage.com/500x420/f3f4f6/111827&text=No+Image"
+                        }
+                        alt={p.title}
+                        loading="lazy"
+                      />
+                      <span className="fpSale">{p.is_sale ? "SALE" : "NEW"}</span>
+                    </a>
+
+                    <button
+                      className="fpEye"
+                      aria-label="Quick view"
+                      title="Quick view"
+                      onClick={() =>
+                        setQuickView({
+                          open: true,
+                          product: p,
+                          qty: qtyMap[p.id] || 1,
+                        })
+                      }
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"
+                        />
+                        <circle cx="12" cy="12" r="3" strokeWidth="2" />
+                      </svg>
+                    </button>
+
+                    <div className="fpBody">
+                      <div className="fpCat">
+                        {p.short_category_label || p.category_name || "UNCATEGORIZED"}
+                      </div>
+
+                      <h3
+                        className="fpTitle"
+                        title={p.title}
+                        onClick={() => navigate(`/product/${p.slug}`)}
+                      >
+                        {p.title.toUpperCase()}
+                      </h3>
+
+                      <div className="fpPriceRow">
+                        {Number(p.mrp) > Number(p.sale_price) ? (
+                          <span className="fpOld">{inr(Number(p.mrp))}</span>
+                        ) : null}
+                        <span className="fpNow">{inr(Number(p.sale_price))}</span>
+                        {p.discount_percent ? (
+                          <span className="fpOff">-{p.discount_percent}%</span>
+                        ) : null}
+                      </div>
+
+                      <div className="fpGst">
+                        GST ({p.gst_percent}%) {inr(Number(p.gst_amount || 0))}
+                      </div>
+
+                      <button
+                        className="fpBtn"
+                        type="button"
+                        disabled={busyId === p.id}
+                        onClick={() => handleAddToCart(p.id, qty)}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 10V8a6 6 0 0112 0v2" />
+                          <rect x="5" y="10" width="14" height="12" rx="2" strokeWidth="2" />
+                        </svg>
+                        {busyId === p.id ? "ADDING..." : "ADD TO CART"}
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
 
           <div className="specialBannerWrap">
             <div className="specialBanner">
@@ -618,8 +1050,10 @@ export default function Home() {
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis,
                   pulvinar dapibus leo.
                 </p>
-                <p className="specialStrong">Buy This Toolkit At 20% Discount, Use Code OFF20</p>
-                <button className="promoBtn" onClick={() => (window.location.href = "/store")}>
+                <p className="specialStrong">
+                  Buy This Toolkit At 20% Discount, Use Code OFF20
+                </p>
+                <button className="promoBtn" onClick={() => navigate("/store")}>
                   SHOP NOW
                 </button>
               </div>
@@ -667,13 +1101,120 @@ export default function Home() {
                 <img className="avatar" src={r.img} alt={r.name} />
                 <p className="rName">{r.name}</p>
                 <Stars count={r.stars} />
-                <p className="rText">The product was nice, offering quality tools and good value for money.</p>
+                <p className="rText">
+                  The product was nice, offering quality tools and good value for money.
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
-      {/* FLOATING */}
+
+      {/* QUICK VIEW MODAL */}
+      {quickView.open && quickView.product && (
+        <div
+          className="qvOverlay"
+          onClick={() => setQuickView({ open: false, product: null, qty: 1 })}
+        >
+          <div className="qvCard" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="qvClose"
+              onClick={() => setQuickView({ open: false, product: null, qty: 1 })}
+            >
+              ✕
+            </button>
+
+            <div className="qvGrid">
+              <div>
+                <img
+                  className="qvMainImage"
+                  src={
+                    quickView.product.image ||
+                    "https://dummyimage.com/700x520/f3f4f6/111827&text=No+Image"
+                  }
+                  alt={quickView.product.title}
+                />
+
+                <div className="qvThumbRow">
+                  <img
+                    className="qvThumb"
+                    src={
+                      quickView.product.image ||
+                      "https://dummyimage.com/120x90/f3f4f6/111827&text=No+Image"
+                    }
+                    alt="thumb"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="qvPriceRow">
+                  {Number(quickView.product.mrp) > Number(quickView.product.sale_price) ? (
+                    <span className="qvOld">{inr(Number(quickView.product.mrp))}</span>
+                  ) : null}
+                  <span className="qvNow">{inr(Number(quickView.product.sale_price))}</span>
+                </div>
+
+                <div className="qvActionRow">
+                  <div className="qvQty">
+                    <button
+                      className="qvQtyBtn"
+                      onClick={() =>
+                        setQuickView((prev) => ({
+                          ...prev,
+                          qty: Math.max(1, prev.qty - 1),
+                        }))
+                      }
+                    >
+                      -
+                    </button>
+
+                    <div className="qvQtyValue">{quickView.qty}</div>
+
+                    <button
+                      className="qvQtyBtn"
+                      onClick={() =>
+                        setQuickView((prev) => ({
+                          ...prev,
+                          qty: prev.qty + 1,
+                        }))
+                      }
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <button
+                    className="qvAdd"
+                    onClick={() => handleAddToCart(quickView.product!.id, quickView.qty)}
+                  >
+                    Add To Cart
+                  </button>
+                </div>
+
+                <div className="qvDivider" />
+
+                <div className="qvMeta">
+                  <span>SKU: {quickView.product.sku || "-"}</span>
+                  <span>Category: {quickView.product.category_name || "-"}</span>
+                  <span>Brand: {quickView.product.brand || "-"}</span>
+                </div>
+
+                <div className="qvShare">
+                  <span>Share:</span>
+                  <span className="qvShareIcon">f</span>
+                  <span className="qvShareIcon">𝕏</span>
+                  <span className="qvShareIcon">p</span>
+                  <span className="qvShareIcon">in</span>
+                  <span className="qvShareIcon">✈</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* FLOAT TOP */}
       
     </div>
   );

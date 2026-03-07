@@ -18,6 +18,19 @@ export default function CartPage() {
   const [busyId, setBusyId] = useState<number | null>(null);
   const navigate = useNavigate();
 
+  // Responsive state track karne ke liye
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth <= 768 : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   async function load() {
     setLoading(true);
     try {
@@ -80,8 +93,9 @@ export default function CartPage() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1.4fr 0.6fr",
-          gap: 18,
+          // Mobile par 1 column, Desktop par 2 columns
+          gridTemplateColumns: isMobile ? "1fr" : "1.4fr 0.6fr",
+          gap: 24,
           alignItems: "start",
         }}
       >
@@ -100,7 +114,8 @@ export default function CartPage() {
                   padding: 16,
                   background: "#fff",
                   display: "grid",
-                  gridTemplateColumns: "120px 1fr",
+                  // Mobile par image choti, Desktop par normal
+                  gridTemplateColumns: isMobile ? "90px 1fr" : "120px 1fr",
                   gap: 16,
                 }}
               >
@@ -110,7 +125,7 @@ export default function CartPage() {
                     alt={it.product_title}
                     style={{
                       width: "100%",
-                      height: 110,
+                      height: isMobile ? 90 : 110,
                       objectFit: "cover",
                       borderRadius: 12,
                       border: "1px solid #eee",
@@ -120,15 +135,17 @@ export default function CartPage() {
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <div>
-                    <div style={{ fontSize: 18, fontWeight: 900 }}>{it.product_title}</div>
+                    <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 900 }}>
+                      {it.product_title}
+                    </div>
                     {it.product_slug ? (
-                      <div style={{ color: "#6b7280", marginTop: 4 }}>
+                      <div style={{ color: "#6b7280", marginTop: 4, fontSize: isMobile ? 13 : 14 }}>
                         Product: {it.product_slug}
                       </div>
                     ) : null}
                   </div>
 
-                  <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: 20, flexWrap: "wrap", alignItems: "flex-end" }}>
                     <div>
                       <div style={{ color: "#6b7280", fontSize: 13 }}>Unit Price</div>
                       <div style={{ fontWeight: 800 }}>{money(unitPrice)}</div>
@@ -157,7 +174,7 @@ export default function CartPage() {
 
                         <div
                           style={{
-                            minWidth: 46,
+                            minWidth: 40,
                             textAlign: "center",
                             fontWeight: 900,
                             padding: "0 10px",
@@ -182,12 +199,12 @@ export default function CartPage() {
                     </div>
                   </div>
 
-                  <div>
+                  <div style={{ marginTop: isMobile ? 8 : 0 }}>
                     <button
                       onClick={() => remove(it.id)}
                       disabled={busyId === it.id}
                       style={{
-                        height: 40,
+                        height: isMobile ? 36 : 40,
                         padding: "0 16px",
                         borderRadius: 10,
                         border: "1px solid #fecaca",
@@ -195,6 +212,7 @@ export default function CartPage() {
                         color: "#991b1b",
                         fontWeight: 900,
                         cursor: "pointer",
+                        width: isMobile ? "100%" : "auto", // Mobile pe full width button
                       }}
                     >
                       Remove
@@ -213,7 +231,8 @@ export default function CartPage() {
             borderRadius: 16,
             padding: 18,
             background: "#fff",
-            position: "sticky",
+            // Mobile par static aur Desktop par sticky rahega
+            position: isMobile ? "static" : "sticky",
             top: 90,
           }}
         >
@@ -255,6 +274,7 @@ export default function CartPage() {
               color: "#fff",
               fontWeight: 900,
               cursor: "pointer",
+              fontSize: 16,
             }}
           >
             Proceed to Checkout
@@ -266,13 +286,16 @@ export default function CartPage() {
 }
 
 const qtyBtnStyle: React.CSSProperties = {
-  width: 40,
-  height: 40,
+  width: 36,
+  height: 36,
   border: "none",
   background: "#f9fafb",
-  fontSize: 22,
+  fontSize: 20,
   fontWeight: 900,
   cursor: "pointer",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center"
 };
 
 const rowStyle: React.CSSProperties = {

@@ -28,7 +28,8 @@ import Checkout from "./Pages/Checkout";
 
 import { AuthProvider } from "./auth/AuthContext";
 import ProtectedRoute from "./auth/ProtectedRoute";
-
+import ForgotPasswordPage from "./Pages/ForgotPassword";
+import ResetPasswordPage from "./Pages/ResetPassword";
 import "./App.css";
 
 function App() {
@@ -54,7 +55,8 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/store" element={<Store />} />
               <Route path="/my-account" element={<MyAccount />} />
-
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password/:uid/:token" element={<ResetPasswordPage />} />
               {/* CATEGORY & PRODUCT */}
               <Route path="/category/:slug" element={<CategoryProducts />} />
               <Route path="/product/:slug" element={<ProductDetailPage />} />
