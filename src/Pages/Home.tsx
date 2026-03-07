@@ -154,12 +154,12 @@ export default function Home() {
     };
   }, [quickView.open]);
 
-  function setQty(productId: number, qty: number) {
-    setQtyMap((prev) => ({
-      ...prev,
-      [productId]: Math.max(1, qty),
-    }));
-  }
+  // function setQty(productId: number, qty: number) {
+  //   setQtyMap((prev) => ({
+  //     ...prev,
+  //     [productId]: Math.max(1, qty),
+  //   }));
+  // }
 
   async function handleAddToCart(productId: number, qty: number) {
     try {
