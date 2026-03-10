@@ -52,10 +52,12 @@ export default function OrdersPage() {
 
   const totalOrders = useMemo(() => items.length, [items]);
 
-  if (loading) return <div style={{ padding: 40 }}>Loading orders...</div>;
+  if (loading) {
+    return <div style={{ padding: "120px 20px" }}>Loading orders...</div>;
+  }
 
   return (
-    <div style={{ maxWidth: 1200, margin: "40px auto", padding: 16 }}>
+    <div style={{ maxWidth: 1200, margin: "90px auto 40px", padding: 16 }}>
       <div style={{ marginBottom: 22 }}>
         <h1 style={{ margin: 0, fontSize: 40, fontWeight: 900 }}>My Orders</h1>
         <p style={{ marginTop: 8, color: "#6b7280" }}>
@@ -77,9 +79,13 @@ export default function OrdersPage() {
       ) : (
         <div style={{ display: "grid", gap: 14 }}>
           {items.map((o) => {
-            const firstImage = o.items?.[0]?.product_image || "https://via.placeholder.com/140x140?text=No+Image";
-            const totalQty = o.items?.reduce((sum, it) => sum + (it.quantity || 0), 0) ?? 0;
+            const firstImage = o.items?.[0]?.product_image || "";
+            const totalQty =
+              o.items?.reduce((sum, it) => sum + Number(it.quantity || 0), 0) ?? 0;
             const firstTitle = o.items?.[0]?.product_title || "Order Item";
+            const lastHistory = o.history?.length
+              ? o.history[o.history.length - 1]
+              : null;
 
             return (
               <div
@@ -97,29 +103,61 @@ export default function OrdersPage() {
                   alignItems: "center",
                 }}
               >
-                <img
-                  src={firstImage}
-                  alt={firstTitle}
+                <div
                   style={{
                     width: 110,
                     height: 110,
-                    objectFit: "cover",
                     borderRadius: 12,
                     border: "1px solid #eee",
+                    overflow: "hidden",
+                    background: "#f8fafc",
+                    display: "grid",
+                    placeItems: "center",
                   }}
-                />
+                >
+                  {firstImage ? (
+                    <img
+                      src={firstImage}
+                      alt={firstTitle}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  ) : (
+                    <span style={{ color: "#9ca3af", fontSize: 13 }}>No Image</span>
+                  )}
+                </div>
 
                 <div>
                   <div style={{ fontWeight: 900, fontSize: 20 }}>Order #{o.id}</div>
+
                   <div style={{ color: "#6b7280", marginTop: 6 }}>
-                    {new Date(o.created_at).toLocaleString()}
+                    Placed: {new Date(o.created_at).toLocaleString()}
                   </div>
+
+                  {o.expected_delivery_date ? (
+                    <div style={{ color: "#6b7280", marginTop: 6 }}>
+                      Expected Delivery: <b>{o.expected_delivery_date}</b>
+                    </div>
+                  ) : null}
 
                   <div style={{ marginTop: 10, fontWeight: 700 }}>{firstTitle}</div>
 
                   <div style={{ color: "#6b7280", marginTop: 6 }}>
                     Items: <b>{o.items?.length ?? 0}</b> • Total Qty: <b>{totalQty}</b>
                   </div>
+
+                  {lastHistory ? (
+                    <div style={{ color: "#6b7280", marginTop: 8, fontSize: 14 }}>
+                      Last Update:{" "}
+                      <b>
+                        {formatStatus(lastHistory.status)} —{" "}
+                        {new Date(lastHistory.created_at).toLocaleString()}
+                      </b>
+                    </div>
+                  ) : null}
                 </div>
 
                 <div style={{ textAlign: "right" }}>

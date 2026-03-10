@@ -23,6 +23,8 @@ export type Order = {
   total_amount: string;
   created_at: string;
   items: OrderItem[];
+  history?: OrderHistory[];
+  expected_delivery_date?: string | null;
 };
 
 export type OrderDetail = Order & {
@@ -37,6 +39,7 @@ export type OrderDetail = Order & {
   shipping_postal_code: string;
   shipping_country: string;
   history: OrderHistory[];
+  expected_delivery_date?: string | null;
 };
 
 export async function fetchOrders(): Promise<Order[]> {
