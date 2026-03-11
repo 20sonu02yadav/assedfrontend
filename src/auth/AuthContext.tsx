@@ -1,27 +1,23 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-
+import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   clearTokens,
-  getMe,
+  fetchMe,
   getStoredAccessToken,
   setAuthToken,
   storeTokens,
 } from "../services/api";
+import { mergeGuestCartToServer } from "../services/cartApi";
 
 type AuthUser = {
   id: number;
   username: string;
   email: string;
   role: string;
+  mobile_no?: string;
+  is_mobile_verified?: boolean;
 };
 
-type AuthCtx = {
+type AuthContextType = {
   user: AuthUser | null;
   loading: boolean;
   loginWithTokens: (
@@ -33,7 +29,7 @@ type AuthCtx = {
   refreshMe: () => Promise<void>;
 };
 
-const Ctx = createContext<AuthCtx | null>(null);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -41,45 +37,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function refreshMe() {
     try {
-      const token = getStoredAccessToken();
-
-      if (!token) {
-        setUser(null);
-        return;
-      }
-
-      setAuthToken(token);
-
-      const me = await getMe();
-      setUser(me.user);
-    } catch (err) {
-      clearTokens();
+      const me = await fetchMe();
+      setUser(me);
+    } catch {
       setUser(null);
+      clearTokens();
     }
   }
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const token = getStoredAccessToken();
-
-        if (!token) {
-          setLoading(false);
-          return;
-        }
-
-        setAuthToken(token);
-
-        const me = await getMe();
-        setUser(me.user);
-      } catch {
-        clearTokens();
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
 
   async function loginWithTokens(
     access: string,
@@ -87,30 +51,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     remember = true
   ) {
     storeTokens({ access, refresh, remember });
-    await refreshMe();
+    setAuthToken(access);
+
+    try {
+      await mergeGuestCartToServer();
+    } catch {
+      // merge fail ho to bhi login continue rahe
+    }
+
+    const me = await fetchMe();
+    setUser(me);
+
+    window.dispatchEvent(new Event("cart:changed"));
   }
 
   function logout() {
     clearTokens();
     setUser(null);
+    window.dispatchEvent(new Event("cart:changed"));
   }
 
-  const value = useMemo(
-    () => ({
-      user,
-      loading,
-      loginWithTokens,
-      logout,
-      refreshMe,
-    }),
-    [user, loading]
-  );
+  useEffect(() => {
+    let mounted = true;
 
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+    async function init() {
+      const token = getStoredAccessToken();
+
+      if (!token) {
+        if (mounted) {
+          setUser(null);
+          setLoading(false);
+        }
+        return;
+      }
+
+      try {
+        setAuthToken(token);
+        const me = await fetchMe();
+
+        if (!mounted) return;
+        setUser(me);
+      } catch {
+        if (!mounted) return;
+        clearTokens();
+        setUser(null);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    init();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        loginWithTokens,
+        logout,
+        refreshMe,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {
-  const ctx = useContext(Ctx);
+  const ctx = useContext(AuthContext);
 
   if (!ctx) {
     throw new Error("useAuth must be used inside AuthProvider");

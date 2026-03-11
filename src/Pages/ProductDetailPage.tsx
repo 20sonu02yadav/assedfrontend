@@ -11,7 +11,7 @@ import {
   type ProductListItem,
   type Review,
 } from "../services/storeApi";
-import { addToCart } from "../services/cartApi";
+import { addProductToHybridCart } from "../services/cartHelper";
 
 const HERO_BG =
   "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2018/12/slide-image-free-img.jpg";
@@ -35,6 +35,13 @@ function flattenTree(nodes: CategoryNode[]): CategoryNode[] {
 
   walk(nodes);
   return out;
+}
+
+function getRelatedImage(product: ProductListItem) {
+  return (
+    product.image ||
+    "https://dummyimage.com/380x320/f3f4f6/111827&text=No+Image"
+  );
 }
 
 export default function ProductDetailPage() {
@@ -91,15 +98,14 @@ export default function ProductDetailPage() {
         if (currentCat) {
           const map = new Map<number, ProductListItem>();
 
-          // same category products
           const sameCategoryProducts = await fetchProducts({
             category: currentCat.slug,
           });
+
           sameCategoryProducts.forEach((p) => {
             if (p.slug !== detail.slug) map.set(p.id, p);
           });
 
-          // if current category is subcategory, include parent category direct + sibling subcategory products
           if (currentCat.parent !== null) {
             const parentCat = flat.find((c) => c.id === currentCat.parent);
 
@@ -114,7 +120,6 @@ export default function ProductDetailPage() {
               });
             }
           } else {
-            // top-level category: include child subcategory products too
             const childProducts = await fetchProducts({ parent: currentCat.slug });
             childProducts.forEach((p) => {
               if (p.slug !== detail.slug) map.set(p.id, p);
@@ -128,6 +133,12 @@ export default function ProductDetailPage() {
         }
 
         setRelatedProducts(related.slice(0, 10));
+      } catch {
+        if (mounted) {
+          setProduct(null);
+          setReviews([]);
+          setRelatedProducts([]);
+        }
       } finally {
         if (mounted) setLoading(false);
       }
@@ -146,17 +157,30 @@ export default function ProductDetailPage() {
     return total / reviews.length;
   }, [reviews]);
 
-  async function handleAddToCart(productId: number, count: number) {
-    try {
-      setBusyCart(true);
-      await addToCart(productId, count);
-      alert("Added to cart ✅");
-    } catch {
-      alert("Please login to add to cart.");
-    } finally {
-      setBusyCart(false);
-    }
+  async function handleAddToCartNow(count: number) {
+  if (!product) return;
+
+  try {
+    setBusyCart(true);
+
+    await addProductToHybridCart(product, count);
+
+    alert("Added to cart ✅");
+  } catch {
+    alert("Failed to add to cart.");
+  } finally {
+    setBusyCart(false);
   }
+}
+
+  async function handleRelatedAddToCart(item: ProductListItem) {
+  try {
+    await addProductToHybridCart(item, 1);
+    alert("Added to cart ✅");
+  } catch {
+    alert("Failed to add to cart.");
+  }
+}
 
   async function handleReviewSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -215,7 +239,6 @@ export default function ProductDetailPage() {
 
   return (
     <div style={styles.page}>
-      {/* HERO */}
       <div style={{ ...styles.hero, backgroundImage: `url(${HERO_BG})` }}>
         <div style={styles.heroOverlay} />
 
@@ -239,9 +262,7 @@ export default function ProductDetailPage() {
       </div>
 
       <div style={styles.container}>
-        {/* TOP SECTION */}
         <div style={styles.topGrid}>
-          {/* LEFT */}
           <div>
             {product.is_sale ? <div style={styles.saleBadge}>Sale!</div> : null}
 
@@ -289,7 +310,6 @@ export default function ProductDetailPage() {
             ) : null}
           </div>
 
-          {/* RIGHT */}
           <div>
             <h1 style={styles.title}>{product.title}</h1>
 
@@ -322,7 +342,7 @@ export default function ProductDetailPage() {
               <button
                 style={styles.addCartBtn}
                 disabled={busyCart}
-                onClick={() => handleAddToCart(product.id, qty)}
+                onClick={() => handleAddToCartNow(qty)}
               >
                 {busyCart ? "Adding..." : "Add To Cart"}
               </button>
@@ -352,7 +372,6 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* BOTTOM */}
         <div style={styles.bottomGrid}>
           <div>
             <div style={styles.tabRow}>
@@ -510,7 +529,6 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* RELATED */}
         {relatedProducts.length > 0 && (
           <div style={styles.relatedSection}>
             <h2 style={styles.relatedTitle}>Related products</h2>
@@ -525,10 +543,7 @@ export default function ProductDetailPage() {
                     onClick={() => navigate(`/product/${p.slug}`)}
                   >
                     <img
-                      src={
-                        p.image ||
-                        "https://dummyimage.com/380x320/f3f4f6/111827&text=No+Image"
-                      }
+                      src={getRelatedImage(p)}
                       alt={p.title}
                       style={styles.relatedImg}
                     />
@@ -554,7 +569,7 @@ export default function ProductDetailPage() {
 
                   <button
                     style={styles.relatedCartBtn}
-                    onClick={() => handleAddToCart(p.id, 1)}
+                    onClick={() => handleRelatedAddToCart(p)}
                   >
                     ADD TO CART
                   </button>
@@ -575,7 +590,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: "Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
     color: "#111",
   },
-
   hero: {
     position: "relative",
     height: 320,
@@ -611,20 +625,17 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     opacity: 0.95,
   },
-
   container: {
     maxWidth: 1880,
     margin: "0 auto",
     padding: "26px 16px 40px",
   },
-
   topGrid: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
     gap: 28,
     alignItems: "start",
   },
-
   saleBadge: {
     display: "inline-block",
     background: "#fff",
@@ -634,7 +645,6 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
     marginBottom: 10,
   },
-
   mainImageWrap: {
     position: "relative",
     width: "100%",
@@ -664,7 +674,6 @@ const styles: Record<string, React.CSSProperties> = {
     display: "grid",
     placeItems: "center",
   },
-
   thumbRow: {
     display: "flex",
     gap: 10,
@@ -684,14 +693,12 @@ const styles: Record<string, React.CSSProperties> = {
     height: "100%",
     objectFit: "contain",
   },
-
   title: {
     fontSize: 28,
     fontWeight: 500,
     lineHeight: 1.35,
     margin: "40px 0 24px",
   },
-
   priceRow: {
     display: "flex",
     alignItems: "center",
@@ -717,7 +724,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 22,
     color: "#374151",
   },
-
   cartRow: {
     display: "flex",
     alignItems: "center",
@@ -759,7 +765,6 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     padding: "0 24px",
   },
-
   metaBlock: {
     borderTop: "1px solid #d7d7d7",
     paddingTop: 16,
@@ -779,7 +784,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 18,
     color: "#374151",
   },
-
   bottomGrid: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
@@ -787,7 +791,6 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: 30,
     alignItems: "start",
   },
-
   tabRow: {
     display: "flex",
     gap: 24,
@@ -801,7 +804,6 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "10px 0",
     fontSize: 16,
   },
-
   descriptionBox: {
     paddingRight: 20,
   },
@@ -820,7 +822,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#1f2937",
     lineHeight: 1.6,
   },
-
   reviewsList: {
     display: "grid",
     gap: 14,
@@ -855,7 +856,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 16,
     lineHeight: 1.7,
   },
-
   reviewFormCard: {
     background: "#fff",
     border: "1px solid #d1d5db",
@@ -910,7 +910,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 900,
     cursor: "pointer",
   },
-
   relatedSection: {
     marginTop: 44,
   },

@@ -27,7 +27,11 @@ export type ProductListItem = {
   image: string | null;
 };
 
-export type ProductImage = { id: number; image_url: string; sort_order: number };
+export type ProductImage = {
+  id: number;
+  image_url: string;
+  sort_order: number;
+};
 
 export type ProductDetail = {
   id: number;
@@ -72,6 +76,11 @@ export async function fetchProducts(params?: {
   return res.data;
 }
 
+export async function fetchAllProducts(): Promise<ProductListItem[]> {
+  const res = await api.get("/store/products/");
+  return res.data;
+}
+
 export async function fetchProductDetail(slug: string): Promise<ProductDetail> {
   const res = await api.get(`/store/products/${slug}/`);
   return res.data;
@@ -82,12 +91,15 @@ export async function fetchReviews(slug: string): Promise<Review[]> {
   return res.data;
 }
 
-export async function createReview(slug: string, payload: {
-  rating: number;
-  name: string;
-  email: string;
-  comment: string;
-}) {
+export async function createReview(
+  slug: string,
+  payload: {
+    rating: number;
+    name: string;
+    email: string;
+    comment: string;
+  }
+) {
   const res = await api.post(`/store/products/${slug}/reviews/`, payload);
   return res.data;
 }

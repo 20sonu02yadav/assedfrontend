@@ -1,10 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { addToCart } from "../services/cartApi";
-import {
-  fetchProducts,
-  type ProductListItem,
-} from "../services/storeApi";
+import { addProductToHybridCart } from "../services/cartHelper";
+import { fetchProducts, type ProductListItem } from "../services/storeApi";
 
 const HERO_BG =
   "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2018/12/slide-image-free-img.jpg";
@@ -12,6 +9,13 @@ const HERO_BG =
 function money(v?: string | number) {
   const n = Number(v || 0);
   return `₹${n.toFixed(2)}`;
+}
+
+function getProductImage(product: ProductListItem) {
+  return (
+    product.image ||
+    "https://dummyimage.com/500x420/f3f4f6/111827&text=No+Image"
+  );
 }
 
 type QuickViewState = {
@@ -94,17 +98,19 @@ export default function CategoryProducts() {
     }));
   }
 
-  async function handleAddToCart(productId: number, qty: number) {
-    try {
-      setBusyId(productId);
-      await addToCart(productId, qty);
-      alert("Added to cart ✅");
-    } catch {
-      alert("Please login to add to cart.");
-    } finally {
-      setBusyId(null);
-    }
+  async function handleAddToCart(product: ProductListItem, qty: number) {
+  try {
+    setBusyId(product.id);
+
+    await addProductToHybridCart(product, qty);
+
+    alert("Added to cart ✅");
+  } catch {
+    alert("Failed to add to cart.");
+  } finally {
+    setBusyId(null);
   }
+}
 
   const filteredItems = useMemo(() => {
     let list = [...items];
@@ -114,9 +120,9 @@ export default function CategoryProducts() {
       list = list.filter((p) => {
         return (
           p.title.toLowerCase().includes(q) ||
-          p.brand?.toLowerCase().includes(q) ||
-          p.category_name?.toLowerCase().includes(q) ||
-          p.short_category_label?.toLowerCase().includes(q)
+          (p.brand || "").toLowerCase().includes(q) ||
+          (p.category_name || "").toLowerCase().includes(q) ||
+          (p.short_category_label || "").toLowerCase().includes(q)
         );
       });
     }
@@ -148,7 +154,6 @@ export default function CategoryProducts() {
 
   return (
     <div style={styles.page}>
-      {/* HERO */}
       <div style={{ ...styles.hero, backgroundImage: `url(${HERO_BG})` }}>
         <div style={styles.heroOverlay} />
 
@@ -169,9 +174,7 @@ export default function CategoryProducts() {
         </div>
       </div>
 
-      {/* CONTENT */}
       <div style={styles.content}>
-        {/* FILTER */}
         <div style={styles.filterCard}>
           <div style={styles.filterTopRow}>
             <div style={styles.filterTitle}>Filter</div>
@@ -233,12 +236,10 @@ export default function CategoryProducts() {
           </div>
         </div>
 
-        {/* TITLE */}
         <div style={styles.sectionTitle}>
           {slug.replace(/-/g, " ").toUpperCase()}
         </div>
 
-        {/* PRODUCTS */}
         {loading ? (
           <div style={styles.emptyBox}>Loading products...</div>
         ) : filteredItems.length === 0 ? (
@@ -273,10 +274,7 @@ export default function CategoryProducts() {
                     onClick={() => navigate(`/product/${p.slug}`)}
                   >
                     <img
-                      src={
-                        p.image ||
-                        "https://dummyimage.com/500x420/f3f4f6/111827&text=No+Image"
-                      }
+                      src={getProductImage(p)}
                       alt={p.title}
                       style={styles.productImg}
                     />
@@ -324,7 +322,7 @@ export default function CategoryProducts() {
                     <button
                       style={styles.addCartBtn}
                       disabled={busyId === p.id}
-                      onClick={() => handleAddToCart(p.id, qty)}
+                      onClick={() => handleAddToCart(p, qty)}
                     >
                       {busyId === p.id ? "ADDING..." : "ADD TO CART"}
                     </button>
@@ -336,7 +334,6 @@ export default function CategoryProducts() {
         )}
       </div>
 
-      {/* QUICK VIEW MODAL */}
       {quickView.open && quickView.product && (
         <div
           style={styles.modalOverlay}
@@ -356,24 +353,10 @@ export default function CategoryProducts() {
             <div style={styles.modalGrid}>
               <div>
                 <img
-                  src={
-                    quickView.product.image ||
-                    "https://dummyimage.com/700x520/f3f4f6/111827&text=No+Image"
-                  }
+                  src={getProductImage(quickView.product)}
                   alt={quickView.product.title}
                   style={styles.modalMainImage}
                 />
-
-                <div style={styles.modalThumbRow}>
-                  <img
-                    src={
-                      quickView.product.image ||
-                      "https://dummyimage.com/120x90/f3f4f6/111827&text=No+Image"
-                    }
-                    alt="thumb"
-                    style={styles.modalThumb}
-                  />
-                </div>
               </div>
 
               <div>
@@ -414,7 +397,7 @@ export default function CategoryProducts() {
                   <button
                     style={styles.modalAddCartBtn}
                     onClick={() =>
-                      handleAddToCart(quickView.product!.id, quickView.qty)
+                      handleAddToCart(quickView.product!, quickView.qty)
                     }
                   >
                     Add To Cart
@@ -424,24 +407,9 @@ export default function CategoryProducts() {
                 <div style={styles.modalDivider} />
 
                 <div style={styles.modalMeta}>
-                  <span>
-                    SKU: {quickView.product.sku || "-"}
-                  </span>
-                  <span>
-                    Category: {quickView.product.category_name || "-"}
-                  </span>
-                  <span>
-                    Brand: {quickView.product.brand || "-"}
-                  </span>
-                </div>
-
-                <div style={styles.shareRow}>
-                  <span>Share:</span>
-                  <span style={styles.shareIcon}>f</span>
-                  <span style={styles.shareIcon}>𝕏</span>
-                  <span style={styles.shareIcon}>p</span>
-                  <span style={styles.shareIcon}>in</span>
-                  <span style={styles.shareIcon}>✈</span>
+                  <span>SKU: {quickView.product.sku || "-"}</span>
+                  <span>Category: {quickView.product.category_name || "-"}</span>
+                  <span>Brand: {quickView.product.brand || "-"}</span>
                 </div>
               </div>
             </div>
@@ -459,7 +427,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: "Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
     color: "#111",
   },
-
   hero: {
     position: "relative",
     height: 320,
@@ -499,19 +466,13 @@ const styles: Record<string, React.CSSProperties> = {
     flexWrap: "wrap",
     justifyContent: "center",
   },
-  crumbLink: {
-    cursor: "pointer",
-  },
-  crumbSep: {
-    margin: "0 10px",
-  },
-
+  crumbLink: { cursor: "pointer" },
+  crumbSep: { margin: "0 10px" },
   content: {
     maxWidth: 1460,
     margin: "0 auto",
     padding: "34px 20px 70px",
   },
-
   filterCard: {
     background: "#fff",
     borderRadius: 18,
@@ -590,14 +551,12 @@ const styles: Record<string, React.CSSProperties> = {
     outline: "none",
     minWidth: 170,
   },
-
   sectionTitle: {
     fontSize: 30,
     fontWeight: 900,
     margin: "34px 0 20px",
     textTransform: "uppercase",
   },
-
   emptyBox: {
     background: "#fff",
     padding: 30,
@@ -606,7 +565,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     border: "1px solid #e5e7eb",
   },
-
   productGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
@@ -705,7 +663,6 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "4px 8px",
     borderRadius: 6,
   },
-
   productBottom: {
     marginTop: "auto",
     display: "grid",
@@ -746,7 +703,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 16,
     cursor: "pointer",
   },
-
   modalOverlay: {
     position: "fixed",
     inset: 0,
@@ -783,17 +739,6 @@ const styles: Record<string, React.CSSProperties> = {
   modalMainImage: {
     width: "100%",
     height: 560,
-    objectFit: "contain",
-    background: "#fff",
-  },
-  modalThumbRow: {
-    marginTop: 18,
-    display: "flex",
-    justifyContent: "center",
-  },
-  modalThumb: {
-    width: 110,
-    height: 90,
     objectFit: "contain",
     background: "#fff",
   },
@@ -864,17 +809,5 @@ const styles: Record<string, React.CSSProperties> = {
     flexWrap: "wrap",
     fontSize: 16,
     color: "#1f2937",
-  },
-  shareRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 16,
-    marginTop: 26,
-    fontSize: 16,
-    color: "#374151",
-  },
-  shareIcon: {
-    fontWeight: 800,
-    fontSize: 18,
   },
 };

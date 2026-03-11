@@ -2,12 +2,17 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   loginUser,
+  loginWithOtp,
   registerUser,
   sendOtp,
   verifyOtp,
   type Role,
 } from "../services/api";
 import { useAuth } from "../auth/AuthContext";
+
+function onlyDigits(value: string) {
+  return value.replace(/\D/g, "");
+}
 
 export default function MyAccount() {
   const navigate = useNavigate();
@@ -16,105 +21,49 @@ export default function MyAccount() {
   const HERO_BG =
     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-yankrukov-8867241.jpg";
 
-  // LOGIN
-  const [loginIdentifier, setLoginIdentifier] = useState("");
+  const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showLoginPass, setShowLoginPass] = useState(false);
 
-  // REGISTER
+  const [otpLoginMobile, setOtpLoginMobile] = useState("");
+  const [otpLoginCode, setOtpLoginCode] = useState("");
+  const [otpLoginSent, setOtpLoginSent] = useState(false);
+  const [otpLoginLoading, setOtpLoginLoading] = useState(false);
+
   const [regEmail, setRegEmail] = useState("");
   const [regMobile, setRegMobile] = useState("");
-  const [regOtp, setRegOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpVerified, setOtpVerified] = useState(false);
-
   const [regRole, setRegRole] = useState<Role | "">("");
   const [regPassword, setRegPassword] = useState("");
   const [regConfirmPassword, setRegConfirmPassword] = useState("");
+  const [regOtpCode, setRegOtpCode] = useState("");
+  const [regOtpSent, setRegOtpSent] = useState(false);
+  const [regMobileVerified, setRegMobileVerified] = useState(false);
+
   const [showRegPass, setShowRegPass] = useState(false);
   const [showRegConfirmPass, setShowRegConfirmPass] = useState(false);
 
-  // UI
   const [loginError, setLoginError] = useState("");
   const [registerError, setRegisterError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-  const [otpLoading, setOtpLoading] = useState(false);
-  const [otpVerifyLoading, setOtpVerifyLoading] = useState(false);
-  const [loginLoading, setLoginLoading] = useState(false);
-  const [registerLoading, setRegisterLoading] = useState(false);
 
   const regPasswordMismatch = useMemo(() => {
     if (!regPassword || !regConfirmPassword) return false;
     return regPassword !== regConfirmPassword;
   }, [regPassword, regConfirmPassword]);
 
-  async function handleSendOtp() {
-    setRegisterError("");
-    setSuccessMsg("");
+  const normalizedRegMobile = onlyDigits(regMobile);
+  const normalizedOtpLoginMobile = onlyDigits(otpLoginMobile);
 
-    if (!regMobile.trim()) {
-      setRegisterError("Please enter mobile number first.");
-      return;
-    }
-
-    try {
-      setOtpLoading(true);
-      await sendOtp({
-        mobile_no: regMobile.trim(),
-        purpose: "register",
-      });
-      setOtpSent(true);
-      setSuccessMsg("OTP sent successfully ✅");
-    } catch (err: any) {
-      const d = err?.response?.data;
-      setRegisterError(
-        d?.mobile_no || d?.detail || "Failed to send OTP. Please try again."
-      );
-    } finally {
-      setOtpLoading(false);
-    }
-  }
-
-  async function handleVerifyOtp() {
-    setRegisterError("");
-    setSuccessMsg("");
-
-    if (!regMobile.trim() || !regOtp.trim()) {
-      setRegisterError("Please enter mobile number and OTP.");
-      return;
-    }
-
-    try {
-      setOtpVerifyLoading(true);
-      await verifyOtp({
-        mobile_no: regMobile.trim(),
-        otp_code: regOtp.trim(),
-        purpose: "register",
-      });
-      setOtpVerified(true);
-      setSuccessMsg("Mobile number verified successfully ✅");
-    } catch (err: any) {
-      const d = err?.response?.data;
-      setRegisterError(
-        d?.otp_code || d?.mobile_no || d?.detail || "Invalid OTP."
-      );
-    } finally {
-      setOtpVerifyLoading(false);
-    }
-  }
-
-  const onLoginSubmit = async (e: React.FormEvent) => {
+  async function onLoginSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoginError("");
     setRegisterError("");
     setSuccessMsg("");
 
     try {
-      setLoginLoading(true);
-
       const data = await loginUser({
-        username_or_email_or_mobile: loginIdentifier,
+        username_or_email_or_mobile: loginUsername,
         password: loginPassword,
       });
 
@@ -127,51 +76,175 @@ export default function MyAccount() {
       }
 
       await loginWithTokens(access, refresh, rememberMe);
-
       setSuccessMsg("Login successful ✅");
       navigate("/account-dashboard", { replace: true });
     } catch (err: any) {
-      const d = err?.response?.data;
       const msg =
-        d?.password ||
-        d?.username_or_email_or_mobile ||
-        d?.detail ||
+        err?.response?.data?.password ||
+        err?.response?.data?.username_or_email_or_mobile ||
+        err?.response?.data?.detail ||
         "Login failed. Please try again.";
       setLoginError(typeof msg === "string" ? msg : "Login failed.");
-    } finally {
-      setLoginLoading(false);
     }
-  };
+  }
 
-  const onRegisterSubmit = async (e: React.FormEvent) => {
+  async function sendLoginOtpNow() {
+    setLoginError("");
+    setSuccessMsg("");
+
+    if (normalizedOtpLoginMobile.length !== 10) {
+      setLoginError("Enter valid 10 digit mobile number.");
+      return;
+    }
+
+    try {
+      setOtpLoginLoading(true);
+      await sendOtp({
+        mobile_no: `+91${normalizedOtpLoginMobile}`,
+        purpose: "login",
+      });
+      setOtpLoginSent(true);
+      setSuccessMsg("OTP sent successfully ✅");
+    } catch (err: any) {
+      const rawMsg = err?.response?.data?.detail || "Failed to send OTP.";
+      const msg = Array.isArray(rawMsg) ? rawMsg[0] : rawMsg;
+      setLoginError(typeof msg === "string" ? msg : "Failed to send OTP.");
+    } finally {
+      setOtpLoginLoading(false);
+    }
+  }
+
+  async function verifyLoginOtpNow(e: React.FormEvent) {
+    e.preventDefault();
+    setLoginError("");
+    setSuccessMsg("");
+
+    if (normalizedOtpLoginMobile.length !== 10) {
+      setLoginError("Enter valid 10 digit mobile number.");
+      return;
+    }
+
+    if (!otpLoginCode.trim()) {
+      setLoginError("Enter OTP.");
+      return;
+    }
+
+    try {
+      setOtpLoginLoading(true);
+
+      const data = await loginWithOtp({
+        mobile_no: `+91${normalizedOtpLoginMobile}`,
+        otp_code: otpLoginCode.trim(),
+      });
+
+      const access = data?.tokens?.access as string | undefined;
+      const refresh = data?.tokens?.refresh as string | undefined;
+
+      if (!access) {
+        setLoginError("OTP login failed: Access token missing.");
+        return;
+      }
+
+      await loginWithTokens(access, refresh, true);
+      setSuccessMsg("OTP login successful ✅");
+      navigate("/account-dashboard", { replace: true });
+    } catch (err: any) {
+      const rawMsg =
+        err?.response?.data?.detail ||
+        err?.response?.data?.otp_code ||
+        "OTP verification failed.";
+      const msg = Array.isArray(rawMsg) ? rawMsg[0] : rawMsg;
+      setLoginError(typeof msg === "string" ? msg : "OTP verification failed.");
+    } finally {
+      setOtpLoginLoading(false);
+    }
+  }
+
+  async function sendRegisterOtpNow() {
+    setRegisterError("");
+    setSuccessMsg("");
+
+    if (normalizedRegMobile.length !== 10) {
+      setRegisterError("Enter valid 10 digit mobile number.");
+      return;
+    }
+
+    try {
+      await sendOtp({
+        mobile_no: `+91${normalizedRegMobile}`,
+        purpose: "register",
+      });
+      setRegOtpSent(true);
+      setSuccessMsg("Registration OTP sent ✅");
+    } catch (err: any) {
+      const rawMsg = err?.response?.data?.detail || "Failed to send registration OTP.";
+      const msg = Array.isArray(rawMsg) ? rawMsg[0] : rawMsg;
+      setRegisterError(typeof msg === "string" ? msg : "Failed to send registration OTP.");
+    }
+  }
+
+  async function verifyRegisterOtpNow() {
+    setRegisterError("");
+    setSuccessMsg("");
+
+    if (normalizedRegMobile.length !== 10) {
+      setRegisterError("Enter valid 10 digit mobile number.");
+      return;
+    }
+
+    if (!regOtpCode.trim()) {
+      setRegisterError("Enter OTP.");
+      return;
+    }
+
+    try {
+      await verifyOtp({
+        mobile_no: `+91${normalizedRegMobile}`,
+        otp_code: regOtpCode.trim(),
+        purpose: "register",
+      });
+      setRegMobileVerified(true);
+      setSuccessMsg("Mobile verified successfully ✅");
+    } catch (err: any) {
+      const rawMsg =
+        err?.response?.data?.detail ||
+        err?.response?.data?.otp_code ||
+        "OTP verification failed.";
+      const msg = Array.isArray(rawMsg) ? rawMsg[0] : rawMsg;
+      setRegisterError(typeof msg === "string" ? msg : "OTP verification failed.");
+    }
+  }
+
+  async function onRegisterSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoginError("");
     setRegisterError("");
     setSuccessMsg("");
-
-    if (regPasswordMismatch) return;
 
     if (!regRole) {
       setRegisterError("Please select User Type.");
       return;
     }
 
-    if (!regMobile.trim()) {
-      setRegisterError("Please enter mobile number.");
+    if (normalizedRegMobile.length !== 10) {
+      setRegisterError("Enter valid 10 digit mobile number.");
       return;
     }
 
-    if (!otpVerified) {
-      setRegisterError("Please verify mobile number with OTP first.");
+    if (!regMobileVerified) {
+      setRegisterError("Please verify mobile number first.");
+      return;
+    }
+
+    if (regPasswordMismatch) {
+      setRegisterError("Passwords do not match.");
       return;
     }
 
     try {
-      setRegisterLoading(true);
-
       const data = await registerUser({
-        email: regEmail,
-        mobile_no: regMobile,
+        email: regEmail.trim(),
+        mobile_no: `+91${normalizedRegMobile}`,
         role: regRole,
         password: regPassword,
         confirm_password: regConfirmPassword,
@@ -191,17 +264,17 @@ export default function MyAccount() {
 
       setRegEmail("");
       setRegMobile("");
-      setRegOtp("");
-      setOtpSent(false);
-      setOtpVerified(false);
       setRegRole("");
       setRegPassword("");
       setRegConfirmPassword("");
+      setRegOtpCode("");
+      setRegOtpSent(false);
+      setRegMobileVerified(false);
 
       navigate("/account-dashboard", { replace: true });
     } catch (err: any) {
       const d = err?.response?.data;
-      const msg =
+      const rawMsg =
         d?.email ||
         d?.mobile_no ||
         d?.role ||
@@ -209,11 +282,11 @@ export default function MyAccount() {
         d?.confirm_password ||
         d?.detail ||
         "Registration failed. Please try again.";
+
+      const msg = Array.isArray(rawMsg) ? rawMsg[0] : rawMsg;
       setRegisterError(typeof msg === "string" ? msg : "Registration failed.");
-    } finally {
-      setRegisterLoading(false);
     }
-  };
+  }
 
   return (
     <div className="page">
@@ -238,31 +311,19 @@ export default function MyAccount() {
           <section className="loggedCard">
             <h2 className="loggedTitle">Welcome, {user.username} 👋</h2>
             <p className="loggedSub">
-              You are logged in as <b>{user.role}</b> ({user.email})
+              You are logged in as <b>{user.role}</b> ({user.email || "No email"})
             </p>
 
             <div className="loggedActions">
-              <button
-                className="primaryBtnWide"
-                onClick={() => navigate("/account-dashboard")}
-              >
+              <button className="primaryBtnWide" onClick={() => navigate("/account-dashboard")}>
                 GO TO DASHBOARD
               </button>
-
-              <button
-                className="secondaryBtnWide"
-                onClick={() => navigate("/orders")}
-              >
+              <button className="secondaryBtnWide" onClick={() => navigate("/orders")}>
                 VIEW ORDERS
               </button>
-
-              <button
-                className="secondaryBtnWide"
-                onClick={() => navigate("/cart")}
-              >
+              <button className="secondaryBtnWide" onClick={() => navigate("/cart")}>
                 OPEN CART
               </button>
-
               <button
                 className="dangerBtnWide"
                 onClick={() => {
@@ -276,23 +337,21 @@ export default function MyAccount() {
           </section>
         ) : (
           <div className="formsGrid">
-            {/* LOGIN */}
             <section className="card">
               <h2 className="cardTitle">Login</h2>
 
               <form onSubmit={onLoginSubmit} className="form">
                 <label className="label">
-                  Username / Email / Mobile with Country Code <span className="req">*</span>
+                  Username / Email / Mobile
                 </label>
                 <input
                   className="input"
-                  value={loginIdentifier}
-                  onChange={(e) => setLoginIdentifier(e.target.value)}
-                  placeholder="Enter username, email or mobile number with  country code"
+                  value={loginUsername}
+                  onChange={(e) => setLoginUsername(e.target.value)}
                 />
 
                 <label className="label" style={{ marginTop: 16 }}>
-                  Password <span className="req">*</span>
+                  Password
                 </label>
                 <div className="inputWrap">
                   <input
@@ -300,7 +359,6 @@ export default function MyAccount() {
                     type={showLoginPass ? "text" : "password"}
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="Enter password"
                   />
                   <button
                     type="button"
@@ -322,83 +380,112 @@ export default function MyAccount() {
                   </label>
                 </div>
 
-                <button className="primaryBtn" type="submit" disabled={loginLoading}>
-                  {loginLoading ? "LOGGING IN..." : "LOG IN"}
+                <button className="primaryBtn" type="submit">
+                  LOG IN
                 </button>
 
                 <a className="link" href="/forgot-password">
                   Lost your password?
                 </a>
               </form>
+
+              <div className="dividerText">OR LOGIN WITH OTP</div>
+
+              <form onSubmit={verifyLoginOtpNow} className="form">
+                <label className="label">Mobile Number</label>
+                <div className="mobileWrap">
+                  <div className="countryCode">+91</div>
+                  <input
+                    className="input mobileInput"
+                    value={otpLoginMobile}
+                    onChange={(e) => setOtpLoginMobile(onlyDigits(e.target.value).slice(0, 10))}
+                    placeholder="Enter mobile number"
+                  />
+                </div>
+
+                {!otpLoginSent ? (
+                  <button
+                    type="button"
+                    className="secondaryBtn"
+                    style={{ marginTop: 14 }}
+                    onClick={sendLoginOtpNow}
+                    disabled={otpLoginLoading}
+                  >
+                    {otpLoginLoading ? "SENDING..." : "SEND OTP"}
+                  </button>
+                ) : (
+                  <>
+                    <label className="label" style={{ marginTop: 16 }}>Enter OTP</label>
+                    <input
+                      className="input"
+                      value={otpLoginCode}
+                      onChange={(e) => setOtpLoginCode(onlyDigits(e.target.value).slice(0, 6))}
+                      placeholder="Enter OTP"
+                    />
+
+                    <button
+                      className="primaryBtn"
+                      type="submit"
+                      style={{ marginTop: 14 }}
+                      disabled={otpLoginLoading}
+                    >
+                      {otpLoginLoading ? "VERIFYING..." : "VERIFY OTP & LOGIN"}
+                    </button>
+                  </>
+                )}
+              </form>
             </section>
 
-            {/* REGISTER */}
             <section className="card">
               <h2 className="cardTitle">Register</h2>
 
               <form onSubmit={onRegisterSubmit} className="form">
-                <label className="label">
-                  Email address <span className="req">*</span>
-                </label>
+                <label className="label">Email address (optional)</label>
                 <input
                   className="input"
                   type="email"
                   value={regEmail}
                   onChange={(e) => setRegEmail(e.target.value)}
-                  placeholder="Enter email address"
+                  placeholder="You can leave this blank"
                 />
 
                 <label className="label" style={{ marginTop: 16 }}>
                   Mobile Number <span className="req">*</span>
                 </label>
-                <input
-                  className="input"
-                  type="text"
-                  value={regMobile}
-                  onChange={(e) => {
-                    setRegMobile(e.target.value);
-                    setOtpVerified(false);
-                  }}
-                  placeholder="Enter mobile number with country code"
-                />
+                <div className="mobileWrap">
+                  <div className="countryCode">+91</div>
+                  <input
+                    className="input mobileInput"
+                    value={regMobile}
+                    onChange={(e) => {
+                      setRegMobile(onlyDigits(e.target.value).slice(0, 10));
+                      setRegMobileVerified(false);
+                    }}
+                    placeholder="Enter mobile number"
+                  />
+                </div>
 
                 <div className="otpRow">
-                  <button
-                    type="button"
-                    className="otpBtn"
-                    onClick={handleSendOtp}
-                    disabled={otpLoading}
-                  >
-                    {otpLoading ? "Sending..." : otpSent ? "Resend OTP" : "Send OTP"}
+                  <button type="button" className="secondaryBtn" onClick={sendRegisterOtpNow}>
+                    {regOtpSent ? "RESEND OTP" : "SEND OTP"}
                   </button>
                 </div>
 
-                {otpSent && (
+                {regOtpSent && (
                   <>
-                    <label className="label" style={{ marginTop: 16 }}>
-                      Enter OTP <span className="req">*</span>
-                    </label>
+                    <label className="label" style={{ marginTop: 16 }}>Enter OTP</label>
                     <div className="otpVerifyRow">
                       <input
-                        className="input otpInput"
-                        type="text"
-                        value={regOtp}
-                        onChange={(e) => setRegOtp(e.target.value)}
+                        className="input"
+                        value={regOtpCode}
+                        onChange={(e) => setRegOtpCode(onlyDigits(e.target.value).slice(0, 6))}
                         placeholder="Enter OTP"
                       />
-                      <button
-                        type="button"
-                        className={`otpBtn ${otpVerified ? "otpVerifiedBtn" : ""}`}
-                        onClick={handleVerifyOtp}
-                        disabled={otpVerifyLoading || otpVerified}
-                      >
-                        {otpVerified
-                          ? "Verified ✅"
-                          : otpVerifyLoading
-                          ? "Verifying..."
-                          : "Verify OTP"}
+                      <button type="button" className="secondaryBtn" onClick={verifyRegisterOtpNow}>
+                        VERIFY
                       </button>
                     </div>
+                    {regMobileVerified && <div className="verifyOk">Mobile verified ✅</div>}
                   </>
                 )}
 
@@ -424,7 +511,6 @@ export default function MyAccount() {
                     type={showRegPass ? "text" : "password"}
                     value={regPassword}
                     onChange={(e) => setRegPassword(e.target.value)}
-                    placeholder="Enter password"
                   />
                   <button
                     type="button"
@@ -444,7 +530,6 @@ export default function MyAccount() {
                     type={showRegConfirmPass ? "text" : "password"}
                     value={regConfirmPassword}
                     onChange={(e) => setRegConfirmPassword(e.target.value)}
-                    placeholder="Confirm password"
                   />
                   <button
                     type="button"
@@ -455,22 +540,10 @@ export default function MyAccount() {
                   </button>
                 </div>
 
-                {regPasswordMismatch && (
-                  <div className="errorText">Passwords do not match.</div>
-                )}
+                {regPasswordMismatch && <div className="errorText">Passwords do not match.</div>}
 
-                <p className="muted" style={{ marginTop: 16 }}>
-                  Your personal data will be used to support your experience throughout
-                  this website, to manage access to your account, and for other
-                  purposes described in our privacy policy.
-                </p>
-
-                <button
-                  className="primaryBtn"
-                  type="submit"
-                  disabled={regPasswordMismatch || registerLoading || !otpVerified}
-                >
-                  {registerLoading ? "REGISTERING..." : "REGISTER"}
+                <button className="primaryBtn" type="submit" disabled={regPasswordMismatch}>
+                  REGISTER
                 </button>
               </form>
             </section>
@@ -503,90 +576,28 @@ export default function MyAccount() {
           justify-content:center;
           padding-top:72px;
         }
-        .heroOverlay{
-          position:absolute;
-          inset:0;
-          background:rgba(0,0,0,0.35);
-        }
-        .heroContent{
-          position:relative;
-          text-align:center;
-          color:#fff;
-          padding:0 18px;
-        }
-        .heroTitle{
-          font-size:66px;
-          font-weight:800;
-          margin:0;
-          text-shadow:0 4px 18px rgba(0,0,0,0.35);
-        }
-        .heroSub{
-          margin-top:10px;
-          font-size:18px;
-          opacity:0.95;
-        }
+        .heroOverlay{ position:absolute; inset:0; background:rgba(0,0,0,0.35); }
+        .heroContent{ position:relative; text-align:center; color:#fff; padding:0 18px; }
+        .heroTitle{ font-size:66px; font-weight:800; margin:0; text-shadow:0 4px 18px rgba(0,0,0,0.35); }
+        .heroSub{ margin-top:10px; font-size:18px; opacity:0.95; }
 
-        .contentWrap{
-          max-width:1320px;
-          margin:0 auto;
-          padding:70px 22px 90px;
-        }
+        .contentWrap{ max-width:1320px; margin:0 auto; padding:70px 22px 90px; }
+        .topMsgWrap{ margin-bottom:18px; display:flex; flex-direction:column; gap:10px; }
+        .msgSuccess{ background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; padding:12px 14px; border-radius:10px; font-weight:700; }
+        .msgError{ background:#fef2f2; color:#991b1b; border:1px solid #fecaca; padding:12px 14px; border-radius:10px; font-weight:700; }
 
-        .topMsgWrap{
-          margin-bottom:18px;
-          display:flex;
-          flex-direction:column;
-          gap:10px;
-        }
-        .msgSuccess{
-          background:#ecfdf5;
-          color:#065f46;
-          border:1px solid #a7f3d0;
-          padding:12px 14px;
-          border-radius:10px;
-          font-weight:700;
-        }
-        .msgError{
-          background:#fef2f2;
-          color:#991b1b;
-          border:1px solid #fecaca;
-          padding:12px 14px;
-          border-radius:10px;
-          font-weight:700;
-        }
-
-        .formsGrid{
-          display:grid;
-          grid-template-columns: 1fr 1fr;
-          gap:42px;
-          align-items:start;
-        }
+        .formsGrid{ display:grid; grid-template-columns: 1fr 1fr; gap:42px; align-items:start; }
 
         .card{
           border:1px solid var(--cardBorder);
-          border-radius:14px;
+          border-radius:12px;
           padding:28px 28px 26px;
           background:#fff;
         }
-        .cardTitle{
-          font-size:56px;
-          font-weight:900;
-          margin:0 0 18px;
-          color:#0b0b0b;
-        }
-        .form{
-          display:flex;
-          flex-direction:column;
-        }
-        .label{
-          font-size:16px;
-          font-weight:700;
-          color:#111827;
-        }
-        .req{
-          color:#ef4444;
-          font-weight:900;
-        }
+        .cardTitle{ font-size:46px; font-weight:900; margin:0 0 18px; color:#0b0b0b; }
+        .form{ display:flex; flex-direction:column; }
+        .label{ font-size:16px; font-weight:700; color:#111827; }
+        .req{ color:#ef4444; font-weight:900; }
 
         .input, .select{
           width:100%;
@@ -598,132 +609,91 @@ export default function MyAccount() {
           outline:none;
           font-size:16px;
           background:#fff;
+          box-sizing:border-box;
         }
-
-        .select{
-          border-radius:10px;
-          height:52px;
-        }
-
+        .select{ border-radius:10px; height:52px; }
         .input:focus, .select:focus{
           border-color:#9ca3af;
           box-shadow:0 0 0 3px rgba(11,118,197,0.10);
         }
 
-        .inputWrap{
-          position:relative;
-          width:100%;
-        }
-
+        .inputWrap{ position:relative; width:100%; }
         .eyeBtn{
-          position:absolute;
-          right:14px;
-          top:50%;
+          position:absolute; right:14px; top:50%;
           transform:translateY(-50%);
-          background:transparent;
-          border:none;
-          cursor:pointer;
-          font-size:18px;
-          opacity:0.85;
+          background:transparent; border:none; cursor:pointer;
+          font-size:18px; opacity:0.85;
         }
 
-        .row{
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          margin:14px 0 8px;
-        }
-
-        .check{
+        .mobileWrap{
           display:flex;
           align-items:center;
           gap:10px;
-          font-size:16px;
-          user-select:none;
-        }
-        .check input{
-          width:16px;
-          height:16px;
-        }
-
-        .otpRow{
           margin-top:10px;
-          display:flex;
-          gap:10px;
-          flex-wrap:wrap;
         }
-
-        .otpVerifyRow{
-          margin-top:10px;
+        .countryCode{
+          height:56px;
+          min-width:72px;
+          border:1px solid #d1d5db;
+          border-radius:18px;
           display:flex;
-          gap:10px;
           align-items:center;
+          justify-content:center;
+          background:#f9fafb;
+          font-weight:800;
         }
-
-        .otpInput{
+        .mobileInput{
+          margin-top:0 !important;
           flex:1;
-          margin-top:0;
         }
 
-        .otpBtn{
-          height:46px;
-          padding:0 18px;
-          border:none;
-          border-radius:999px;
-          background:#111827;
-          color:#fff;
-          font-weight:900;
-          cursor:pointer;
-          white-space:nowrap;
+        .otpRow{ margin-top:14px; }
+        .otpVerifyRow{
+          display:flex;
+          gap:10px;
+          align-items:flex-end;
         }
-
-        .otpVerifiedBtn{
-          background:#16a34a;
-        }
-
-        .primaryBtn{
+        .verifyOk{
           margin-top:10px;
-          width:160px;
+          color:#16a34a;
+          font-weight:800;
+        }
+
+        .row{ display:flex; align-items:center; justify-content:space-between; margin:14px 0 8px; }
+        .check{ display:flex; align-items:center; gap:10px; font-size:16px; user-select:none; }
+        .check input{ width:16px; height:16px; }
+
+        .primaryBtn, .secondaryBtn{
+          margin-top:10px;
           height:46px;
           border:none;
           border-radius:999px;
-          background:var(--blue);
           color:#fff;
           font-weight:900;
           letter-spacing:0.8px;
           cursor:pointer;
+          padding:0 18px;
         }
+        .primaryBtn{ background:var(--blue); }
+        .secondaryBtn{ background:#111827; }
 
-        .primaryBtn:disabled,
-        .otpBtn:disabled{
+        .primaryBtn:disabled, .secondaryBtn:disabled{
           opacity:0.55;
           cursor:not-allowed;
         }
 
-        .link{
-          margin-top:16px;
-          color:#111827;
-          text-decoration:none;
-          font-size:16px;
-        }
-        .link:hover{
-          text-decoration:underline;
-        }
+        .link{ margin-top:16px; color:#111827; text-decoration:none; font-size:16px; }
+        .link:hover{ text-decoration:underline; }
+        .inputError{ border-color:#ef4444 !important; }
+        .errorText{ margin-top:10px; color:#ef4444; font-weight:700; }
 
-        .muted{
-          color:#374151;
-          font-size:16px;
-          line-height:1.6;
-        }
-
-        .inputError{
-          border-color:#ef4444 !important;
-        }
-
-        .errorText{
-          margin-top:10px;
-          color:#ef4444;
-          font-weight:700;
+        .dividerText{
+          margin:24px 0 12px;
+          text-align:center;
+          font-size:13px;
+          font-weight:900;
+          color:#6b7280;
+          letter-spacing:1px;
         }
 
         .loggedCard{
@@ -732,25 +702,9 @@ export default function MyAccount() {
           padding:22px;
           background:#fff;
         }
-
-        .loggedTitle{
-          margin:0;
-          font-size:32px;
-          font-weight:900;
-          color:#0b0b0b;
-        }
-
-        .loggedSub{
-          margin:10px 0 18px;
-          color:#374151;
-        }
-
-        .loggedActions{
-          display:grid;
-          grid-template-columns: 1fr 1fr;
-          gap:12px;
-        }
-
+        .loggedTitle{ margin:0; font-size:32px; font-weight:900; color:#0b0b0b; }
+        .loggedSub{ margin:10px 0 18px; color:#374151; }
+        .loggedActions{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
         .primaryBtnWide, .secondaryBtnWide, .dangerBtnWide{
           height:46px;
           border-radius:12px;
@@ -759,39 +713,21 @@ export default function MyAccount() {
           font-weight:900;
           letter-spacing:0.4px;
         }
-
         .primaryBtnWide{ background:var(--blue); color:#fff; }
         .secondaryBtnWide{ background:#111827; color:#fff; opacity:0.92; }
         .dangerBtnWide{ background:#ef4444; color:#fff; }
 
         @media (max-width: 1024px){
-          .cardTitle{ font-size:44px; }
+          .cardTitle{ font-size:36px; }
           .heroTitle{ font-size:52px; }
           .formsGrid{ grid-template-columns:1fr; }
           .loggedActions{ grid-template-columns:1fr; }
+          .otpVerifyRow{ flex-direction:column; align-items:stretch; }
         }
-
-        @media (max-width: 640px){
-          .otpVerifyRow{
-            flex-direction:column;
-            align-items:stretch;
-          }
-
-          .otpInput{
-            width:100%;
-          }
-
-          .otpBtn{
-            width:100%;
-          }
-        }
-
         @media (max-width: 520px){
           .hero{ height:360px; }
           .heroTitle{ font-size:44px; }
-          .card{ padding:22px 18px; }
-          .cardTitle{ font-size:36px; }
-          .primaryBtn{ width:100%; }
+          .countryCode{ min-width:62px; }
         }
       `}</style>
     </div>

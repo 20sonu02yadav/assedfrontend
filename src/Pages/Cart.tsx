@@ -1,10 +1,18 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  getCart,
+  getCart as getServerCart,
   removeCartItem,
   updateCartItemQty,
-  type Cart,
+  type Cart as ServerCart,
 } from "../services/cartApi";
+import {
+  getCart as getLocalCart,
+  removeFromCart as removeLocalCartItem,
+  updateQty as updateLocalCartQty,
+  clearCart as _clearLocalCart,
+  type CartItem as LocalCartItem,
+} from "../services/cart";
+import { getStoredAccessToken } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
 function money(v?: string | number) {
@@ -12,16 +20,30 @@ function money(v?: string | number) {
   return `₹ ${n.toFixed(2)}`;
 }
 
+type HybridCartItem = {
+  mode: "server" | "local";
+  id: number | string;
+  productId: number;
+  product_title: string;
+  product_slug?: string;
+  product_image?: string | null;
+  unit_price?: string | number;
+  quantity: number;
+  line_total?: string | number;
+};
+
 export default function CartPage() {
-  const [cart, setCart] = useState<Cart | null>(null);
+  const [serverCart, setServerCart] = useState<ServerCart | null>(null);
+  const [localItems, setLocalItems] = useState<LocalCartItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [busyId, setBusyId] = useState<number | null>(null);
+  const [busyId, setBusyId] = useState<number | string | null>(null);
   const navigate = useNavigate();
 
-  // Responsive state track karne ke liye
   const [isMobile, setIsMobile] = useState(
     typeof window !== "undefined" ? window.innerWidth <= 768 : false
   );
+
+  const isLoggedIn = !!getStoredAccessToken();
 
   useEffect(() => {
     const handleResize = () => {
@@ -33,9 +55,16 @@ export default function CartPage() {
 
   async function load() {
     setLoading(true);
+
     try {
-      const c = await getCart();
-      setCart(c);
+      if (getStoredAccessToken()) {
+        const c = await getServerCart();
+        setServerCart(c);
+        setLocalItems([]);
+      } else {
+        setServerCart(null);
+        setLocalItems(getLocalCart());
+      }
     } finally {
       setLoading(false);
     }
@@ -45,21 +74,80 @@ export default function CartPage() {
     load();
   }, []);
 
-  async function changeQty(itemId: number, qty: number) {
+  useEffect(() => {
+    const sync = () => load();
+
+    window.addEventListener("cart:changed", sync);
+    window.addEventListener("storage", sync);
+    window.addEventListener("focus", sync);
+
+    return () => {
+      window.removeEventListener("cart:changed", sync);
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("focus", sync);
+    };
+  }, []);
+
+  const items: HybridCartItem[] = useMemo(() => {
+    if (isLoggedIn) {
+      return (
+        serverCart?.items?.map((it) => ({
+          mode: "server" as const,
+          id: it.id,
+          productId: it.product,
+          product_title: it.product_title,
+          product_slug: it.product_slug,
+          product_image: it.product_image,
+          unit_price: it.unit_price,
+          quantity: it.quantity,
+          line_total: it.line_total,
+        })) || []
+      );
+    }
+
+    return localItems.map((it) => ({
+      mode: "local" as const,
+      id: it.productId,
+      productId: it.productId,
+      product_title: it.title,
+      product_slug: it.slug,
+      product_image: it.image || null,
+      unit_price: it.price,
+      quantity: it.qty,
+      line_total: Number(it.price || 0) * Number(it.qty || 0),
+    }));
+  }, [isLoggedIn, serverCart, localItems]);
+
+  async function changeQty(item: HybridCartItem, qty: number) {
     if (qty < 1) return;
-    setBusyId(itemId);
+
+    setBusyId(item.id);
+
     try {
-      await updateCartItemQty(itemId, qty);
+      if (item.mode === "server") {
+        await updateCartItemQty(Number(item.id), qty);
+      } else {
+        updateLocalCartQty(item.productId, qty);
+        window.dispatchEvent(new Event("cart:changed"));
+      }
+
       await load();
     } finally {
       setBusyId(null);
     }
   }
 
-  async function remove(itemId: number) {
-    setBusyId(itemId);
+  async function remove(item: HybridCartItem) {
+    setBusyId(item.id);
+
     try {
-      await removeCartItem(itemId);
+      if (item.mode === "server") {
+        await removeCartItem(Number(item.id));
+      } else {
+        removeLocalCartItem(item.productId);
+        window.dispatchEvent(new Event("cart:changed"));
+      }
+
       await load();
     } finally {
       setBusyId(null);
@@ -67,17 +155,17 @@ export default function CartPage() {
   }
 
   const grandTotal = useMemo(() => {
-    if (!cart?.items?.length) return 0;
-    return cart.items.reduce((sum, it) => {
+    if (!items.length) return 0;
+    return items.reduce((sum, it) => {
       return sum + Number(it.line_total || Number(it.unit_price || 0) * it.quantity);
     }, 0);
-  }, [cart]);
+  }, [items]);
 
   if (loading) {
     return <div style={{ padding: 40 }}>Loading cart...</div>;
   }
 
-  if (!cart || cart.items.length === 0) {
+  if (!items.length) {
     return (
       <div style={{ maxWidth: 1200, margin: "40px auto", padding: 16 }}>
         <h1>My Cart</h1>
@@ -90,31 +178,44 @@ export default function CartPage() {
     <div style={{ maxWidth: 1200, margin: "40px auto", padding: 16 }}>
       <h1 style={{ marginBottom: 20 }}>My Cart</h1>
 
+      {!isLoggedIn && (
+        <div
+          style={{
+            marginBottom: 18,
+            padding: 14,
+            borderRadius: 12,
+            background: "#eff6ff",
+            border: "1px solid #bfdbfe",
+            color: "#1e3a8a",
+            fontWeight: 600,
+          }}
+        >
+          You are using guest cart. Login/register to save cart permanently.
+        </div>
+      )}
+
       <div
         style={{
           display: "grid",
-          // Mobile par 1 column, Desktop par 2 columns
           gridTemplateColumns: isMobile ? "1fr" : "1.4fr 0.6fr",
           gap: 24,
           alignItems: "start",
         }}
       >
-        {/* LEFT - CART ITEMS */}
         <div style={{ display: "grid", gap: 14 }}>
-          {cart.items.map((it) => {
+          {items.map((it) => {
             const unitPrice = Number(it.unit_price || 0);
             const lineTotal = Number(it.line_total || unitPrice * it.quantity);
 
             return (
               <div
-                key={it.id}
+                key={`${it.mode}-${it.id}`}
                 style={{
                   border: "1px solid #e5e7eb",
                   borderRadius: 16,
                   padding: 16,
                   background: "#fff",
                   display: "grid",
-                  // Mobile par image choti, Desktop par normal
                   gridTemplateColumns: isMobile ? "90px 1fr" : "120px 1fr",
                   gap: 16,
                 }}
@@ -165,7 +266,7 @@ export default function CartPage() {
                         }}
                       >
                         <button
-                          onClick={() => changeQty(it.id, it.quantity - 1)}
+                          onClick={() => changeQty(it, it.quantity - 1)}
                           disabled={busyId === it.id || it.quantity <= 1}
                           style={qtyBtnStyle}
                         >
@@ -184,7 +285,7 @@ export default function CartPage() {
                         </div>
 
                         <button
-                          onClick={() => changeQty(it.id, it.quantity + 1)}
+                          onClick={() => changeQty(it, it.quantity + 1)}
                           disabled={busyId === it.id}
                           style={qtyBtnStyle}
                         >
@@ -201,7 +302,7 @@ export default function CartPage() {
 
                   <div style={{ marginTop: isMobile ? 8 : 0 }}>
                     <button
-                      onClick={() => remove(it.id)}
+                      onClick={() => remove(it)}
                       disabled={busyId === it.id}
                       style={{
                         height: isMobile ? 36 : 40,
@@ -212,7 +313,7 @@ export default function CartPage() {
                         color: "#991b1b",
                         fontWeight: 900,
                         cursor: "pointer",
-                        width: isMobile ? "100%" : "auto", // Mobile pe full width button
+                        width: isMobile ? "100%" : "auto",
                       }}
                     >
                       Remove
@@ -224,14 +325,12 @@ export default function CartPage() {
           })}
         </div>
 
-        {/* RIGHT - PRICE SUMMARY */}
         <div
           style={{
             border: "1px solid #e5e7eb",
             borderRadius: 16,
             padding: 18,
             background: "#fff",
-            // Mobile par static aur Desktop par sticky rahega
             position: isMobile ? "static" : "sticky",
             top: 90,
           }}
@@ -242,12 +341,12 @@ export default function CartPage() {
 
           <div style={rowStyle}>
             <span>Items</span>
-            <span>{cart.items.length}</span>
+            <span>{items.length}</span>
           </div>
 
           <div style={rowStyle}>
             <span>Total Quantity</span>
-            <span>{cart.items.reduce((sum, it) => sum + it.quantity, 0)}</span>
+            <span>{items.reduce((sum, it) => sum + it.quantity, 0)}</span>
           </div>
 
           <div style={rowStyle}>
@@ -295,7 +394,7 @@ const qtyBtnStyle: React.CSSProperties = {
   cursor: "pointer",
   display: "flex",
   justifyContent: "center",
-  alignItems: "center"
+  alignItems: "center",
 };
 
 const rowStyle: React.CSSProperties = {

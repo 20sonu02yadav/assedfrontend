@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { addToCart } from "../services/cartApi";
+import { addProductToHybridCart } from "../services/cartHelper";
 import { fetchProducts, type ProductListItem } from "../services/storeApi";
 
 type Offer = {
@@ -56,8 +56,7 @@ export default function Home() {
   const promo3 =
     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-matreding-6835302.jpg";
 
-  const specialEditionBg =
-    "/image.png";
+  const specialEditionBg = "/image.png";
 
   const brandLogos = useMemo(
     () => [
@@ -125,11 +124,11 @@ export default function Home() {
       setFeaturedLoading(true);
       try {
         const data = await fetchProducts();
-        const topSix = data.slice(0, 6);
-        setFeatured(topSix);
+        const topProducts = data.slice(0, 10);
+        setFeatured(topProducts);
 
         const nextQty: Record<number, number> = {};
-        topSix.forEach((p) => {
+        topProducts.forEach((p) => {
           nextQty[p.id] = 1;
         });
         setQtyMap(nextQty);
@@ -154,24 +153,26 @@ export default function Home() {
     };
   }, [quickView.open]);
 
-  // function setQty(productId: number, qty: number) {
-  //   setQtyMap((prev) => ({
-  //     ...prev,
-  //     [productId]: Math.max(1, qty),
-  //   }));
-  // }
-
-  async function handleAddToCart(productId: number, qty: number) {
-    try {
-      setBusyId(productId);
-      await addToCart(productId, qty);
-      alert("Added to cart ✅");
-    } catch {
-      alert("Please login to add to cart.");
-    } finally {
-      setBusyId(null);
-    }
+  function setQty(productId: number, qty: number) {
+    setQtyMap((prev) => ({
+      ...prev,
+      [productId]: Math.max(1, qty),
+    }));
   }
+
+  async function handleAddToCart(product: ProductListItem, qty: number) {
+  try {
+    setBusyId(product.id);
+
+    await addProductToHybridCart(product, qty);
+
+    alert("Added to cart ✅");
+  } catch {
+    alert("Something went wrong while adding to cart.");
+  } finally {
+    setBusyId(null);
+  }
+}
 
   return (
     <div className="home">
@@ -191,12 +192,12 @@ export default function Home() {
         }
         a{text-decoration:none; color:inherit}
         .container{
-        width:100%;
-        max-width:1600px;
-        margin:auto;
-        padding-left:40px;
-        padding-right:40px;
-      }
+          width:100%;
+          max-width:1600px;
+          margin:auto;
+          padding-left:40px;
+          padding-right:40px;
+        }
 
         .hero{
           position:relative;
@@ -227,14 +228,14 @@ export default function Home() {
         }
 
         .heroContent{
-        position:relative;
-        z-index:2;
-        height:100%;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        text-align:center;
-      }
+          position:relative;
+          z-index:2;
+          height:100%;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          text-align:center;
+        }
         .heroText{
           color:#fff;
           max-width:760px;
@@ -341,7 +342,11 @@ export default function Home() {
         }
 
         .fpSection{background:#f3f5f7; padding:70px 0}
-        .fpGrid{display:grid; grid-template-columns:repeat(3,1fr); gap:28px}
+        .fpGrid{
+          display:grid;
+          grid-template-columns:repeat(5,1fr);
+          gap:22px;
+        }
         .fpCard{
           background:#fff;
           border-radius:24px;
@@ -353,7 +358,7 @@ export default function Home() {
         .fpImgWrap{
           position:relative;
           background:#f7f7f7;
-          height:320px;
+          height:280px;
           display:block;
           cursor:pointer;
         }
@@ -399,11 +404,11 @@ export default function Home() {
         }
         .fpTitle{
           margin:0 0 14px;
-          font-size:22px;
+          font-size:18px;
           font-weight:900;
           line-height:1.25;
           color:#1f2937;
-          min-height:84px;
+          min-height:68px;
           cursor:pointer;
         }
         .fpPriceRow{
@@ -417,11 +422,11 @@ export default function Home() {
           color:#9aa1aa;
           text-decoration:line-through;
           font-weight:900;
-          font-size:16px;
+          font-size:15px;
         }
         .fpNow{
           font-weight:900;
-          font-size:22px;
+          font-size:20px;
           color:#111827;
         }
         .fpOff{
@@ -437,6 +442,30 @@ export default function Home() {
           font-weight:800;
           color:#4b5563;
           margin-bottom:16px;
+        }
+        .fpQtyWrap{
+          display:inline-flex;
+          align-items:center;
+          border:1px solid #d1d5db;
+          border-radius:999px;
+          overflow:hidden;
+          margin-bottom:14px;
+        }
+        .fpQtyBtn{
+          width:36px;
+          height:36px;
+          border:none;
+          background:#f9fafb;
+          font-size:20px;
+          font-weight:900;
+          cursor:pointer;
+        }
+        .fpQtyValue{
+          min-width:38px;
+          text-align:center;
+          font-weight:900;
+          font-size:14px;
+          padding:0 8px;
         }
         .fpBtn{
           width:100%;
@@ -501,15 +530,6 @@ export default function Home() {
         .star.on{opacity:1}
         .rText{margin:0; color:#444; line-height:2; padding:0 14px}
 
-        .floatTop{
-          position:fixed; left:22px; bottom:22px;
-          width:56px; height:56px; border-radius:999px;
-          background:#9aa8ff; display:grid; place-items:center;
-          box-shadow:0 12px 22px rgba(0,0,0,.18); cursor:pointer; z-index:999;
-          border:none;
-        }
-
-        /* QUICK VIEW */
         .qvOverlay{
           position:fixed;
           inset:0;
@@ -525,6 +545,7 @@ export default function Home() {
           position:relative;
           padding:28px;
           box-sizing:border-box;
+          border-radius:18px;
         }
         .qvClose{
           position:absolute;
@@ -642,222 +663,156 @@ export default function Home() {
           font-size:18px;
         }
 
-        /* ===== RESPONSIVE STYLES ADDED ===== */
-        @media (max-width: 1280px) {
-          .heroH1 { font-size: 56px; }
-          .title { font-size: 42px; }
-          .specialH { font-size: 44px; }
+        @media (max-width:1400px){
+          .fpGrid{grid-template-columns:repeat(4,1fr)}
         }
 
-        @media (max-width: 1080px) {
+        @media (max-width:1180px){
           .heroH1 { font-size: 48px; }
-          .hero { min-height: 600px; }
-          .heroText { max-width: 600px; }
-          
           .title { font-size: 40px; }
-          
-          .promoGrid { grid-template-columns: repeat(2, 1fr); }
-          .promo { min-height: 380px; }
-          
-          .fpGrid { grid-template-columns: repeat(2, 1fr); }
-          
-          .reviewGrid { grid-template-columns: repeat(2, 1fr); }
-          
-          .featGrid { grid-template-columns: repeat(2, 1fr); }
-          
+          .promoGrid { grid-template-columns:repeat(2,1fr); }
+          .fpGrid { grid-template-columns:repeat(3,1fr); }
+          .reviewGrid { grid-template-columns:repeat(2,1fr); }
+          .featGrid { grid-template-columns:repeat(2,1fr); }
           .specialContent { left: 40px; top: 40px; max-width: 450px; }
           .specialH { font-size: 40px; }
-          
-          .qvGrid { grid-template-columns: 1fr; }
+          .qvGrid { grid-template-columns:1fr; }
           .qvMainImage { height: 400px; }
           .qvAdd { min-width: 250px; }
-          
           .brandsScroll { gap: 40px; }
           .brandLogo { min-width: 180px; }
         }
 
-        @media (max-width: 768px) {
-          .hero { min-height: 500px; }
-          .heroText { padding-top: 30px; }
-          .heroH1 { font-size: 38px; }
-          .heroH3 { font-size: 20px; margin-bottom: 20px; }
-          
-          .title { font-size: 34px; }
-          .section { padding: 40px 0; }
-          
-          .promoGrid { grid-template-columns: 1fr; }
-          .promo { min-height: 320px; }
-          .promoBody { left: 24px; right: 24px; bottom: 24px; }
-          .promoH { font-size: 28px; }
-          .promoSub { font-size: 15px; }
-          
-          .fpSection { padding: 40px 0; }
-          .fpGrid { gap: 20px; }
-          .fpImgWrap { height: 260px; }
-          .fpTitle { font-size: 18px; min-height: auto; }
-          .fpNow { font-size: 18px; }
-          
-          .brandsBox { padding: 30px 0; }
-          .brandsRow { gap: 10px; }
-          .brandsScroll { gap: 20px; height: 120px; }
-          .brandLogo { min-width: 140px; height: 120px; }
-          .brandLogo img { max-height: 100px; max-width: 140px; }
-          .brandArrow { width: 44px; height: 44px; }
-          
-          .specialBannerWrap { padding: 40px 0 10px; }
-          .specialBanner { min-height: 350px; }
-          .specialContent { left: 24px; top: 24px; right: 24px; max-width: 100%; }
-          .specialH { font-size: 32px; }
-          .specialP { font-size: 15px; }
-          .specialStrong { font-size: 16px; }
-          
-          .features { padding: 40px 0; }
-          .featGrid { gap: 16px; }
-          .featItem h4 { font-size: 18px; }
-          .featItem p { font-size: 14px; }
-          
-          .reviews { padding: 40px 0; }
-          .reviewGrid { gap: 20px; }
-          .avatar { width: 70px; height: 70px; }
-          .rName { font-size: 16px; }
-          .rText { font-size: 14px; line-height: 1.6; }
-          
-          .floatTop { width: 48px; height: 48px; left: 16px; bottom: 16px; }
-          
-          .qvCard { padding: 20px; }
-          .qvMainImage { height: 300px; }
-          .qvClose { font-size: 28px; top: 12px; right: 12px; }
-          .qvNow { font-size: 24px; }
-          .qvOld { font-size: 18px; }
-          .qvQtyBtn { width: 40px; height: 36px; font-size: 20px; }
-          .qvAdd { min-width: 200px; height: 48px; font-size: 16px; }
-          .qvMeta { gap: 16px; font-size: 14px; }
-        }
-
-        @media (max-width: 480px) {
-          .hero { min-height: 450px; }
-          .heroH1 { font-size: 30px; }
-          .heroH3 { font-size: 18px; }
-          .heroBtn { padding: 10px 18px; font-size: 14px; }
-          
-          .title { font-size: 28px; }
-          .underline { width: 120px; }
-          
-          .promo { min-height: 280px; }
-          .promoBody { left: 18px; right: 18px; bottom: 18px; }
-          .promoH { font-size: 24px; }
-          .promoSub { font-size: 14px; margin-bottom: 12px; }
-          .promoBtn { padding: 10px 18px; font-size: 13px; }
-          
-          .fpGrid { grid-template-columns: 1fr; }
-          .fpImgWrap { height: 240px; }
-          .fpEye { width: 48px; height: 48px; }
-          .fpSale { font-size: 11px; padding: 6px 12px; }
-          .fpCat { font-size: 11px; }
-          .fpTitle { font-size: 16px; }
-          .fpPriceRow { gap: 6px; }
-          .fpOld { font-size: 14px; }
-          .fpNow { font-size: 16px; }
-          .fpOff { font-size: 11px; padding: 3px 6px; }
-          .fpGst { font-size: 12px; }
-          .fpBtn { padding: 14px 10px; font-size: 14px; }
-          
-          .brandsBox { padding: 20px 0; }
-          .brandsScroll { gap: 15px; height: 100px; }
-          .brandLogo { min-width: 120px; height: 100px; }
-          .brandLogo img { max-height: 80px; max-width: 120px; }
-          .brandArrow { width: 38px; height: 38px; }
-          
-          .specialBanner { min-height: 300px; }
-          .specialContent { left: 18px; top: 18px; }
-          .smallLabel { font-size: 14px; }
-          .specialH { font-size: 26px; margin-bottom: 8px; }
-          .specialP { font-size: 13px; line-height: 1.5; margin-bottom: 12px; }
-          .specialStrong { font-size: 14px; margin-bottom: 16px; }
-          
-          .featGrid { grid-template-columns: 1fr; gap: 20px; }
-          .featIcon { width: 40px; height: 40px; }
-          .featItem h4 { font-size: 16px; margin: 8px 0 4px; }
-          .featItem p { font-size: 13px; max-width: 100%; }
-          
-          .reviewGrid { grid-template-columns: 1fr; }
-          .avatar { width: 60px; height: 60px; }
-          .star { font-size: 16px; }
-          .rText { font-size: 13px; }
-          
-          .qvCard { padding: 16px; }
-          .qvMainImage { height: 220px; }
-          .qvPriceRow { gap: 6px; }
-          .qvNow { font-size: 22px; }
-          .qvOld { font-size: 16px; }
-          .qvActionRow { gap: 10px; }
-          .qvQty { height: 38px; }
-          .qvQtyBtn { width: 36px; height: 36px; font-size: 18px; }
-          .qvQtyValue { min-width: 36px; font-size: 16px; }
-          .qvAdd { min-width: 100%; height: 44px; font-size: 15px; padding: 0 16px; }
-          .qvMeta { gap: 10px; font-size: 12px; }
-          .qvShare { gap: 10px; font-size: 14px; margin-top: 16px; }
-          .qvShareIcon { font-size: 16px; }
-          
-          .floatTop { width: 42px; height: 42px; left: 12px; bottom: 12px; }
-        }
-
-        /* Fix for very small devices */
-        @media (max-width: 360px) {
-          .heroH1 { font-size: 26px; }
-          .heroH3 { font-size: 16px; }
-          
-          .title { font-size: 24px; }
-          
-          .brandLogo { min-width: 100px; }
-          .brandLogo img { max-width: 90px; }
-          
-          .promoH { font-size: 22px; }
-        }
-
         @media (max-width:768px){
-
-        .hero{
-          height:420px;
-          min-height:420px;
-        }
-
+          .container{
+            padding-left:18px;
+            padding-right:18px;
+          }
+          .hero{
+            height:420px;
+            min-height:420px;
+          }
+          .heroText{padding-top:30px}
+          .heroH1{font-size:36px}
+          .heroH3{font-size:18px}
+          .heroBtn{margin-top:10px}
+          .title{font-size:34px}
+          .section{padding:40px 0}
+          .promoGrid{grid-template-columns:1fr}
+          .promo{min-height:320px}
+          .promoBody{left:24px; right:24px; bottom:24px}
+          .promoH{font-size:28px}
+          .promoSub{font-size:15px}
+          .fpGrid{grid-template-columns:repeat(2,1fr); gap:18px}
+          .fpImgWrap{height:230px}
+          .fpTitle{font-size:16px; min-height:auto}
+          .fpNow{font-size:18px}
+          .brandsBox{padding:30px 0}
+          .brandsRow{gap:10px}
+          .brandsScroll{gap:20px; height:120px}
+          .brandLogo{min-width:140px; height:120px}
+          .brandLogo img{max-height:100px; max-width:140px}
+          .brandArrow{width:44px; height:44px}
+          .specialBannerWrap{padding:40px 0 10px}
+          .specialBanner{min-height:350px}
+          .specialContent{left:24px; top:24px; right:24px; max-width:100%}
+          .specialH{font-size:32px}
+          .specialP{font-size:15px}
+          .specialStrong{font-size:16px}
+          .features{padding:40px 0}
+          .featGrid{gap:16px}
+          .featItem h4{font-size:18px}
+          .featItem p{font-size:14px}
+          .reviews{padding:40px 0}
+          .reviewGrid{gap:20px}
+          .avatar{width:70px; height:70px}
+          .rName{font-size:16px}
+          .rText{font-size:14px; line-height:1.6}
+          .qvCard{padding:20px}
+          .qvMainImage{height:300px}
+          .qvClose{font-size:28px; top:12px; right:12px}
+          .qvNow{font-size:24px}
+          .qvOld{font-size:18px}
+          .qvQtyBtn{width:40px; height:36px; font-size:20px}
+          .qvAdd{min-width:200px; height:48px; font-size:16px}
+          .qvMeta{gap:16px; font-size:14px}
         }
 
         @media (max-width:480px){
-
-        .hero{
-          height:360px;
-          min-height:360px;
+          .hero{
+            height:360px;
+            min-height:360px;
+          }
+          .heroH1{font-size:30px}
+          .heroH3{font-size:16px}
+          .heroBtn{padding:10px 18px; font-size:14px}
+          .title{font-size:28px}
+          .underline{width:120px}
+          .promo{min-height:280px}
+          .promoBody{left:18px; right:18px; bottom:18px}
+          .promoH{font-size:24px}
+          .promoSub{font-size:14px; margin-bottom:12px}
+          .promoBtn{padding:10px 18px; font-size:13px}
+          .fpGrid{grid-template-columns:1fr}
+          .fpImgWrap{height:240px}
+          .fpEye{width:48px; height:48px}
+          .fpSale{font-size:11px; padding:6px 12px}
+          .fpCat{font-size:11px}
+          .fpTitle{font-size:16px}
+          .fpPriceRow{gap:6px}
+          .fpOld{font-size:14px}
+          .fpNow{font-size:16px}
+          .fpOff{font-size:11px; padding:3px 6px}
+          .fpGst{font-size:12px}
+          .fpBtn{padding:14px 10px; font-size:14px}
+          .brandsBox{padding:20px 0}
+          .brandsScroll{gap:15px; height:100px}
+          .brandLogo{min-width:120px; height:100px}
+          .brandLogo img{max-height:80px; max-width:120px}
+          .brandArrow{width:38px; height:38px}
+          .specialBanner{min-height:300px}
+          .specialContent{left:18px; top:18px}
+          .smallLabel{font-size:14px}
+          .specialH{font-size:26px; margin-bottom:8px}
+          .specialP{font-size:13px; line-height:1.5; margin-bottom:12px}
+          .specialStrong{font-size:14px; margin-bottom:16px}
+          .featGrid{grid-template-columns:1fr; gap:20px}
+          .featIcon{width:40px; height:40px}
+          .featItem h4{font-size:16px; margin:8px 0 4px}
+          .featItem p{font-size:13px; max-width:100%}
+          .reviewGrid{grid-template-columns:1fr}
+          .avatar{width:60px; height:60px}
+          .star{font-size:16px}
+          .rText{font-size:13px}
+          .qvCard{padding:16px}
+          .qvMainImage{height:220px}
+          .qvNow{font-size:22px}
+          .qvOld{font-size:16px}
+          .qvActionRow{gap:10px}
+          .qvQty{height:38px}
+          .qvQtyBtn{width:36px; height:36px; font-size:18px}
+          .qvQtyValue{min-width:36px; font-size:16px}
+          .qvAdd{min-width:100%; height:44px; font-size:15px; padding:0 16px}
+          .qvMeta{gap:10px; font-size:12px}
+          .qvShare{gap:10px; font-size:14px; margin-top:16px}
+          .qvShareIcon{font-size:16px}
         }
 
-
+        @media (max-width:360px){
+          .heroH1{font-size:26px}
+          .heroH3{font-size:15px}
+          .title{font-size:24px}
+          .brandLogo{min-width:100px}
+          .brandLogo img{max-width:90px}
+          .promoH{font-size:22px}
         }
 
-        @media (max-width:768px){
-
-      .heroH1{
-        font-size:36px;
-      }
-
-      .heroH3{
-        font-size:18px;
-      }
-
-      .heroBtn{
-        margin-top:10px;
-      }
-
-      }
-
-        /* Landscape mode fixes */
         @media (max-height: 600px) and (orientation: landscape) {
           .hero { min-height: 400px; }
           .heroText { padding-top: 20px; }
         }
       `}</style>
 
-      {/* HERO */}
       <section className="hero">
         <img className="heroBgImg" src={heroBg} alt="Hero Background" />
         <div className="heroOverlay" />
@@ -874,7 +829,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* BRANDS */}
       <section className="brandsBox">
         <div className="container">
           <div className="brandsRow">
@@ -909,7 +863,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SPECIAL OFFERS */}
       <section className="section">
         <div className="container">
           <div className="titleWrap left">
@@ -933,7 +886,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FEATURED PRODUCTS */}
       <section className="fpSection">
         <div className="container">
           <div className="titleWrap center">
@@ -1022,11 +974,29 @@ export default function Home() {
                         GST ({p.gst_percent}%) {inr(Number(p.gst_amount || 0))}
                       </div>
 
+                      <div className="fpQtyWrap">
+                        <button
+                          className="fpQtyBtn"
+                          onClick={() => setQty(p.id, qty - 1)}
+                          type="button"
+                        >
+                          −
+                        </button>
+                        <div className="fpQtyValue">{qty}</div>
+                        <button
+                          className="fpQtyBtn"
+                          onClick={() => setQty(p.id, qty + 1)}
+                          type="button"
+                        >
+                          +
+                        </button>
+                      </div>
+
                       <button
                         className="fpBtn"
                         type="button"
                         disabled={busyId === p.id}
-                        onClick={() => handleAddToCart(p.id, qty)}
+                        onClick={() => handleAddToCart(p, qty)}
                       >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                           <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 10V8a6 6 0 0112 0v2" />
@@ -1062,7 +1032,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FEATURES */}
       <section className="features">
         <div className="container">
           <div className="featGrid">
@@ -1082,7 +1051,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* REVIEWS */}
       <section className="reviews">
         <div className="container">
           <div className="titleWrap center">
@@ -1110,7 +1078,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* QUICK VIEW MODAL */}
       {quickView.open && quickView.product && (
         <div
           className="qvOverlay"
@@ -1186,7 +1153,7 @@ export default function Home() {
 
                   <button
                     className="qvAdd"
-                    onClick={() => handleAddToCart(quickView.product!.id, quickView.qty)}
+                    onClick={() => handleAddToCart(quickView.product!, quickView.qty)}
                   >
                     Add To Cart
                   </button>
@@ -1213,9 +1180,6 @@ export default function Home() {
           </div>
         </div>
       )}
-
-      {/* FLOAT TOP */}
-      
     </div>
   );
 }

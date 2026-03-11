@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   fetchCategoryTree,
   fetchProducts,
   type CategoryNode,
   type ProductListItem,
 } from "../services/storeApi";
-import { addToCart } from "../services/cartApi";
-import { useNavigate } from "react-router-dom";
+import { addProductToHybridCart } from "../services/cartHelper";
 
 const HERO_BG =
   "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2018/12/slide-image-free-img.jpg";
@@ -14,6 +14,13 @@ const HERO_BG =
 function money(v?: string | number) {
   const n = Number(v || 0);
   return `₹${n.toFixed(2)}`;
+}
+
+function getProductImage(product: ProductListItem) {
+  return (
+    product.image ||
+    "https://dummyimage.com/400x280/f3f4f6/111827&text=No+Image"
+  );
 }
 
 export default function Store() {
@@ -46,6 +53,8 @@ export default function Store() {
         const cats = await fetchCategoryTree();
         if (!mounted) return;
         setCategoryTree(cats);
+      } catch {
+        if (mounted) setCategoryTree([]);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -78,6 +87,9 @@ export default function Store() {
       setCategoryProducts(directProducts);
       setSubCategoryProducts([]);
       initializeQty(directProducts);
+    } catch {
+      setCategoryProducts([]);
+      setSubCategoryProducts([]);
     } finally {
       setProductsLoading(false);
     }
@@ -91,6 +103,8 @@ export default function Store() {
       const prods = await fetchProducts({ category: sub.slug });
       setSubCategoryProducts(prods);
       initializeQty(prods);
+    } catch {
+      setSubCategoryProducts([]);
     } finally {
       setProductsLoading(false);
     }
@@ -114,17 +128,19 @@ export default function Store() {
     }));
   }
 
-  async function handleAddToCart(productId: number) {
-    try {
-      setBusyId(productId);
-      await addToCart(productId, qtyMap[productId] || 1);
-      alert("Added to cart ✅");
-    } catch {
-      alert("Please login to add to cart.");
-    } finally {
-      setBusyId(null);
-    }
+  async function handleAddToCart(product: ProductListItem) {
+  try {
+    setBusyId(product.id);
+
+    await addProductToHybridCart(product, qtyMap[product.id] || 1);
+
+    alert("Added to cart ✅");
+  } catch {
+    alert("Failed to add to cart.");
+  } finally {
+    setBusyId(null);
   }
+}
 
   const activeProducts = useMemo(() => {
     const base = selectedSubCategory ? subCategoryProducts : categoryProducts;
@@ -135,9 +151,9 @@ export default function Store() {
       list = list.filter((p) => {
         return (
           p.title.toLowerCase().includes(q) ||
-          p.brand?.toLowerCase().includes(q) ||
-          p.category_name?.toLowerCase().includes(q) ||
-          p.short_category_label?.toLowerCase().includes(q)
+          (p.brand || "").toLowerCase().includes(q) ||
+          (p.category_name || "").toLowerCase().includes(q) ||
+          (p.short_category_label || "").toLowerCase().includes(q)
         );
       });
     }
@@ -190,10 +206,8 @@ export default function Store() {
 
   return (
     <div style={styles.page}>
-      {/* HERO */}
       <div style={{ ...styles.hero, backgroundImage: `url(${HERO_BG})` }}>
         <div style={styles.heroOverlay} />
-
         <div style={styles.heroCenter}>
           <div style={styles.heroTitle}>{pageTitle}</div>
 
@@ -224,9 +238,7 @@ export default function Store() {
         </div>
       </div>
 
-      {/* CONTENT */}
       <div style={styles.content}>
-        {/* FILTER CARD */}
         <div style={styles.filterCard}>
           <div style={styles.filterTopRow}>
             <div style={styles.filterTitle}>Filter</div>
@@ -287,7 +299,6 @@ export default function Store() {
           </div>
         </div>
 
-        {/* ROOT CATEGORY GRID */}
         {!selectedCategory && (
           <div style={styles.gridWrap}>
             <div style={styles.grid}>
@@ -314,12 +325,10 @@ export default function Store() {
           </div>
         )}
 
-        {/* CATEGORY PAGE */}
         {selectedCategory && !selectedSubCategory && (
           <div style={{ marginTop: 36 }}>
             <div style={styles.sectionTitle}>{selectedCategory.name}</div>
 
-            {/* Direct category products */}
             {productsLoading ? (
               <div style={styles.emptyBox}>Loading products...</div>
             ) : activeProducts.length > 0 ? (
@@ -336,10 +345,7 @@ export default function Store() {
                           onClick={() => navigate(`/product/${p.slug}`)}
                         >
                           <img
-                            src={
-                              p.image ||
-                              "https://dummyimage.com/400x280/f3f4f6/111827&text=No+Image"
-                            }
+                            src={getProductImage(p)}
                             alt={p.title}
                             style={styles.productImg}
                           />
@@ -387,7 +393,7 @@ export default function Store() {
                           <button
                             style={styles.addCartBtn}
                             disabled={busyId === p.id}
-                            onClick={() => handleAddToCart(p.id)}
+                            onClick={() => handleAddToCart(p)}
                           >
                             {busyId === p.id ? "Adding..." : "ADD TO CART"}
                           </button>
@@ -401,7 +407,6 @@ export default function Store() {
               <div style={styles.emptyBox}>No direct products in this category.</div>
             )}
 
-            {/* Subcategories list */}
             {currentSubCategories.length > 0 && (
               <div style={{ marginTop: 34 }}>
                 <div style={styles.productsSectionTitle}>Sub Categories</div>
@@ -432,7 +437,6 @@ export default function Store() {
           </div>
         )}
 
-        {/* SUBCATEGORY PAGE */}
         {selectedCategory && selectedSubCategory && (
           <div style={{ marginTop: 36 }}>
             <div style={styles.sectionTitle}>{selectedSubCategory.name}</div>
@@ -453,10 +457,7 @@ export default function Store() {
                         onClick={() => navigate(`/product/${p.slug}`)}
                       >
                         <img
-                          src={
-                            p.image ||
-                            "https://dummyimage.com/400x280/f3f4f6/111827&text=No+Image"
-                          }
+                          src={getProductImage(p)}
                           alt={p.title}
                           style={styles.productImg}
                         />
@@ -504,7 +505,7 @@ export default function Store() {
                         <button
                           style={styles.addCartBtn}
                           disabled={busyId === p.id}
-                          onClick={() => handleAddToCart(p.id)}
+                          onClick={() => handleAddToCart(p)}
                         >
                           {busyId === p.id ? "Adding..." : "ADD TO CART"}
                         </button>
@@ -528,7 +529,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: "Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
     color: "#111",
   },
-
   hero: {
     position: "relative",
     height: 420,
@@ -565,13 +565,11 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     opacity: 0.95,
   },
-
   content: {
     maxWidth: 1400,
     margin: "0 auto",
     padding: "34px 20px 70px",
   },
-
   filterCard: {
     background: "#fff",
     borderRadius: 18,
@@ -651,7 +649,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 800,
     cursor: "pointer",
   },
-
   gridWrap: {
     position: "relative",
     paddingTop: 36,
@@ -704,7 +701,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#111",
     textAlign: "center",
   },
-
   sectionTitle: {
     fontSize: 28,
     fontWeight: 900,
@@ -725,7 +721,6 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: "center",
     fontWeight: 700,
   },
-
   productGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
