@@ -416,3 +416,6 @@ export async function resetPassword(payload: {
   const res = await api.post("/auth/reset-password/", payload);
   return res.data;
 }
+
+
+
