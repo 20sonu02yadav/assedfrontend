@@ -446,7 +446,7 @@ export default function ProductDetailPage() {
 
           <div style={styles.reviewFormCard}>
             <div style={styles.formTitle}>
-              Be the first to review “{product.title}”
+               Review “{product.title}”
             </div>
             <div style={styles.formSub}>
               Your email address will not be published. Required fields are marked *

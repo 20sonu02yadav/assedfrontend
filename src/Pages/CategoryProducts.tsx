@@ -567,7 +567,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   productGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
     gap: 18,
     marginTop: 12,
   },

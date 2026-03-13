@@ -1,15 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { fetchCategoryTree } from "../services/storeApi";
+import { fetchCategoryTree, fetchProducts } from "../services/storeApi";
 import { getCart as getServerCart } from "../services/cartApi";
-import { getCart as _getLocalCart, getCartCount as getLocalCartCount } from "../services/cart";
+import { getCartCount as getLocalCartCount } from "../services/cart";
 import { getStoredAccessToken } from "../services/api";
-import type { CategoryNode } from "../services/storeApi";
+import type { CategoryNode, ProductListItem } from "../services/storeApi";
 
 const LOGO_URL =
   "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/cropped-TUNTURU-LOGO-scaled-1-2048x681.png";
 
 const TOTAL_TOOLS_PARENT_NAME = "TOTAL TOOLS";
+
+type FlatCategoryNode = CategoryNode & {
+  level?: number;
+};
 
 export default function Header() {
   const navigate = useNavigate();
@@ -25,11 +29,17 @@ export default function Header() {
 
   const [cartCount, setCartCount] = useState(0);
 
+  const [search, setSearch] = useState("");
+  const [searchBusy, setSearchBusy] = useState(false);
+  const [searchResults, setSearchResults] = useState<ProductListItem[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const searchRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     fetchCategoryTree()
-      .then(setCategories)
+      .then((data) => setCategories(Array.isArray(data) ? data : []))
       .catch(() => setCategories([]));
   }, []);
 
@@ -82,6 +92,7 @@ export default function Header() {
     setOpenSubmenuSlug(null);
     setMobileCatOpen(false);
     setMobileExpandedSlugs([]);
+    setShowSearchResults(false);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -95,7 +106,11 @@ export default function Header() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMobileOpen(false);
+      if (e.key === "Escape") {
+        setMobileOpen(false);
+        setShowCategories(false);
+        setShowSearchResults(false);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -103,15 +118,41 @@ export default function Header() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (!dropdownRef.current) return;
-      if (!dropdownRef.current.contains(event.target as Node)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowCategories(false);
         setOpenSubmenuSlug(null);
       }
+
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSearchResults(false);
+      }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const flatCategories = useMemo(() => {
+    const out: FlatCategoryNode[] = [];
+
+    const walk = (nodes: CategoryNode[], level = 0) => {
+      nodes.forEach((node) => {
+        out.push({ ...node, level });
+        if (node.children?.length) {
+          walk(node.children, level + 1);
+        }
+      });
+    };
+
+    walk(categories, 0);
+    return out;
+  }, [categories]);
+
+  const categoryMap = useMemo(() => {
+    const map = new Map<number, FlatCategoryNode>();
+    flatCategories.forEach((cat) => map.set(cat.id, cat));
+    return map;
+  }, [flatCategories]);
 
   const totalToolsParent = useMemo(() => {
     const findInTree = (nodes: CategoryNode[]): CategoryNode | null => {
@@ -131,19 +172,95 @@ export default function Header() {
     );
   }, [categories]);
 
+  const categorySuggestions = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return [];
+    return flatCategories
+      .filter((cat) => (cat.name || "").toLowerCase().includes(q))
+      .slice(0, 6);
+  }, [search, flatCategories]);
+
+  useEffect(() => {
+    const q = search.trim();
+
+    if (!q) {
+      setSearchResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        setSearchBusy(true);
+        const data = await fetchProducts();
+        const filtered = (Array.isArray(data) ? data : [])
+          .filter((p) => {
+            const title = (p.title || "").toLowerCase();
+            const brand = (p.brand || "").toLowerCase();
+            const cat = (p.category_name || "").toLowerCase();
+            const sub = (p.short_category_label || "").toLowerCase();
+            const query = q.toLowerCase();
+
+            return (
+              title.includes(query) ||
+              brand.includes(query) ||
+              cat.includes(query) ||
+              sub.includes(query)
+            );
+          })
+          .slice(0, 8);
+
+        setSearchResults(filtered);
+      } catch {
+        setSearchResults([]);
+      } finally {
+        setSearchBusy(false);
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const toggleMobileSubmenu = (slug: string) => {
     setMobileExpandedSlugs((prev) =>
       prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]
     );
   };
 
-  function goCategory(slug: string) {
+  function goCategory(node: CategoryNode) {
     setShowCategories(false);
     setOpenSubmenuSlug(null);
     setMobileOpen(false);
     setMobileCatOpen(false);
     setMobileExpandedSlugs([]);
-    navigate(`/category/${slug}`);
+    setShowSearchResults(false);
+
+    if (node.parent) {
+      const parentNode = categoryMap.get(node.parent);
+      navigate(
+        `/store?subcategory=${encodeURIComponent(node.slug)}${
+          parentNode ? `&parent=${encodeURIComponent(parentNode.slug)}` : ""
+        }`
+      );
+      return;
+    }
+
+    navigate(`/store?category=${encodeURIComponent(node.slug)}`);
+  }
+
+  function onSearchSubmit(e?: React.FormEvent) {
+    e?.preventDefault();
+
+    const q = search.trim();
+    if (!q) return;
+
+    setShowSearchResults(false);
+    navigate(`/store?search=${encodeURIComponent(q)}`);
+  }
+
+  function goProduct(slug: string) {
+    setShowSearchResults(false);
+    setSearch("");
+    navigate(`/product/${slug}`);
   }
 
   const renderMobileCategory = (node: CategoryNode, level = 0) => {
@@ -159,7 +276,7 @@ export default function Header() {
             background: level === 0 ? "rgba(255,255,255,0.08)" : "transparent",
             borderBottom: level === 0 ? "1px solid rgba(255,255,255,0.06)" : "none",
           }}
-          onClick={() => (hasChildren ? toggleMobileSubmenu(node.slug) : goCategory(node.slug))}
+          onClick={() => (hasChildren ? toggleMobileSubmenu(node.slug) : goCategory(node))}
         >
           <span
             style={{
@@ -183,6 +300,18 @@ export default function Header() {
               marginTop: 6,
             }}
           >
+            <button
+              type="button"
+              style={{
+                ...styles.mobileCatRow,
+                background: "rgba(255,255,255,0.04)",
+                fontWeight: 800,
+              }}
+              onClick={() => goCategory(node)}
+            >
+              VIEW ALL {(node.name || "").toUpperCase()}
+            </button>
+
             {node.children?.map((child) => renderMobileCategory(child, level + 1))}
           </div>
         )}
@@ -193,9 +322,10 @@ export default function Header() {
   return (
     <>
       <style>{`
-        @media (max-width: 900px){
+        @media (max-width: 1100px){
           .desktopNav { display: none !important; }
           .desktopRightLinks { display: none !important; }
+          .desktopSearch { display: none !important; }
           .mobileHamburger { display: inline-flex !important; }
           .headerInner { padding: 0 16px !important; }
         }
@@ -262,11 +392,18 @@ export default function Header() {
 
                         {openSubmenuSlug === totalToolsParent.slug && (
                           <div style={styles.subMenu}>
+                            <button
+                              style={{ ...styles.subItem, fontWeight: 900 }}
+                              onClick={() => goCategory(totalToolsParent)}
+                            >
+                              VIEW ALL {TOTAL_TOOLS_PARENT_NAME}
+                            </button>
+
                             {(totalToolsParent.children || []).map((child) => (
                               <button
                                 key={child.slug}
                                 style={styles.subItem}
-                                onClick={() => goCategory(child.slug)}
+                                onClick={() => goCategory(child)}
                               >
                                 {(child.name || "").toUpperCase()}
                               </button>
@@ -277,13 +414,41 @@ export default function Header() {
                     )}
 
                     {topLevelCategories.map((c) => (
-                      <button
-                        key={c.slug}
-                        style={styles.dropdownItemBtn}
-                        onClick={() => goCategory(c.slug)}
-                      >
-                        {(c.name || "").toUpperCase()}
-                      </button>
+                      <div key={c.slug} style={{ position: "relative" }}>
+                        <button
+                          style={styles.dropdownItemBtn}
+                          onClick={() => {
+                            if (c.children?.length) {
+                              setOpenSubmenuSlug((s) => (s === c.slug ? null : c.slug));
+                            } else {
+                              goCategory(c);
+                            }
+                          }}
+                        >
+                          {(c.name || "").toUpperCase()} {c.children?.length ? "›" : ""}
+                        </button>
+
+                        {openSubmenuSlug === c.slug && c.children?.length ? (
+                          <div style={styles.subMenu}>
+                            <button
+                              style={{ ...styles.subItem, fontWeight: 900 }}
+                              onClick={() => goCategory(c)}
+                            >
+                              VIEW ALL {(c.name || "").toUpperCase()}
+                            </button>
+
+                            {c.children.map((child) => (
+                              <button
+                                key={child.slug}
+                                style={styles.subItem}
+                                onClick={() => goCategory(child)}
+                              >
+                                {(child.name || "").toUpperCase()}
+                              </button>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
                     ))}
                   </div>
                 )}
@@ -296,6 +461,86 @@ export default function Header() {
           </div>
 
           <div style={styles.right}>
+            <div ref={searchRef} className="desktopSearch" style={styles.searchWrap}>
+              <form onSubmit={onSearchSubmit} style={styles.searchForm}>
+                <input
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setShowSearchResults(true);
+                  }}
+                  onFocus={() => {
+                    if (search.trim()) setShowSearchResults(true);
+                  }}
+                  placeholder="Search products / category..."
+                  style={styles.searchInput}
+                />
+                <button type="submit" style={styles.searchBtn}>
+                  🔍
+                </button>
+              </form>
+
+              {showSearchResults && search.trim() && (
+                <div style={styles.searchDropdown}>
+                  {categorySuggestions.length > 0 && (
+                    <>
+                      <div style={styles.searchSectionTitle}>Categories</div>
+                      {categorySuggestions.map((cat) => (
+                        <button
+                          key={`cat-${cat.id}`}
+                          style={styles.searchItem}
+                          onClick={() => {
+                            setSearch(cat.name);
+                            goCategory(cat);
+                          }}
+                        >
+                          📁 {cat.name}
+                        </button>
+                      ))}
+                    </>
+                  )}
+
+                  <div style={styles.searchSectionTitle}>Products</div>
+
+                  {searchBusy ? (
+                    <div style={styles.searchEmpty}>Searching...</div>
+                  ) : searchResults.length > 0 ? (
+                    searchResults.map((item) => (
+                      <button
+                        key={`prod-${item.id}`}
+                        style={styles.searchItem}
+                        onClick={() => goProduct(item.slug)}
+                      >
+                        <img
+                          src={
+                            item.image ||
+                            "https://dummyimage.com/60x60/f3f4f6/111827&text=No+Image"
+                          }
+                          alt={item.title}
+                          style={styles.searchThumb}
+                        />
+                        <div style={{ flex: 1, textAlign: "left" }}>
+                          <div style={styles.searchItemTitle}>{item.title}</div>
+                          <div style={styles.searchItemMeta}>
+                            {item.short_category_label || item.category_name}
+                          </div>
+                        </div>
+                      </button>
+                    ))
+                  ) : (
+                    <div style={styles.searchEmpty}>No results found</div>
+                  )}
+
+                  <button
+                    style={{ ...styles.searchItem, justifyContent: "center", fontWeight: 900 }}
+                    onClick={onSearchSubmit}
+                  >
+                    VIEW ALL RESULTS
+                  </button>
+                </div>
+              )}
+            </div>
+
             <div
               className="desktopRightLinks"
               style={{ display: "flex", gap: 20, alignItems: "center" }}
@@ -343,6 +588,25 @@ export default function Header() {
             </div>
 
             <div style={styles.mobileScrollArea}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setMobileOpen(false);
+                  onSearchSubmit();
+                }}
+                style={styles.mobileSearchForm}
+              >
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search products..."
+                  style={styles.mobileSearchInput}
+                />
+                <button type="submit" style={styles.mobileSearchBtn}>
+                  🔍
+                </button>
+              </form>
+
               <MobileLink to="/" close={() => setMobileOpen(false)}>HOME</MobileLink>
               <MobileLink to="/store" close={() => setMobileOpen(false)}>STORE</MobileLink>
               <MobileLink to="/cart" close={() => setMobileOpen(false)}>
@@ -430,8 +694,9 @@ const styles: any = {
     padding: "0 40px",
     width: "100%",
     boxSizing: "border-box",
+    gap: 16,
   },
-  left: { display: "flex", alignItems: "center", gap: 18 },
+  left: { display: "flex", alignItems: "center", gap: 18, minWidth: 0 },
   logo: { height: 40 },
   nav: { display: "flex", gap: 24, alignItems: "center" },
   navLink: {
@@ -440,8 +705,15 @@ const styles: any = {
     fontWeight: 700,
     fontSize: 14,
     letterSpacing: 0.3,
+    whiteSpace: "nowrap",
   },
-  right: { display: "flex", alignItems: "center", gap: 16, color: "#fff" },
+  right: {
+    display: "flex",
+    alignItems: "center",
+    gap: 16,
+    color: "#fff",
+    minWidth: 0,
+  },
   price: { color: "#fff", fontWeight: 800 },
   iconWrap: {
     position: "relative",
@@ -466,6 +738,95 @@ const styles: any = {
     fontWeight: 800,
   },
 
+  searchWrap: {
+    position: "relative",
+    width: 320,
+  },
+  searchForm: {
+    display: "flex",
+    alignItems: "center",
+    background: "rgba(255,255,255,0.14)",
+    border: "1px solid rgba(255,255,255,0.25)",
+    borderRadius: 999,
+    overflow: "hidden",
+  },
+  searchInput: {
+    flex: 1,
+    height: 40,
+    border: "none",
+    outline: "none",
+    background: "transparent",
+    color: "#fff",
+    padding: "0 14px",
+    fontSize: 14,
+  },
+  searchBtn: {
+    width: 42,
+    height: 40,
+    border: "none",
+    background: "transparent",
+    color: "#fff",
+    cursor: "pointer",
+    fontSize: 16,
+  },
+  searchDropdown: {
+    position: "absolute",
+    top: 48,
+    left: 0,
+    width: "100%",
+    background: "#fff",
+    borderRadius: 16,
+    padding: 10,
+    boxShadow: "0 15px 40px rgba(0,0,0,0.25)",
+    zIndex: 1200,
+    maxHeight: 430,
+    overflowY: "auto",
+  },
+  searchSectionTitle: {
+    fontSize: 12,
+    fontWeight: 900,
+    color: "#64748b",
+    textTransform: "uppercase",
+    padding: "8px 10px 6px",
+  },
+  searchItem: {
+    width: "100%",
+    border: "none",
+    background: "transparent",
+    padding: 10,
+    borderRadius: 12,
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    cursor: "pointer",
+    textAlign: "left",
+  },
+  searchThumb: {
+    width: 42,
+    height: 42,
+    borderRadius: 8,
+    objectFit: "contain",
+    background: "#f8fafc",
+    border: "1px solid #e5e7eb",
+    flexShrink: 0,
+  },
+  searchItemTitle: {
+    fontSize: 13,
+    fontWeight: 800,
+    color: "#111827",
+    lineHeight: 1.35,
+  },
+  searchItemMeta: {
+    fontSize: 12,
+    color: "#6b7280",
+    marginTop: 2,
+  },
+  searchEmpty: {
+    padding: 12,
+    fontSize: 13,
+    color: "#6b7280",
+  },
+
   dropdown: {
     position: "absolute",
     top: 40,
@@ -477,7 +838,12 @@ const styles: any = {
     boxShadow: "0 15px 40px rgba(0,0,0,0.25)",
     zIndex: 1000,
   },
-  dropdownItem: { padding: 10, fontWeight: 800, cursor: "pointer" },
+  dropdownItem: {
+    padding: 10,
+    fontWeight: 800,
+    cursor: "pointer",
+    color: "#111827",
+  },
   dropdownItemBtn: {
     padding: 10,
     border: "none",
@@ -486,6 +852,7 @@ const styles: any = {
     textAlign: "left",
     fontWeight: 800,
     cursor: "pointer",
+    color: "#111827",
   },
   subMenu: {
     position: "absolute",
@@ -494,7 +861,8 @@ const styles: any = {
     background: "#f3f3f3",
     padding: 10,
     borderRadius: 12,
-    minWidth: 220,
+    minWidth: 240,
+    boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
   },
   subItem: {
     padding: 8,
@@ -504,6 +872,7 @@ const styles: any = {
     fontWeight: 800,
     width: "100%",
     textAlign: "left",
+    color: "#111827",
   },
 
   hamburgerBtn: {
@@ -574,6 +943,34 @@ const styles: any = {
     display: "flex",
     flexDirection: "column",
     gap: 10,
+  },
+
+  mobileSearchForm: {
+    display: "flex",
+    alignItems: "center",
+    background: "rgba(255,255,255,0.08)",
+    border: "1px solid rgba(255,255,255,0.12)",
+    borderRadius: 12,
+    overflow: "hidden",
+    marginBottom: 6,
+  },
+  mobileSearchInput: {
+    flex: 1,
+    height: 42,
+    border: "none",
+    outline: "none",
+    background: "transparent",
+    color: "#fff",
+    padding: "0 12px",
+    fontSize: 14,
+  },
+  mobileSearchBtn: {
+    width: 46,
+    height: 42,
+    border: "none",
+    background: "transparent",
+    color: "#fff",
+    cursor: "pointer",
   },
 
   mobileLink: {

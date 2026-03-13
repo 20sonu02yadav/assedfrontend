@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   fetchCategoryTree,
   fetchProducts,
@@ -23,8 +23,23 @@ function getProductImage(product: ProductListItem) {
   );
 }
 
+function flattenTree(nodes: CategoryNode[]): CategoryNode[] {
+  const out: CategoryNode[] = [];
+
+  const walk = (items: CategoryNode[]) => {
+    items.forEach((item) => {
+      out.push(item);
+      if (item.children?.length) walk(item.children);
+    });
+  };
+
+  walk(nodes);
+  return out;
+}
+
 export default function Store() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [categoryTree, setCategoryTree] = useState<CategoryNode[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,6 +48,7 @@ export default function Store() {
   const [selectedCategory, setSelectedCategory] = useState<CategoryNode | null>(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState<CategoryNode | null>(null);
 
+  const [allProducts, setAllProducts] = useState<ProductListItem[]>([]);
   const [categoryProducts, setCategoryProducts] = useState<ProductListItem[]>([]);
   const [subCategoryProducts, setSubCategoryProducts] = useState<ProductListItem[]>([]);
 
@@ -44,23 +60,46 @@ export default function Store() {
   const [qtyMap, setQtyMap] = useState<Record<number, number>>({});
   const [busyId, setBusyId] = useState<number | null>(null);
 
+  const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const querySearch = queryParams.get("search")?.trim() || "";
+  const queryCategory = queryParams.get("category")?.trim() || "";
+  const querySubCategory = queryParams.get("subcategory")?.trim() || "";
+  const queryParent = queryParams.get("parent")?.trim() || "";
+
   useEffect(() => {
     let mounted = true;
 
-    async function loadStore() {
+    async function loadStoreBase() {
       setLoading(true);
       try {
-        const cats = await fetchCategoryTree();
+        const [cats, products] = await Promise.all([
+          fetchCategoryTree(),
+          fetchProducts(),
+        ]);
+
         if (!mounted) return;
-        setCategoryTree(cats);
+
+        const safeCats = Array.isArray(cats) ? cats : [];
+        const safeProducts = Array.isArray(products) ? products : [];
+
+        setCategoryTree(safeCats);
+        setAllProducts(safeProducts);
+
+        const nextQty: Record<number, number> = {};
+        safeProducts.forEach((p) => {
+          nextQty[p.id] = 1;
+        });
+        setQtyMap(nextQty);
       } catch {
-        if (mounted) setCategoryTree([]);
+        if (!mounted) return;
+        setCategoryTree([]);
+        setAllProducts([]);
       } finally {
         if (mounted) setLoading(false);
       }
     }
 
-    loadStore();
+    loadStoreBase();
 
     return () => {
       mounted = false;
@@ -77,16 +116,52 @@ export default function Store() {
     });
   }
 
+  function resetToRoot() {
+    setSelectedCategory(null);
+    setSelectedSubCategory(null);
+    setCategoryProducts([]);
+    setSubCategoryProducts([]);
+    setSearch("");
+    setSortBy("default");
+    setOrderBy("default");
+    setPricing("default");
+    navigate("/store");
+  }
+
+  function setQty(productId: number, qty: number) {
+    setQtyMap((prev) => ({
+      ...prev,
+      [productId]: Math.max(1, qty),
+    }));
+  }
+
+  async function handleAddToCart(product: ProductListItem) {
+    try {
+      setBusyId(product.id);
+      await addProductToHybridCart(product, qtyMap[product.id] || 1);
+      alert("Added to cart ✅");
+    } catch {
+      alert("Failed to add to cart.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   async function handleCategoryClick(cat: CategoryNode) {
     setSelectedCategory(cat);
     setSelectedSubCategory(null);
     setProductsLoading(true);
+    setSearch("");
 
     try {
       const directProducts = await fetchProducts({ category: cat.slug });
-      setCategoryProducts(directProducts);
+      const safeProducts = Array.isArray(directProducts) ? directProducts : [];
+
+      setCategoryProducts(safeProducts);
       setSubCategoryProducts([]);
-      initializeQty(directProducts);
+      initializeQty(safeProducts);
+
+      navigate(`/store?category=${encodeURIComponent(cat.slug)}`);
     } catch {
       setCategoryProducts([]);
       setSubCategoryProducts([]);
@@ -98,11 +173,24 @@ export default function Store() {
   async function handleSubCategoryClick(sub: CategoryNode) {
     setSelectedSubCategory(sub);
     setProductsLoading(true);
+    setSearch("");
 
     try {
       const prods = await fetchProducts({ category: sub.slug });
-      setSubCategoryProducts(prods);
-      initializeQty(prods);
+      const safeProducts = Array.isArray(prods) ? prods : [];
+
+      setSubCategoryProducts(safeProducts);
+      initializeQty(safeProducts);
+
+      if (selectedCategory) {
+        navigate(
+          `/store?subcategory=${encodeURIComponent(sub.slug)}&parent=${encodeURIComponent(
+            selectedCategory.slug
+          )}`
+        );
+      } else {
+        navigate(`/store?subcategory=${encodeURIComponent(sub.slug)}`);
+      }
     } catch {
       setSubCategoryProducts([]);
     } finally {
@@ -110,64 +198,133 @@ export default function Store() {
     }
   }
 
-  function resetToRoot() {
-    setSelectedCategory(null);
-    setSelectedSubCategory(null);
-    setCategoryProducts([]);
-    setSubCategoryProducts([]);
-    setSearch("");
-    setSortBy("default");
-    setOrderBy("default");
-    setPricing("default");
-  }
+  useEffect(() => {
+    if (loading) return;
 
-  function setQty(productId: number, qty: number) {
-    setQtyMap((prev) => ({
-      ...prev,
-      [productId]: Math.max(1, qty),
-    }));
-  }
+    const flat = flattenTree(categoryTree);
 
-  async function handleAddToCart(product: ProductListItem) {
-  try {
-    setBusyId(product.id);
+    async function applyUrlFilters() {
+      if (!querySearch && !queryCategory && !querySubCategory) {
+        setSelectedCategory(null);
+        setSelectedSubCategory(null);
+        setCategoryProducts([]);
+        setSubCategoryProducts([]);
+        setSearch("");
+        return;
+      }
 
-    await addProductToHybridCart(product, qtyMap[product.id] || 1);
+      if (querySearch) {
+        setSelectedCategory(null);
+        setSelectedSubCategory(null);
+        setCategoryProducts([]);
+        setSubCategoryProducts([]);
+        setSearch(querySearch);
+        return;
+      }
 
-    alert("Added to cart ✅");
-  } catch {
-    alert("Failed to add to cart.");
-  } finally {
-    setBusyId(null);
-  }
-}
+      if (querySubCategory) {
+        setProductsLoading(true);
+        try {
+          const subNode = flat.find((c) => c.slug === querySubCategory) || null;
+          const parentNode = queryParent
+            ? flat.find((c) => c.slug === queryParent) || null
+            : subNode?.parent
+            ? flat.find((c) => c.id === subNode.parent) || null
+            : null;
+
+          const prods = await fetchProducts({ category: querySubCategory });
+          const safeProducts = Array.isArray(prods) ? prods : [];
+
+          setSelectedCategory(parentNode);
+          setSelectedSubCategory(subNode);
+          setCategoryProducts([]);
+          setSubCategoryProducts(safeProducts);
+          initializeQty(safeProducts);
+          setSearch("");
+        } catch {
+          setSelectedCategory(null);
+          setSelectedSubCategory(null);
+          setCategoryProducts([]);
+          setSubCategoryProducts([]);
+        } finally {
+          setProductsLoading(false);
+        }
+        return;
+      }
+
+      if (queryCategory) {
+        setProductsLoading(true);
+        try {
+          const catNode = flat.find((c) => c.slug === queryCategory) || null;
+          const prods = await fetchProducts({ category: queryCategory });
+          const safeProducts = Array.isArray(prods) ? prods : [];
+
+          setSelectedCategory(catNode);
+          setSelectedSubCategory(null);
+          setCategoryProducts(safeProducts);
+          setSubCategoryProducts([]);
+          initializeQty(safeProducts);
+          setSearch("");
+        } catch {
+          setSelectedCategory(null);
+          setSelectedSubCategory(null);
+          setCategoryProducts([]);
+          setSubCategoryProducts([]);
+        } finally {
+          setProductsLoading(false);
+        }
+      }
+    }
+
+    applyUrlFilters();
+  }, [loading, categoryTree, querySearch, queryCategory, querySubCategory, queryParent]);
+
+  const currentSubCategories = useMemo(() => {
+    if (!selectedCategory) return [];
+    return selectedCategory.children || [];
+  }, [selectedCategory]);
+
+  const baseProducts = useMemo(() => {
+    if (querySearch) return allProducts;
+    if (selectedSubCategory) return subCategoryProducts;
+    if (selectedCategory) return categoryProducts;
+    return [];
+  }, [
+    querySearch,
+    allProducts,
+    selectedSubCategory,
+    subCategoryProducts,
+    selectedCategory,
+    categoryProducts,
+  ]);
 
   const activeProducts = useMemo(() => {
-    const base = selectedSubCategory ? subCategoryProducts : categoryProducts;
-    let list = [...base];
+    let list = [...baseProducts];
     const q = search.trim().toLowerCase();
 
     if (q) {
       list = list.filter((p) => {
         return (
-          p.title.toLowerCase().includes(q) ||
+          (p.title || "").toLowerCase().includes(q) ||
           (p.brand || "").toLowerCase().includes(q) ||
           (p.category_name || "").toLowerCase().includes(q) ||
-          (p.short_category_label || "").toLowerCase().includes(q)
+          (p.short_category_label || "").toLowerCase().includes(q) ||
+          (p.slug || "").toLowerCase().includes(q) ||
+          (p.sku || "").toLowerCase().includes(q)
         );
       });
     }
 
     if (pricing === "low") {
-      list.sort((a, b) => Number(a.sale_price) - Number(b.sale_price));
+      list.sort((a, b) => Number(a.sale_price || 0) - Number(b.sale_price || 0));
     } else if (pricing === "high") {
-      list.sort((a, b) => Number(b.sale_price) - Number(a.sale_price));
+      list.sort((a, b) => Number(b.sale_price || 0) - Number(a.sale_price || 0));
     }
 
     if (sortBy === "az") {
-      list.sort((a, b) => a.title.localeCompare(b.title));
+      list.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
     } else if (sortBy === "za") {
-      list.sort((a, b) => b.title.localeCompare(a.title));
+      list.sort((a, b) => (b.title || "").localeCompare(a.title || ""));
     }
 
     if (orderBy === "latest") {
@@ -177,28 +334,27 @@ export default function Store() {
     }
 
     return list;
-  }, [
-    selectedSubCategory,
-    categoryProducts,
-    subCategoryProducts,
-    search,
-    pricing,
-    sortBy,
-    orderBy,
-  ]);
+  }, [baseProducts, search, pricing, sortBy, orderBy]);
 
-  const currentSubCategories = useMemo(() => {
-    if (!selectedCategory) return [];
-    return selectedCategory.children || [];
-  }, [selectedCategory]);
-
-  const pageTitle = selectedCategory || selectedSubCategory ? "Products" : "Store";
+  const pageTitle = useMemo(() => {
+    if (querySearch) return "Products";
+    if (selectedCategory || selectedSubCategory) return "Products";
+    return "Store";
+  }, [querySearch, selectedCategory, selectedSubCategory]);
 
   const breadcrumb = useMemo(() => {
+    if (querySearch) return ["Home", "Store", "Search"];
     if (!selectedCategory) return ["Home", "Store"];
     if (!selectedSubCategory) return ["Home", selectedCategory.name];
     return ["Home", selectedCategory.name, selectedSubCategory.name];
-  }, [selectedCategory, selectedSubCategory]);
+  }, [querySearch, selectedCategory, selectedSubCategory]);
+
+  const sectionHeading = useMemo(() => {
+    if (querySearch) return `Search Results for "${search}"`;
+    if (selectedSubCategory) return selectedSubCategory.name;
+    if (selectedCategory) return selectedCategory.name;
+    return "";
+  }, [querySearch, search, selectedCategory, selectedSubCategory]);
 
   if (loading) {
     return <div style={{ padding: 40 }}>Loading store...</div>;
@@ -227,6 +383,7 @@ export default function Store() {
                       resetToRoot();
                     } else if (selectedCategory && item === selectedCategory.name) {
                       setSelectedSubCategory(null);
+                      navigate(`/store?category=${encodeURIComponent(selectedCategory.slug)}`);
                     }
                   }}
                 >
@@ -247,7 +404,16 @@ export default function Store() {
               <div style={styles.searchPill}>
                 <input
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setSearch(value);
+
+                    if (value.trim()) {
+                      navigate(`/store?search=${encodeURIComponent(value)}`);
+                    } else if (querySearch) {
+                      navigate("/store");
+                    }
+                  }}
                   placeholder="Search Products..."
                   style={styles.searchInput}
                 />
@@ -256,7 +422,7 @@ export default function Store() {
                 </button>
               </div>
 
-              {(selectedCategory || selectedSubCategory) && (
+              {(selectedCategory || selectedSubCategory || querySearch) && (
                 <button style={styles.clearBtn} onClick={resetToRoot}>
                   Back to Categories
                 </button>
@@ -299,7 +465,7 @@ export default function Store() {
           </div>
         </div>
 
-        {!selectedCategory && (
+        {!selectedCategory && !querySearch && (
           <div style={styles.gridWrap}>
             <div style={styles.grid}>
               {categoryTree.map((cat) => (
@@ -325,9 +491,9 @@ export default function Store() {
           </div>
         )}
 
-        {selectedCategory && !selectedSubCategory && (
+        {(selectedCategory || selectedSubCategory || querySearch) && (
           <div style={{ marginTop: 36 }}>
-            <div style={styles.sectionTitle}>{selectedCategory.name}</div>
+            <div style={styles.sectionTitle}>{sectionHeading}</div>
 
             {productsLoading ? (
               <div style={styles.emptyBox}>Loading products...</div>
@@ -404,10 +570,10 @@ export default function Store() {
                 </div>
               </>
             ) : (
-              <div style={styles.emptyBox}>No direct products in this category.</div>
+              <div style={styles.emptyBox}>No products found.</div>
             )}
 
-            {currentSubCategories.length > 0 && (
+            {selectedCategory && !selectedSubCategory && currentSubCategories.length > 0 && !querySearch && (
               <div style={{ marginTop: 34 }}>
                 <div style={styles.productsSectionTitle}>Sub Categories</div>
 
@@ -432,87 +598,6 @@ export default function Store() {
                     </button>
                   ))}
                 </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {selectedCategory && selectedSubCategory && (
-          <div style={{ marginTop: 36 }}>
-            <div style={styles.sectionTitle}>{selectedSubCategory.name}</div>
-
-            {productsLoading ? (
-              <div style={styles.emptyBox}>Loading products...</div>
-            ) : activeProducts.length === 0 ? (
-              <div style={styles.emptyBox}>No products found in this sub category.</div>
-            ) : (
-              <div style={styles.productGrid}>
-                {activeProducts.map((p) => {
-                  const qty = qtyMap[p.id] || 1;
-
-                  return (
-                    <div key={p.id} style={styles.productCard}>
-                      <div
-                        style={{ cursor: "pointer" }}
-                        onClick={() => navigate(`/product/${p.slug}`)}
-                      >
-                        <img
-                          src={getProductImage(p)}
-                          alt={p.title}
-                          style={styles.productImg}
-                        />
-
-                        <div style={styles.productShortLabel}>
-                          {p.short_category_label || p.category_name}
-                        </div>
-
-                        <h3 style={styles.productTitle}>{p.title}</h3>
-
-                        <div style={styles.priceWrap}>
-                          <b style={styles.salePrice}>{money(p.sale_price)}</b>
-                          <span style={styles.mrpPrice}>{money(p.mrp)}</span>
-                          {p.discount_percent ? (
-                            <span style={styles.discountText}>
-                              -{p.discount_percent}%
-                            </span>
-                          ) : null}
-                        </div>
-
-                        <div style={styles.gstText}>
-                          GST ({p.gst_percent}%) {money(p.gst_amount)}
-                        </div>
-                      </div>
-
-                      <div style={styles.productBottom}>
-                        <div style={styles.qtyWrap}>
-                          <button
-                            onClick={() => setQty(p.id, qty - 1)}
-                            style={styles.qtyBtn}
-                          >
-                            −
-                          </button>
-
-                          <div style={styles.qtyValue}>{qty}</div>
-
-                          <button
-                            onClick={() => setQty(p.id, qty + 1)}
-                            style={styles.qtyBtn}
-                          >
-                            +
-                          </button>
-                        </div>
-
-                        <button
-                          style={styles.addCartBtn}
-                          disabled={busyId === p.id}
-                          onClick={() => handleAddToCart(p)}
-                        >
-                          {busyId === p.id ? "Adding..." : "ADD TO CART"}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
               </div>
             )}
           </div>
@@ -655,7 +740,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
     gap: 48,
     alignItems: "start",
   },
@@ -723,7 +808,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   productGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
     gap: 18,
     marginTop: 8,
   },
