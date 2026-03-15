@@ -81,6 +81,10 @@ const Footer = () => {
   return (
     <footer style={styles.footer}>
       <style>{`
+      @keyframes companyGradient {
+        0% { background-position: 0% center; }
+        100% { background-position: 200% center; }
+      }
         @media (max-width: 900px) {
           .footerMain {
             grid-template-columns: 1fr !important;
@@ -116,6 +120,21 @@ const Footer = () => {
             alt="Tunturu Logo"
             style={styles.logo}
           />
+          <p
+  style={{
+    fontSize: "15px",
+    fontWeight: "bold",
+    marginBottom: "10px",
+    letterSpacing: "1px",
+    background: "linear-gradient(90deg,#00c6ff,#0072ff,#00c6ff)",
+    backgroundSize: "200% auto",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    animation: "companyGradient 4s linear infinite",
+  }}
+>
+  TUNTURU ENGINEERING AID PRIVATE LIMITED
+</p>
 
           <p style={styles.text}>Email: Support@tunturu.co.in</p>
           <p style={styles.text}>Email: Sales@tunturu.co.in</p>
@@ -244,7 +263,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: "10px",
     flexWrap: "wrap",
   },
-
+  
   socialIcon: {
     background: "#fff",
     color: "#000",

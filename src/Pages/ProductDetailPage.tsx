@@ -69,6 +69,26 @@ export default function ProductDetailPage() {
   });
   const [reviewBusy, setReviewBusy] = useState(false);
 
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth <= 768 : false
+  );
+  const [isTablet, setIsTablet] = useState(
+    typeof window !== "undefined"
+      ? window.innerWidth > 768 && window.innerWidth <= 1100
+      : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      const w = window.innerWidth;
+      setIsMobile(w <= 768);
+      setIsTablet(w > 768 && w <= 1100);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   useEffect(() => {
     if (!slug) return;
 
@@ -158,29 +178,27 @@ export default function ProductDetailPage() {
   }, [reviews]);
 
   async function handleAddToCartNow(count: number) {
-  if (!product) return;
+    if (!product) return;
 
-  try {
-    setBusyCart(true);
-
-    await addProductToHybridCart(product, count);
-
-    alert("Added to cart ✅");
-  } catch {
-    alert("Failed to add to cart.");
-  } finally {
-    setBusyCart(false);
+    try {
+      setBusyCart(true);
+      await addProductToHybridCart(product, count);
+      alert("Added to cart ✅");
+    } catch {
+      alert("Failed to add to cart.");
+    } finally {
+      setBusyCart(false);
+    }
   }
-}
 
   async function handleRelatedAddToCart(item: ProductListItem) {
-  try {
-    await addProductToHybridCart(item, 1);
-    alert("Added to cart ✅");
-  } catch {
-    alert("Failed to add to cart.");
+    try {
+      await addProductToHybridCart(item, 1);
+      alert("Added to cart ✅");
+    } catch {
+      alert("Failed to add to cart.");
+    }
   }
-}
 
   async function handleReviewSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -239,13 +257,33 @@ export default function ProductDetailPage() {
 
   return (
     <div style={styles.page}>
-      <div style={{ ...styles.hero, backgroundImage: `url(${HERO_BG})` }}>
+      <div
+        style={{
+          ...styles.hero,
+          backgroundImage: `url(${HERO_BG})`,
+          height: isMobile ? 220 : 320,
+        }}
+      >
         <div style={styles.heroOverlay} />
 
         <div style={styles.heroCenter}>
-          <div style={styles.heroTitle}>Products</div>
+          <div
+            style={{
+              ...styles.heroTitle,
+              fontSize: isMobile ? 38 : 72,
+            }}
+          >
+            Products
+          </div>
 
-          <div style={styles.heroCrumb}>
+          <div
+            style={{
+              ...styles.heroCrumb,
+              fontSize: isMobile ? 12 : 15,
+              padding: isMobile ? "0 16px" : 0,
+              lineHeight: isMobile ? 1.6 : 1.4,
+            }}
+          >
             <span style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
               Home
             </span>
@@ -262,40 +300,57 @@ export default function ProductDetailPage() {
       </div>
 
       <div style={styles.container}>
-        <div style={styles.topGrid}>
+        <div
+          style={{
+            ...styles.topGrid,
+            gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+            gap: isMobile ? 18 : 28,
+          }}
+        >
           <div>
             {product.is_sale ? <div style={styles.saleBadge}>Sale!</div> : null}
 
             <div
-              style={styles.mainImageWrap}
+              style={{
+                ...styles.mainImageWrap,
+                height: isMobile ? 340 : 520,
+              }}
               onMouseMove={(e) => {
+                if (isMobile) return;
                 const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
                 const x = ((e.clientX - rect.left) / rect.width) * 100;
                 const y = ((e.clientY - rect.top) / rect.height) * 100;
                 setZoomPos({ x, y });
               }}
-              onMouseEnter={() => setIsZooming(true)}
-              onMouseLeave={() => setIsZooming(false)}
+              onMouseEnter={() => !isMobile && setIsZooming(true)}
+              onMouseLeave={() => !isMobile && setIsZooming(false)}
             >
               <img
                 src={mainImage}
                 alt={product.title}
                 style={{
                   ...styles.mainImage,
-                  transform: isZooming ? "scale(1.9)" : "scale(1)",
+                  transform: !isMobile && isZooming ? "scale(1.9)" : "scale(1)",
                   transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
                 }}
               />
-              <div style={styles.zoomIcon}>⌕</div>
+              {!isMobile && <div style={styles.zoomIcon}>⌕</div>}
             </div>
 
             {product.images?.length > 1 ? (
-              <div style={styles.thumbRow}>
+              <div
+                style={{
+                  ...styles.thumbRow,
+                  justifyContent: isMobile ? "center" : "flex-start",
+                }}
+              >
                 {product.images.map((img) => (
                   <button
                     key={img.id}
                     style={{
                       ...styles.thumbBtn,
+                      width: isMobile ? 68 : 82,
+                      height: isMobile ? 68 : 82,
                       border:
                         selectedImage === img.image_url
                           ? "2px solid #0b76c5"
@@ -311,22 +366,81 @@ export default function ProductDetailPage() {
           </div>
 
           <div>
-            <h1 style={styles.title}>{product.title}</h1>
+            <h1
+              style={{
+                ...styles.title,
+                fontSize: isMobile ? 22 : 28,
+                margin: isMobile ? "10px 0 16px" : "40px 0 24px",
+              }}
+            >
+              {product.title}
+            </h1>
 
-            <div style={styles.priceRow}>
-              <span style={styles.oldPrice}>{money(product.mrp)}</span>
-              <span style={styles.salePrice}>{money(product.sale_price)}</span>
+            <div
+              style={{
+                ...styles.priceRow,
+                gap: isMobile ? 10 : 14,
+              }}
+            >
+              <span
+                style={{
+                  ...styles.oldPrice,
+                  fontSize: isMobile ? 16 : 20,
+                }}
+              >
+                {money(product.mrp)}
+              </span>
+              <span
+                style={{
+                  ...styles.salePrice,
+                  fontSize: isMobile ? 28 : 36,
+                }}
+              >
+                {money(product.sale_price)}
+              </span>
               {product.discount_percent ? (
-                <span style={styles.discount}>{product.discount_percent}% OFF</span>
+                <span
+                  style={{
+                    ...styles.discount,
+                    fontSize: isMobile ? 16 : 20,
+                  }}
+                >
+                  {product.discount_percent}% OFF
+                </span>
               ) : null}
             </div>
 
-            <div style={styles.gstText}>
+            <div
+              style={{
+                ...styles.gstText,
+                marginTop: isMobile ? 12 : 16,
+                fontSize: isMobile ? 16 : 22,
+              }}
+            >
               GST ({product.gst_percent}%) <b>{money(product.gst_amount)}</b>
             </div>
 
-            <div style={styles.cartRow}>
-              <div style={styles.qtyWrap}>
+            <div
+              style={{
+                ...styles.cartRow,
+                flexDirection: isMobile ? "column" : "row",
+                alignItems: isMobile ? "stretch" : "center",
+                gap: isMobile ? 14 : 18,
+                marginTop: isMobile ? 24 : 42,
+                marginBottom: isMobile ? 24 : 42,
+              }}
+            >
+              <div
+                style={{
+                  ...styles.qtyWrap,
+                  justifyContent: isMobile ? "center" : "flex-start",
+                  border: isMobile ? "1px solid #dbe2ea" : "none",
+                  borderRadius: isMobile ? 12 : 0,
+                  padding: isMobile ? "10px 14px" : "0 10px",
+                  width: isMobile ? "100%" : "auto",
+                  boxSizing: "border-box",
+                }}
+              >
                 <button
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
                   style={styles.qtyBtn}
@@ -340,7 +454,13 @@ export default function ProductDetailPage() {
               </div>
 
               <button
-                style={styles.addCartBtn}
+                style={{
+                  ...styles.addCartBtn,
+                  width: isMobile ? "100%" : "auto",
+                  minWidth: isMobile ? "100%" : 230,
+                  height: isMobile ? 50 : 54,
+                  fontSize: isMobile ? 18 : 22,
+                }}
                 disabled={busyCart}
                 onClick={() => handleAddToCartNow(qty)}
               >
@@ -348,7 +468,14 @@ export default function ProductDetailPage() {
               </button>
             </div>
 
-            <div style={styles.metaBlock}>
+            <div
+              style={{
+                ...styles.metaBlock,
+                fontSize: isMobile ? 14 : 16,
+                gap: isMobile ? 10 : 18,
+                flexDirection: isMobile ? "column" : "row",
+              }}
+            >
               <div style={styles.metaLine}>
                 <span>SKU:</span> {product.sku || "-"}
               </div>
@@ -360,7 +487,13 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            <div style={styles.reviewSummary}>
+            <div
+              style={{
+                ...styles.reviewSummary,
+                marginTop: isMobile ? 22 : 36,
+                fontSize: isMobile ? 15 : 18,
+              }}
+            >
               {reviews.length === 0 ? (
                 "There are no reviews yet."
               ) : (
@@ -372,13 +505,27 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        <div style={styles.bottomGrid}>
+        <div
+          style={{
+            ...styles.bottomGrid,
+            gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+            gap: isMobile ? 20 : 30,
+            marginTop: isMobile ? 22 : 30,
+          }}
+        >
           <div>
-            <div style={styles.tabRow}>
+            <div
+              style={{
+                ...styles.tabRow,
+                gap: isMobile ? 16 : 24,
+                overflowX: "auto",
+              }}
+            >
               <button
                 onClick={() => setActiveTab("description")}
                 style={{
                   ...styles.tabBtn,
+                  whiteSpace: "nowrap",
                   borderBottom:
                     activeTab === "description" ? "2px solid #111" : "2px solid transparent",
                   fontWeight: activeTab === "description" ? 900 : 500,
@@ -391,6 +538,7 @@ export default function ProductDetailPage() {
                 onClick={() => setActiveTab("reviews")}
                 style={{
                   ...styles.tabBtn,
+                  whiteSpace: "nowrap",
                   borderBottom:
                     activeTab === "reviews" ? "2px solid #111" : "2px solid transparent",
                   fontWeight: activeTab === "reviews" ? 900 : 500,
@@ -401,9 +549,19 @@ export default function ProductDetailPage() {
             </div>
 
             {activeTab === "description" ? (
-              <div style={styles.descriptionBox}>
+              <div
+                style={{
+                  ...styles.descriptionBox,
+                  paddingRight: isMobile ? 0 : 20,
+                }}
+              >
                 {product.description ? (
-                  <div style={styles.descriptionText}>
+                  <div
+                    style={{
+                      ...styles.descriptionText,
+                      fontSize: isMobile ? 15 : 18,
+                    }}
+                  >
                     {product.description.split("\n").map((line, index) => (
                       <div key={index} style={{ marginBottom: 10 }}>
                         {line}
@@ -415,7 +573,13 @@ export default function ProductDetailPage() {
                 {specsList.length > 0 ? (
                   <div style={styles.specsList}>
                     {specsList.map((item, idx) => (
-                      <div key={idx} style={styles.specLine}>
+                      <div
+                        key={idx}
+                        style={{
+                          ...styles.specLine,
+                          fontSize: isMobile ? 15 : 18,
+                        }}
+                      >
                         {item}
                       </div>
                     ))}
@@ -425,18 +589,38 @@ export default function ProductDetailPage() {
             ) : (
               <div style={styles.reviewsList}>
                 {reviews.length === 0 ? (
-                  <div style={styles.noReviewText}>There are no reviews yet.</div>
+                  <div
+                    style={{
+                      ...styles.noReviewText,
+                      fontSize: isMobile ? 15 : 18,
+                    }}
+                  >
+                    There are no reviews yet.
+                  </div>
                 ) : (
                   reviews.map((r) => (
                     <div key={r.id} style={styles.reviewCard}>
-                      <div style={styles.reviewHeader}>
+                      <div
+                        style={{
+                          ...styles.reviewHeader,
+                          flexDirection: isMobile ? "column" : "row",
+                          alignItems: isMobile ? "flex-start" : "center",
+                        }}
+                      >
                         <b>{r.name}</b>
                         <span style={styles.reviewRating}>{"★".repeat(r.rating)}</span>
                       </div>
                       <div style={styles.reviewDate}>
                         {new Date(r.created_at).toLocaleString()}
                       </div>
-                      <div style={styles.reviewComment}>{r.comment}</div>
+                      <div
+                        style={{
+                          ...styles.reviewComment,
+                          fontSize: isMobile ? 15 : 16,
+                        }}
+                      >
+                        {r.comment}
+                      </div>
                     </div>
                   ))
                 )}
@@ -444,9 +628,20 @@ export default function ProductDetailPage() {
             )}
           </div>
 
-          <div style={styles.reviewFormCard}>
-            <div style={styles.formTitle}>
-               Review “{product.title}”
+          <div
+            style={{
+              ...styles.reviewFormCard,
+              borderRadius: isMobile ? 16 : 0,
+              padding: isMobile ? 18 : 24,
+            }}
+          >
+            <div
+              style={{
+                ...styles.formTitle,
+                fontSize: isMobile ? 20 : 22,
+              }}
+            >
+              Review “{product.title}”
             </div>
             <div style={styles.formSub}>
               Your email address will not be published. Required fields are marked *
@@ -483,7 +678,12 @@ export default function ProductDetailPage() {
                 style={{ ...styles.input, minHeight: 110, resize: "vertical" }}
               />
 
-              <div style={styles.formRow}>
+              <div
+                style={{
+                  ...styles.formRow,
+                  gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+                }}
+              >
                 <div>
                   <label style={styles.label}>Name *</label>
                   <input
@@ -522,7 +722,15 @@ export default function ProductDetailPage() {
                 </span>
               </label>
 
-              <button type="submit" disabled={reviewBusy} style={styles.submitBtn}>
+              <button
+                type="submit"
+                disabled={reviewBusy}
+                style={{
+                  ...styles.submitBtn,
+                  width: isMobile ? "100%" : "auto",
+                  textAlign: "center",
+                }}
+              >
                 {reviewBusy ? "SUBMITTING..." : "SUBMIT"}
               </button>
             </form>
@@ -531,9 +739,26 @@ export default function ProductDetailPage() {
 
         {relatedProducts.length > 0 && (
           <div style={styles.relatedSection}>
-            <h2 style={styles.relatedTitle}>Related products</h2>
+            <h2
+              style={{
+                ...styles.relatedTitle,
+                fontSize: isMobile ? 24 : 34,
+              }}
+            >
+              Related products
+            </h2>
 
-            <div style={styles.relatedGrid}>
+            <div
+              style={{
+                ...styles.relatedGrid,
+                gridTemplateColumns: isMobile
+                  ? "repeat(2, minmax(0, 1fr))"
+                  : isTablet
+                  ? "repeat(3, minmax(0, 1fr))"
+                  : "repeat(5, minmax(0, 1fr))",
+                gap: isMobile ? 14 : 24,
+              }}
+            >
               {relatedProducts.map((p) => (
                 <div key={p.id} style={styles.relatedCard}>
                   {p.is_sale ? <div style={styles.smallSaleBadge}>Sale!</div> : null}
@@ -545,30 +770,85 @@ export default function ProductDetailPage() {
                     <img
                       src={getRelatedImage(p)}
                       alt={p.title}
-                      style={styles.relatedImg}
+                      style={{
+                        ...styles.relatedImg,
+                        height: isMobile ? 170 : 320,
+                      }}
                     />
 
-                    <div style={styles.relatedCategory}>
+                    <div
+                      style={{
+                        ...styles.relatedCategory,
+                        fontSize: isMobile ? 11 : 13,
+                      }}
+                    >
                       {p.short_category_label || p.category_name}
                     </div>
 
-                    <div style={styles.relatedName}>{p.title}</div>
-
-                    <div style={styles.relatedPriceRow}>
-                      <span style={styles.relatedOldPrice}>{money(p.mrp)}</span>
-                      <span style={styles.relatedPrice}>{money(p.sale_price)}</span>
-                      {p.discount_percent ? (
-                        <span style={styles.relatedDiscount}>{p.discount_percent}% OFF</span>
-                      ) : null}
+                    <div
+                      style={{
+                        ...styles.relatedName,
+                        fontSize: isMobile ? 14 : 18,
+                        minHeight: isMobile ? 40 : 52,
+                      }}
+                    >
+                      {p.title}
                     </div>
 
-                    <div style={styles.relatedGst}>
+                    <div
+                      style={{
+                        ...styles.relatedPriceRow,
+                        gap: isMobile ? 6 : 8,
+                      }}
+                    >
+                      <span
+                        style={{
+                          ...styles.relatedOldPrice,
+                          fontSize: isMobile ? 12 : 15,
+                        }}
+                      >
+                        {money(p.mrp)}
+                      </span>
+                      <span
+                        style={{
+                          ...styles.relatedPrice,
+                          fontSize: isMobile ? 15 : 20,
+                        }}
+                      >
+                        {money(p.sale_price)}
+                      </span>
+                    </div>
+
+                    {p.discount_percent ? (
+                      <div
+                        style={{
+                          ...styles.relatedDiscount,
+                          textAlign: "center",
+                          marginTop: 4,
+                          fontSize: isMobile ? 12 : 14,
+                        }}
+                      >
+                        {p.discount_percent}% OFF
+                      </div>
+                    ) : null}
+
+                    <div
+                      style={{
+                        ...styles.relatedGst,
+                        fontSize: isMobile ? 12 : 15,
+                      }}
+                    >
                       GST ({p.gst_percent}%) {money(p.gst_amount)}
                     </div>
                   </div>
 
                   <button
-                    style={styles.relatedCartBtn}
+                    style={{
+                      ...styles.relatedCartBtn,
+                      minWidth: isMobile ? "100%" : 150,
+                      height: isMobile ? 38 : 42,
+                      fontSize: isMobile ? 12 : 14,
+                    }}
                     onClick={() => handleRelatedAddToCart(p)}
                   >
                     ADD TO CART
@@ -592,7 +872,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   hero: {
     position: "relative",
-    height: 320,
     backgroundSize: "cover",
     backgroundPosition: "center",
     overflow: "hidden",
@@ -613,7 +892,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   heroTitle: {
     color: "#fff",
-    fontSize: 72,
     fontWeight: 800,
     lineHeight: 1,
     textShadow: "0 10px 30px rgba(0,0,0,0.35)",
@@ -621,7 +899,6 @@ const styles: Record<string, React.CSSProperties> = {
   heroCrumb: {
     marginTop: 14,
     color: "#fff",
-    fontSize: 15,
     fontWeight: 600,
     opacity: 0.95,
   },
@@ -629,11 +906,10 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: 1880,
     margin: "0 auto",
     padding: "26px 16px 40px",
+    boxSizing: "border-box",
   },
   topGrid: {
     display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 28,
     alignItems: "start",
   },
   saleBadge: {
@@ -648,7 +924,6 @@ const styles: Record<string, React.CSSProperties> = {
   mainImageWrap: {
     position: "relative",
     width: "100%",
-    height: 520,
     overflow: "hidden",
     borderRadius: 20,
     background: "#fff",
@@ -681,8 +956,6 @@ const styles: Record<string, React.CSSProperties> = {
     flexWrap: "wrap",
   },
   thumbBtn: {
-    width: 82,
-    height: 82,
     borderRadius: 10,
     background: "#fff",
     padding: 6,
@@ -694,49 +967,36 @@ const styles: Record<string, React.CSSProperties> = {
     objectFit: "contain",
   },
   title: {
-    fontSize: 28,
     fontWeight: 500,
     lineHeight: 1.35,
-    margin: "40px 0 24px",
   },
   priceRow: {
     display: "flex",
     alignItems: "center",
-    gap: 14,
     flexWrap: "wrap",
   },
   oldPrice: {
     textDecoration: "line-through",
     color: "#9ca3af",
-    fontSize: 20,
   },
   salePrice: {
-    fontSize: 36,
     fontWeight: 900,
   },
   discount: {
     color: "red",
-    fontSize: 20,
     fontWeight: 700,
   },
   gstText: {
-    marginTop: 16,
-    fontSize: 22,
     color: "#374151",
   },
   cartRow: {
     display: "flex",
-    alignItems: "center",
-    gap: 18,
-    marginTop: 42,
-    marginBottom: 42,
     flexWrap: "wrap",
   },
   qtyWrap: {
     display: "inline-flex",
     alignItems: "center",
     gap: 22,
-    padding: "0 10px",
   },
   qtyBtn: {
     border: "none",
@@ -754,14 +1014,11 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: "center",
   },
   addCartBtn: {
-    minWidth: 230,
-    height: 54,
     border: "none",
     borderRadius: 16,
     background: "#1d8fe1",
     color: "#fff",
     fontWeight: 800,
-    fontSize: 22,
     cursor: "pointer",
     padding: "0 24px",
   },
@@ -769,9 +1026,7 @@ const styles: Record<string, React.CSSProperties> = {
     borderTop: "1px solid #d7d7d7",
     paddingTop: 16,
     display: "flex",
-    gap: 18,
     flexWrap: "wrap",
-    fontSize: 16,
     color: "#374151",
   },
   metaLine: {
@@ -780,20 +1035,14 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
   },
   reviewSummary: {
-    marginTop: 36,
-    fontSize: 18,
     color: "#374151",
   },
   bottomGrid: {
     display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 30,
-    marginTop: 30,
     alignItems: "start",
   },
   tabRow: {
     display: "flex",
-    gap: 24,
     marginBottom: 20,
     borderBottom: "1px solid #e5e7eb",
   },
@@ -804,11 +1053,8 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "10px 0",
     fontSize: 16,
   },
-  descriptionBox: {
-    paddingRight: 20,
-  },
+  descriptionBox: {},
   descriptionText: {
-    fontSize: 18,
     lineHeight: 1.75,
     color: "#1f2937",
   },
@@ -818,7 +1064,6 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 8,
   },
   specLine: {
-    fontSize: 18,
     color: "#1f2937",
     lineHeight: 1.6,
   },
@@ -827,7 +1072,6 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 14,
   },
   noReviewText: {
-    fontSize: 18,
     color: "#374151",
   },
   reviewCard: {
@@ -840,7 +1084,6 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     justifyContent: "space-between",
     gap: 12,
-    alignItems: "center",
   },
   reviewRating: {
     color: "#f59e0b",
@@ -853,16 +1096,13 @@ const styles: Record<string, React.CSSProperties> = {
   },
   reviewComment: {
     marginTop: 10,
-    fontSize: 16,
     lineHeight: 1.7,
   },
   reviewFormCard: {
     background: "#fff",
     border: "1px solid #d1d5db",
-    padding: 24,
   },
   formTitle: {
-    fontSize: 22,
     lineHeight: 1.45,
     marginBottom: 10,
   },
@@ -889,7 +1129,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   formRow: {
     display: "grid",
-    gridTemplateColumns: "1fr 1fr",
     gap: 12,
   },
   checkboxRow: {
@@ -914,14 +1153,11 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: 44,
   },
   relatedTitle: {
-    fontSize: 34,
     fontWeight: 900,
     marginBottom: 20,
   },
   relatedGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
-    gap: 24,
   },
   relatedCard: {
     position: "relative",
@@ -940,63 +1176,54 @@ const styles: Record<string, React.CSSProperties> = {
   },
   relatedImg: {
     width: "100%",
-    height: 320,
     objectFit: "contain",
     background: "#fff",
+    borderRadius: 10,
   },
   relatedCategory: {
     marginTop: 12,
     color: "#9ca3af",
     textAlign: "center",
     textTransform: "uppercase",
-    fontSize: 13,
   },
   relatedName: {
     marginTop: 8,
     fontWeight: 800,
     textAlign: "center",
-    fontSize: 18,
     lineHeight: 1.45,
-    minHeight: 52,
   },
   relatedPriceRow: {
     marginTop: 10,
     display: "flex",
     justifyContent: "center",
-    gap: 8,
     flexWrap: "wrap",
     alignItems: "center",
   },
   relatedOldPrice: {
     textDecoration: "line-through",
     color: "#9ca3af",
-    fontSize: 15,
   },
   relatedPrice: {
     fontWeight: 900,
-    fontSize: 20,
   },
   relatedDiscount: {
     color: "red",
     fontWeight: 700,
-    fontSize: 14,
   },
   relatedGst: {
     marginTop: 6,
     textAlign: "center",
     fontWeight: 700,
-    fontSize: 15,
   },
   relatedCartBtn: {
     margin: "14px auto 0",
     display: "block",
-    minWidth: 150,
-    height: 42,
     border: "none",
     borderRadius: 999,
     background: "#0b76c5",
     color: "#fff",
     fontWeight: 900,
     cursor: "pointer",
+    width: "100%",
   },
 };

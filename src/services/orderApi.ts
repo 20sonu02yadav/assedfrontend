@@ -2,6 +2,7 @@ import { api } from "./api";
 
 export type OrderItem = {
   id: number;
+  product?: number;
   product_title: string;
   product_slug?: string;
   product_image?: string | null;
@@ -30,6 +31,17 @@ export type Order = {
 export type OrderDetail = Order & {
   razorpay_order_id: string;
   razorpay_payment_id: string;
+
+  billing_full_name: string;
+  billing_phone: string;
+  billing_gstin?: string;
+  billing_line1: string;
+  billing_line2: string;
+  billing_city: string;
+  billing_state: string;
+  billing_postal_code: string;
+  billing_country: string;
+
   shipping_full_name: string;
   shipping_phone: string;
   shipping_line1: string;
@@ -38,6 +50,7 @@ export type OrderDetail = Order & {
   shipping_state: string;
   shipping_postal_code: string;
   shipping_country: string;
+
   history: OrderHistory[];
   expected_delivery_date?: string | null;
 };

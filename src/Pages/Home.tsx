@@ -161,18 +161,16 @@ export default function Home() {
   }
 
   async function handleAddToCart(product: ProductListItem, qty: number) {
-  try {
-    setBusyId(product.id);
-
-    await addProductToHybridCart(product, qty);
-
-    alert("Added to cart ✅");
-  } catch {
-    alert("Something went wrong while adding to cart.");
-  } finally {
-    setBusyId(null);
+    try {
+      setBusyId(product.id);
+      await addProductToHybridCart(product, qty);
+      alert("Added to cart ✅");
+    } catch {
+      alert("Something went wrong while adding to cart.");
+    } finally {
+      setBusyId(null);
+    }
   }
-}
 
   return (
     <div className="home">
@@ -255,7 +253,8 @@ export default function Home() {
         .titleWrap{display:flex; flex-direction:column; gap:10px; margin-bottom:34px}
         .titleWrap.center{align-items:center}
         .titleWrap.left{align-items:flex-start}
-        .title{margin:0; font-size:48px; font-weight:900; color:#0b0b0b}
+        .title{margin:0; font-size:48px; font-weight:900; color:#0b0b0b; text-align:center}
+        .titleWrap.left .title{text-align:left}
         .underline{width:180px; height:3px; background:#8aa0ff}
 
         .brandsBox{
@@ -546,6 +545,8 @@ export default function Home() {
           padding:28px;
           box-sizing:border-box;
           border-radius:18px;
+          max-height:92vh;
+          overflow:auto;
         }
         .qvClose{
           position:absolute;
@@ -557,6 +558,7 @@ export default function Home() {
           font-size:34px;
           line-height:1;
           color:#1f2937;
+          z-index:2;
         }
         .qvGrid{
           display:grid;
@@ -580,6 +582,13 @@ export default function Home() {
           height:90px;
           object-fit:contain;
           background:#fff;
+        }
+        .qvProductTitle{
+          font-size:28px;
+          font-weight:900;
+          line-height:1.3;
+          margin:0 0 16px;
+          color:#111827;
         }
         .qvPriceRow{
           display:flex;
@@ -611,6 +620,8 @@ export default function Home() {
           align-items:center;
           border:1px solid #d1d5db;
           height:42px;
+          border-radius:999px;
+          overflow:hidden;
         }
         .qvQtyBtn{
           width:46px;
@@ -624,6 +635,7 @@ export default function Home() {
           min-width:46px;
           text-align:center;
           font-size:18px;
+          font-weight:900;
         }
         .qvAdd{
           min-width:390px;
@@ -657,6 +669,7 @@ export default function Home() {
           margin-top:26px;
           font-size:16px;
           color:#374151;
+          flex-wrap:wrap;
         }
         .qvShareIcon{
           font-weight:800;
@@ -731,6 +744,7 @@ export default function Home() {
           .qvCard{padding:20px}
           .qvMainImage{height:300px}
           .qvClose{font-size:28px; top:12px; right:12px}
+          .qvProductTitle{font-size:22px}
           .qvNow{font-size:24px}
           .qvOld{font-size:18px}
           .qvQtyBtn{width:40px; height:36px; font-size:20px}
@@ -753,18 +767,24 @@ export default function Home() {
           .promoH{font-size:24px}
           .promoSub{font-size:14px; margin-bottom:12px}
           .promoBtn{padding:10px 18px; font-size:13px}
-          .fpGrid{grid-template-columns:1fr}
-          .fpImgWrap{height:240px}
-          .fpEye{width:48px; height:48px}
-          .fpSale{font-size:11px; padding:6px 12px}
-          .fpCat{font-size:11px}
-          .fpTitle{font-size:16px}
+          .fpGrid{grid-template-columns:repeat(2,1fr); gap:12px}
+          .fpCard{border-radius:16px}
+          .fpImgWrap{height:165px}
+          .fpImg{padding:12px}
+          .fpEye{width:38px; height:38px; top:10px; right:10px}
+          .fpSale{font-size:10px; padding:5px 9px; top:10px; left:10px}
+          .fpBody{padding:12px}
+          .fpCat{font-size:10px; margin-bottom:6px}
+          .fpTitle{font-size:13px; line-height:1.3; margin-bottom:10px}
           .fpPriceRow{gap:6px}
-          .fpOld{font-size:14px}
-          .fpNow{font-size:16px}
-          .fpOff{font-size:11px; padding:3px 6px}
-          .fpGst{font-size:12px}
-          .fpBtn{padding:14px 10px; font-size:14px}
+          .fpOld{font-size:11px}
+          .fpNow{font-size:14px}
+          .fpOff{font-size:10px; padding:3px 5px}
+          .fpGst{font-size:11px; margin-bottom:10px}
+          .fpQtyWrap{width:100%; justify-content:space-between; margin-bottom:10px}
+          .fpQtyBtn{width:32px; height:32px; font-size:18px}
+          .fpQtyValue{min-width:32px; font-size:12px}
+          .fpBtn{padding:12px 8px; font-size:12px; border-radius:10px}
           .brandsBox{padding:20px 0}
           .brandsScroll{gap:15px; height:100px}
           .brandLogo{min-width:120px; height:100px}
@@ -786,14 +806,15 @@ export default function Home() {
           .rText{font-size:13px}
           .qvCard{padding:16px}
           .qvMainImage{height:220px}
+          .qvProductTitle{font-size:18px}
           .qvNow{font-size:22px}
           .qvOld{font-size:16px}
-          .qvActionRow{gap:10px}
-          .qvQty{height:38px}
+          .qvActionRow{gap:10px; flex-direction:column; align-items:stretch}
+          .qvQty{height:38px; width:100%; justify-content:space-between}
           .qvQtyBtn{width:36px; height:36px; font-size:18px}
           .qvQtyValue{min-width:36px; font-size:16px}
           .qvAdd{min-width:100%; height:44px; font-size:15px; padding:0 16px}
-          .qvMeta{gap:10px; font-size:12px}
+          .qvMeta{gap:10px; font-size:12px; flex-direction:column}
           .qvShare{gap:10px; font-size:14px; margin-top:16px}
           .qvShareIcon{font-size:16px}
         }
@@ -805,6 +826,7 @@ export default function Home() {
           .brandLogo{min-width:100px}
           .brandLogo img{max-width:90px}
           .promoH{font-size:22px}
+          .fpGrid{grid-template-columns:1fr}
         }
 
         @media (max-height: 600px) and (orientation: landscape) {
@@ -1115,6 +1137,8 @@ export default function Home() {
               </div>
 
               <div>
+                <h3 className="qvProductTitle">{quickView.product.title}</h3>
+
                 <div className="qvPriceRow">
                   {Number(quickView.product.mrp) > Number(quickView.product.sale_price) ? (
                     <span className="qvOld">{inr(Number(quickView.product.mrp))}</span>

@@ -1,10 +1,14 @@
-// src/services/addressApi.ts
 import { api } from "./api";
+
+export type AddressType = "billing" | "delivery";
 
 export type Address = {
   id: number;
+  address_type: AddressType;
+  label?: string;
   full_name: string;
   phone: string;
+  gstin?: string;
   line1: string;
   line2?: string;
   city: string;
@@ -13,16 +17,21 @@ export type Address = {
   country: string;
   is_default: boolean;
   created_at: string;
-  label?: string; // optional
 };
 
-export async function listAddresses(): Promise<Address[]> {
-  const res = await api.get("/addresses/");
+export type PincodeLookupResult = {
+  postal_code: string;
+  line1_suggestion?: string;
+  city: string;
+  state: string;
+  country: string;
+};
+
+export async function listAddresses(addressType?: AddressType): Promise<Address[]> {
+  const query = addressType ? `?address_type=${addressType}` : "";
+  const res = await api.get(`/addresses/${query}`);
   return res.data;
 }
-
-// optional backward compatibility
-export const fetchAddresses = listAddresses;
 
 export async function createAddress(
   payload: Omit<Address, "id" | "created_at">
@@ -38,5 +47,10 @@ export async function updateAddress(id: number, payload: Partial<Address>) {
 
 export async function deleteAddress(id: number) {
   const res = await api.delete(`/addresses/${id}/`);
+  return res.data;
+}
+
+export async function lookupPincode(pincode: string): Promise<PincodeLookupResult> {
+  const res = await api.get(`/utils/pincode/${pincode}/`);
   return res.data;
 }

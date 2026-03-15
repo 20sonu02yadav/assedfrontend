@@ -22,7 +22,8 @@ function formatStatus(status: string) {
 
 function getStatusSteps(status: string) {
   const all = ["paid", "processing", "shipped", "out_for_delivery", "delivered"];
-  const currentIndex = Math.max(0, all.indexOf(status));
+  const idx = all.indexOf(status);
+  const currentIndex = idx >= 0 ? idx : 0;
   return { all, currentIndex };
 }
 
@@ -83,6 +84,84 @@ function Step({
   );
 }
 
+function AddressCard({
+  title,
+  name,
+  phone,
+  gstin,
+  line1,
+  line2,
+  city,
+  state,
+  postalCode,
+  country,
+}: {
+  title: string;
+  name?: string;
+  phone?: string;
+  gstin?: string;
+  line1?: string;
+  line2?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+}) {
+  return (
+    <div
+      style={{
+        border: "1px solid #e5e7eb",
+        borderRadius: 16,
+        padding: 20,
+        background: "#fff",
+      }}
+    >
+      <div style={{ fontWeight: 900, fontSize: 20, marginBottom: 12 }}>
+        {title}
+      </div>
+
+      <div style={{ color: "#374151", lineHeight: 1.7, fontSize: 15 }}>
+        <b style={{ fontSize: 18, display: "block", marginBottom: 4 }}>
+          {name || "-"}
+        </b>
+
+        {phone ? (
+          <>
+            {phone}
+            <br />
+          </>
+        ) : null}
+
+        {(line1 || line2) ? (
+          <>
+            {line1 || ""}
+            {line2 ? `, ${line2}` : ""}
+            <br />
+          </>
+        ) : null}
+
+        {(city || state || postalCode) ? (
+          <>
+            {city || ""}
+            {city || state ? ", " : ""}
+            {state || ""} {postalCode ? `- ${postalCode}` : ""}
+            <br />
+          </>
+        ) : null}
+
+        {country || ""}
+
+        {gstin ? (
+          <>
+            <br />
+            <span style={{ fontWeight: 700 }}>GSTIN:</span> {gstin}
+          </>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 export default function OrderDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -101,10 +180,19 @@ export default function OrderDetailPage() {
   }, []);
 
   async function loadOrder() {
+    if (!orderId || Number.isNaN(orderId)) {
+      setData(null);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       const d = await fetchOrderDetail(orderId);
       setData(d);
+    } catch (error) {
+      console.error("Failed to fetch order:", error);
+      setData(null);
     } finally {
       setLoading(false);
     }
@@ -189,8 +277,8 @@ export default function OrderDetailPage() {
               marginTop: 12,
               display: "inline-block",
               padding: "6px 14px",
-              background: "#dcfce7",
-              color: "#166534",
+              background: data.status === "cancelled" ? "#fee2e2" : "#dcfce7",
+              color: data.status === "cancelled" ? "#991b1b" : "#166534",
               borderRadius: 99,
               fontWeight: 800,
               fontSize: 13,
@@ -205,7 +293,7 @@ export default function OrderDetailPage() {
             {formatMoney(data.total_amount)}
           </div>
           <div style={{ marginTop: 4, color: "#6b7280", fontWeight: 700 }}>
-            Total Items: {totalQty}
+            Total Quantity: {totalQty}
           </div>
         </div>
       </div>
@@ -274,31 +362,30 @@ export default function OrderDetailPage() {
         </div>
 
         <div style={{ display: "grid", gap: 18 }}>
-          <div
-            style={{
-              border: "1px solid #e5e7eb",
-              borderRadius: 16,
-              padding: 20,
-              background: "#fff",
-            }}
-          >
-            <div style={{ fontWeight: 900, fontSize: 20, marginBottom: 12 }}>
-              Shipping Address
-            </div>
+          <AddressCard
+            title="Billing Address"
+            name={data.billing_full_name}
+            phone={data.billing_phone}
+            gstin={data.billing_gstin}
+            line1={data.billing_line1}
+            line2={data.billing_line2}
+            city={data.billing_city}
+            state={data.billing_state}
+            postalCode={data.billing_postal_code}
+            country={data.billing_country}
+          />
 
-            <div style={{ color: "#374151", lineHeight: 1.7, fontSize: 15 }}>
-              <b style={{ fontSize: 18, display: "block", marginBottom: 4 }}>
-                {data.shipping_full_name}
-              </b>
-              {data.shipping_phone}
-              <br />
-              {data.shipping_line1} {data.shipping_line2 || ""}
-              <br />
-              {data.shipping_city}, {data.shipping_state} - {data.shipping_postal_code}
-              <br />
-              {data.shipping_country}
-            </div>
-          </div>
+          <AddressCard
+            title="Shipping Address"
+            name={data.shipping_full_name}
+            phone={data.shipping_phone}
+            line1={data.shipping_line1}
+            line2={data.shipping_line2}
+            city={data.shipping_city}
+            state={data.shipping_state}
+            postalCode={data.shipping_postal_code}
+            country={data.shipping_country}
+          />
 
           <div
             style={{
@@ -369,60 +456,71 @@ export default function OrderDetailPage() {
         </div>
 
         <div style={{ display: "grid", gap: 14 }}>
-          {data.items?.map((it) => (
-            <div
-              key={it.id}
-              style={{
-                display: "grid",
-                gridTemplateColumns: isMobile ? "80px 1fr" : "110px 1fr auto",
-                gap: 16,
-                alignItems: "center",
-                border: "1px solid #f3f4f6",
-                padding: 12,
-                borderRadius: 14,
-              }}
-            >
+          {data.items?.map((it) => {
+            const itemTotal =
+              Number(it.line_total ?? Number(it.quantity) * Number(it.price));
+
+            return (
               <div
+                key={it.id}
                 style={{
-                  width: isMobile ? 80 : 110,
-                  height: isMobile ? 80 : 110,
-                  borderRadius: 10,
-                  overflow: "hidden",
-                  background: "#f8fafc",
-                  border: "1px solid #eee",
                   display: "grid",
-                  placeItems: "center",
+                  gridTemplateColumns: isMobile ? "80px 1fr" : "110px 1fr auto",
+                  gap: 16,
+                  alignItems: "center",
+                  border: "1px solid #f3f4f6",
+                  padding: 12,
+                  borderRadius: 14,
                 }}
               >
-                {it.product_image ? (
-                  <img
-                    src={it.product_image}
-                    alt={it.product_title}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                ) : (
-                  <span style={{ color: "#9ca3af", fontSize: 12 }}>No Image</span>
+                <div
+                  style={{
+                    width: isMobile ? 80 : 110,
+                    height: isMobile ? 80 : 110,
+                    borderRadius: 10,
+                    overflow: "hidden",
+                    background: "#f8fafc",
+                    border: "1px solid #eee",
+                    display: "grid",
+                    placeItems: "center",
+                  }}
+                >
+                  {it.product_image ? (
+                    <img
+                      src={it.product_image}
+                      alt={it.product_title}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  ) : (
+                    <span style={{ color: "#9ca3af", fontSize: 12 }}>No Image</span>
+                  )}
+                </div>
+
+                <div>
+                  <div style={{ fontWeight: 900, fontSize: 16 }}>{it.product_title}</div>
+                  <div style={{ color: "#6b7280", marginTop: 4, fontSize: 14 }}>
+                    Qty: {it.quantity} × {formatMoney(it.price)}
+                  </div>
+
+                  {isMobile && (
+                    <div style={{ marginTop: 6, fontWeight: 900, fontSize: 16 }}>
+                      {formatMoney(itemTotal)}
+                    </div>
+                  )}
+                </div>
+
+                {!isMobile && (
+                  <div style={{ textAlign: "right", fontWeight: 900, fontSize: 20 }}>
+                    {formatMoney(itemTotal)}
+                  </div>
                 )}
               </div>
-
-              <div>
-                <div style={{ fontWeight: 900, fontSize: 16 }}>{it.product_title}</div>
-                <div style={{ color: "#6b7280", marginTop: 4, fontSize: 14 }}>
-                  Qty: {it.quantity} × {formatMoney(it.price)}
-                </div>
-              </div>
-
-              {!isMobile && (
-                <div style={{ textAlign: "right", fontWeight: 900, fontSize: 20 }}>
-                  {formatMoney(Number(it.quantity) * Number(it.price))}
-                </div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

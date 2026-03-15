@@ -17,7 +17,9 @@ function money(v?: string | number) {
 
 export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
-  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
+  const [sameAsBilling, setSameAsBilling] = useState(true);
+  const [selectedBillingAddressId, setSelectedBillingAddressId] = useState<number | null>(null);
+  const [selectedDeliveryAddressId, setSelectedDeliveryAddressId] = useState<number | null>(null);
   const [cart, setCart] = useState<Cart | null>(null);
   const [cartLoading, setCartLoading] = useState(true);
 
@@ -48,7 +50,12 @@ export default function CheckoutPage() {
   }, [cart]);
 
   async function payNow() {
-    if (!selectedAddressId) {
+    if (!selectedBillingAddressId) {
+      alert("Please select billing address.");
+      return;
+    }
+
+    if (!sameAsBilling && !selectedDeliveryAddressId) {
       alert("Please select delivery address.");
       return;
     }
@@ -75,7 +82,9 @@ export default function CheckoutPage() {
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_signature: response.razorpay_signature,
-            address_id: selectedAddressId,
+            billing_address_id: selectedBillingAddressId,
+            delivery_address_id: sameAsBilling ? selectedBillingAddressId : selectedDeliveryAddressId,
+            same_as_billing: sameAsBilling,
           });
 
           alert("Payment Success ✅ Order created!");
@@ -93,6 +102,7 @@ export default function CheckoutPage() {
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (e) {
+      console.error(e);
       alert("Payment init failed. Ensure cart has items & you are logged in.");
     } finally {
       setLoading(false);
@@ -113,22 +123,64 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin: "40px auto", padding: 16 }}>
+    <div style={{ maxWidth: 1280, margin: "40px auto", padding: 16 }}>
       <h1 style={{ marginBottom: 20 }}>Checkout</h1>
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1.4fr 0.6fr",
+          gridTemplateColumns: "1.3fr 0.7fr",
           gap: 18,
           alignItems: "start",
         }}
       >
         <div style={{ display: "grid", gap: 16 }}>
           <AddressManager
-            selectedId={selectedAddressId}
-            onSelect={(id) => setSelectedAddressId(id)}
+            title="Billing Address"
+            addressType="billing"
+            allowGSTIN={true}
+            selectedId={selectedBillingAddressId}
+            onSelect={(id) => {
+              setSelectedBillingAddressId(id);
+              if (sameAsBilling) {
+                setSelectedDeliveryAddressId(id);
+              }
+            }}
           />
+
+          <div
+            style={{
+              border: "1px solid #e5e7eb",
+              borderRadius: 12,
+              padding: 14,
+              background: "#fff",
+            }}
+          >
+            <label style={{ display: "flex", gap: 10, alignItems: "center", fontWeight: 800 }}>
+              <input
+                type="checkbox"
+                checked={sameAsBilling}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setSameAsBilling(checked);
+                  if (checked && selectedBillingAddressId) {
+                    setSelectedDeliveryAddressId(selectedBillingAddressId);
+                  }
+                }}
+              />
+              Delivery address same as billing
+            </label>
+          </div>
+
+          {!sameAsBilling && (
+            <AddressManager
+              title="Delivery Address"
+              addressType="delivery"
+              allowGSTIN={false}
+              selectedId={selectedDeliveryAddressId}
+              onSelect={(id) => setSelectedDeliveryAddressId(id)}
+            />
+          )}
 
           <div style={{ border: "1px solid #e5e7eb", borderRadius: 16, padding: 16, background: "#fff" }}>
             <h3 style={{ marginTop: 0 }}>Your Products</h3>

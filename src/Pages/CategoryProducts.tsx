@@ -44,6 +44,26 @@ export default function CategoryProducts() {
     qty: 1,
   });
 
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth <= 768 : false
+  );
+  const [isTablet, setIsTablet] = useState(
+    typeof window !== "undefined"
+      ? window.innerWidth > 768 && window.innerWidth <= 1100
+      : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      const w = window.innerWidth;
+      setIsMobile(w <= 768);
+      setIsTablet(w > 768 && w <= 1100);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   useEffect(() => {
     if (!slug) {
       setItems([]);
@@ -99,18 +119,16 @@ export default function CategoryProducts() {
   }
 
   async function handleAddToCart(product: ProductListItem, qty: number) {
-  try {
-    setBusyId(product.id);
-
-    await addProductToHybridCart(product, qty);
-
-    alert("Added to cart ✅");
-  } catch {
-    alert("Failed to add to cart.");
-  } finally {
-    setBusyId(null);
+    try {
+      setBusyId(product.id);
+      await addProductToHybridCart(product, qty);
+      alert("Added to cart ✅");
+    } catch {
+      alert("Failed to add to cart.");
+    } finally {
+      setBusyId(null);
+    }
   }
-}
 
   const filteredItems = useMemo(() => {
     let list = [...items];
@@ -142,7 +160,9 @@ export default function CategoryProducts() {
     if (orderBy === "latest") {
       list.sort((a, b) => b.id - a.id);
     } else if (orderBy === "popular") {
-      list.sort((a, b) => Number(b.discount_percent || 0) - Number(a.discount_percent || 0));
+      list.sort(
+        (a, b) => Number(b.discount_percent || 0) - Number(a.discount_percent || 0)
+      );
     }
 
     return list;
@@ -154,13 +174,33 @@ export default function CategoryProducts() {
 
   return (
     <div style={styles.page}>
-      <div style={{ ...styles.hero, backgroundImage: `url(${HERO_BG})` }}>
+      <div
+        style={{
+          ...styles.hero,
+          backgroundImage: `url(${HERO_BG})`,
+          height: isMobile ? 220 : 320,
+        }}
+      >
         <div style={styles.heroOverlay} />
 
         <div style={styles.heroCenter}>
-          <div style={styles.heroTitle}>Products</div>
+          <div
+            style={{
+              ...styles.heroTitle,
+              fontSize: isMobile ? 38 : 72,
+            }}
+          >
+            Products
+          </div>
 
-          <div style={styles.heroCrumb}>
+          <div
+            style={{
+              ...styles.heroCrumb,
+              fontSize: isMobile ? 12 : 15,
+              padding: isMobile ? "0 16px" : 0,
+              lineHeight: isMobile ? 1.6 : 1.4,
+            }}
+          >
             <span style={styles.crumbLink} onClick={() => navigate("/")}>
               Home
             </span>
@@ -175,12 +215,45 @@ export default function CategoryProducts() {
       </div>
 
       <div style={styles.content}>
-        <div style={styles.filterCard}>
-          <div style={styles.filterTopRow}>
-            <div style={styles.filterTitle}>Filter</div>
+        <div
+          style={{
+            ...styles.filterCard,
+            padding: isMobile ? 16 : 26,
+            borderRadius: isMobile ? 14 : 18,
+          }}
+        >
+          <div
+            style={{
+              ...styles.filterTopRow,
+              flexDirection: isMobile ? "column" : "row",
+              alignItems: isMobile ? "stretch" : "center",
+            }}
+          >
+            <div
+              style={{
+                ...styles.filterTitle,
+                fontSize: isMobile ? 24 : 32,
+                textAlign: isMobile ? "left" : "initial",
+              }}
+            >
+              Filter
+            </div>
 
-            <div style={styles.searchRow}>
-              <div style={styles.searchPill}>
+            <div
+              style={{
+                ...styles.searchRow,
+                width: isMobile ? "100%" : "auto",
+                flexDirection: isMobile ? "row" : "row",
+                alignItems: "stretch",
+              }}
+            >
+              <div
+                style={{
+                  ...styles.searchPill,
+                  minWidth: isMobile ? 0 : 340,
+                  width: isMobile ? "100%" : "auto",
+                }}
+              >
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
@@ -193,7 +266,12 @@ export default function CategoryProducts() {
               </div>
 
               <button
-                style={styles.backBtn}
+                style={{
+                  ...styles.backBtn,
+                  width: isMobile ? 44 : 44,
+                  height: isMobile ? 44 : 44,
+                  flexShrink: 0,
+                }}
                 onClick={() => navigate("/store")}
               >
                 ⏷
@@ -203,11 +281,22 @@ export default function CategoryProducts() {
 
           <div style={styles.filterDivider} />
 
-          <div style={styles.filterBottomRow}>
+          <div
+            style={{
+              ...styles.filterBottomRow,
+              justifyContent: isMobile ? "stretch" : "center",
+              gap: isMobile ? 10 : 18,
+              flexDirection: isMobile ? "column" : "row",
+            }}
+          >
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              style={styles.selectPill}
+              style={{
+                ...styles.selectPill,
+                minWidth: isMobile ? "100%" : 170,
+                width: isMobile ? "100%" : undefined,
+              }}
             >
               <option value="default">Sort By</option>
               <option value="az">A → Z</option>
@@ -217,7 +306,11 @@ export default function CategoryProducts() {
             <select
               value={orderBy}
               onChange={(e) => setOrderBy(e.target.value)}
-              style={styles.selectPill}
+              style={{
+                ...styles.selectPill,
+                minWidth: isMobile ? "100%" : 170,
+                width: isMobile ? "100%" : undefined,
+              }}
             >
               <option value="default">Order By</option>
               <option value="popular">Popular</option>
@@ -227,7 +320,11 @@ export default function CategoryProducts() {
             <select
               value={pricing}
               onChange={(e) => setPricing(e.target.value)}
-              style={styles.selectPill}
+              style={{
+                ...styles.selectPill,
+                minWidth: isMobile ? "100%" : 170,
+                width: isMobile ? "100%" : undefined,
+              }}
             >
               <option value="default">Pricing</option>
               <option value="low">Low to High</option>
@@ -236,25 +333,70 @@ export default function CategoryProducts() {
           </div>
         </div>
 
-        <div style={styles.sectionTitle}>
+        <div
+          style={{
+            ...styles.sectionTitle,
+            fontSize: isMobile ? 22 : 30,
+            margin: isMobile ? "24px 0 16px" : "34px 0 20px",
+          }}
+        >
           {slug.replace(/-/g, " ").toUpperCase()}
         </div>
 
         {loading ? (
           <div style={styles.emptyBox}>Loading products...</div>
         ) : filteredItems.length === 0 ? (
-          <div style={styles.emptyBox}>No products were found matching your selection.</div>
+          <div style={styles.emptyBox}>
+            No products were found matching your selection.
+          </div>
         ) : (
-          <div style={styles.productGrid}>
+          <div
+            style={{
+              ...styles.productGrid,
+              gridTemplateColumns: isMobile
+                ? "repeat(2, minmax(0, 1fr))"
+                : isTablet
+                ? "repeat(3, minmax(0, 1fr))"
+                : "repeat(5, minmax(0, 1fr))",
+              gap: isMobile ? 12 : 18,
+            }}
+          >
             {filteredItems.map((p) => {
               const qty = qtyMap[p.id] || 1;
 
               return (
-                <div key={p.id} style={styles.productCard}>
-                  {p.is_sale ? <div style={styles.saleBadge}>SALE</div> : null}
+                <div
+                  key={p.id}
+                  style={{
+                    ...styles.productCard,
+                    padding: isMobile ? 12 : 18,
+                    borderRadius: isMobile ? 16 : 20,
+                  }}
+                >
+                  {p.is_sale ? (
+                    <div
+                      style={{
+                        ...styles.saleBadge,
+                        top: isMobile ? 10 : 18,
+                        left: isMobile ? 10 : 18,
+                        padding: isMobile ? "5px 9px" : "8px 14px",
+                        fontSize: isMobile ? 11 : 14,
+                        borderRadius: isMobile ? 6 : 8,
+                      }}
+                    >
+                      SALE
+                    </div>
+                  ) : null}
 
                   <button
-                    style={styles.quickViewBtn}
+                    style={{
+                      ...styles.quickViewBtn,
+                      top: isMobile ? 10 : 14,
+                      right: isMobile ? 10 : 14,
+                      width: isMobile ? 38 : 56,
+                      height: isMobile ? 38 : 56,
+                      fontSize: isMobile ? 16 : 24,
+                    }}
                     onClick={(e) => {
                       e.stopPropagation();
                       setQuickView({
@@ -276,51 +418,137 @@ export default function CategoryProducts() {
                     <img
                       src={getProductImage(p)}
                       alt={p.title}
-                      style={styles.productImg}
+                      style={{
+                        ...styles.productImg,
+                        height: isMobile ? 160 : 330,
+                        borderRadius: isMobile ? 10 : 12,
+                      }}
                     />
 
-                    <div style={styles.productShortLabel}>
+                    <div
+                      style={{
+                        ...styles.productShortLabel,
+                        fontSize: isMobile ? 10 : 14,
+                        marginTop: isMobile ? 8 : 8,
+                      }}
+                    >
                       {p.short_category_label || p.category_name}
                     </div>
 
-                    <h3 style={styles.productTitle}>{p.title}</h3>
+                    <h3
+                      style={{
+                        ...styles.productTitle,
+                        fontSize: isMobile ? 14 : 20,
+                        minHeight: isMobile ? 38 : "auto",
+                      }}
+                    >
+                      {p.title}
+                    </h3>
 
                     <div style={styles.priceWrap}>
-                      <span style={styles.oldPrice}>{money(p.mrp)}</span>
-                      <span style={styles.salePrice}>{money(p.sale_price)}</span>
+                      <span
+                        style={{
+                          ...styles.oldPrice,
+                          fontSize: isMobile ? 12 : 18,
+                        }}
+                      >
+                        {money(p.mrp)}
+                      </span>
+                      <span
+                        style={{
+                          ...styles.salePrice,
+                          fontSize: isMobile ? 15 : 22,
+                        }}
+                      >
+                        {money(p.sale_price)}
+                      </span>
                     </div>
 
-                    <div style={styles.gstWrap}>
-                      <span style={styles.gstText}>
+                    <div
+                      style={{
+                        ...styles.gstWrap,
+                        gap: isMobile ? 6 : 10,
+                        alignItems: isMobile ? "flex-start" : "center",
+                        flexDirection: isMobile ? "column" : "row",
+                      }}
+                    >
+                      <span
+                        style={{
+                          ...styles.gstText,
+                          fontSize: isMobile ? 11 : 16,
+                        }}
+                      >
                         GST ({p.gst_percent}%) {money(p.gst_amount)}
                       </span>
                       {p.discount_percent ? (
-                        <span style={styles.discountPill}>-{p.discount_percent}%</span>
+                        <span
+                          style={{
+                            ...styles.discountPill,
+                            fontSize: isMobile ? 11 : 16,
+                            padding: isMobile ? "3px 6px" : "4px 8px",
+                          }}
+                        >
+                          -{p.discount_percent}%
+                        </span>
                       ) : null}
                     </div>
                   </div>
 
-                  <div style={styles.productBottom}>
-                    <div style={styles.qtyWrap}>
+                  <div
+                    style={{
+                      ...styles.productBottom,
+                      gap: isMobile ? 10 : 12,
+                    }}
+                  >
+                    <div
+                      style={{
+                        ...styles.qtyWrap,
+                        width: isMobile ? "100%" : "fit-content",
+                        justifyContent: isMobile ? "space-between" : "flex-start",
+                      }}
+                    >
                       <button
                         onClick={() => setQty(p.id, qty - 1)}
-                        style={styles.qtyBtn}
+                        style={{
+                          ...styles.qtyBtn,
+                          width: isMobile ? 36 : 42,
+                          height: isMobile ? 36 : 42,
+                          fontSize: isMobile ? 20 : 24,
+                        }}
                       >
                         −
                       </button>
 
-                      <div style={styles.qtyValue}>{qty}</div>
+                      <div
+                        style={{
+                          ...styles.qtyValue,
+                          minWidth: isMobile ? 36 : 48,
+                          fontSize: isMobile ? 14 : 16,
+                        }}
+                      >
+                        {qty}
+                      </div>
 
                       <button
                         onClick={() => setQty(p.id, qty + 1)}
-                        style={styles.qtyBtn}
+                        style={{
+                          ...styles.qtyBtn,
+                          width: isMobile ? 36 : 42,
+                          height: isMobile ? 36 : 42,
+                          fontSize: isMobile ? 20 : 24,
+                        }}
                       >
                         +
                       </button>
                     </div>
 
                     <button
-                      style={styles.addCartBtn}
+                      style={{
+                        ...styles.addCartBtn,
+                        height: isMobile ? 42 : 56,
+                        borderRadius: isMobile ? 12 : 18,
+                        fontSize: isMobile ? 12 : 16,
+                      }}
                       disabled={busyId === p.id}
                       onClick={() => handleAddToCart(p, qty)}
                     >
@@ -340,33 +568,89 @@ export default function CategoryProducts() {
           onClick={() => setQuickView({ open: false, product: null, qty: 1 })}
         >
           <div
-            style={styles.modalCard}
+            style={{
+              ...styles.modalCard,
+              maxWidth: isMobile ? 380 : 1380,
+              padding: isMobile ? 16 : 28,
+              borderRadius: isMobile ? 16 : 0,
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              style={styles.modalClose}
+              style={{
+                ...styles.modalClose,
+                top: isMobile ? 10 : 18,
+                right: isMobile ? 10 : 18,
+                fontSize: isMobile ? 24 : 34,
+              }}
               onClick={() => setQuickView({ open: false, product: null, qty: 1 })}
             >
               ✕
             </button>
 
-            <div style={styles.modalGrid}>
+            <div
+              style={{
+                ...styles.modalGrid,
+                gridTemplateColumns: isMobile ? "1fr" : "0.9fr 1.1fr",
+                gap: isMobile ? 16 : 28,
+              }}
+            >
               <div>
                 <img
                   src={getProductImage(quickView.product)}
                   alt={quickView.product.title}
-                  style={styles.modalMainImage}
+                  style={{
+                    ...styles.modalMainImage,
+                    height: isMobile ? 240 : 560,
+                  }}
                 />
               </div>
 
               <div>
-                <div style={styles.modalPriceRow}>
-                  <span style={styles.modalOldPrice}>{money(quickView.product.mrp)}</span>
-                  <span style={styles.modalSalePrice}>{money(quickView.product.sale_price)}</span>
+                <div
+                  style={{
+                    fontSize: isMobile ? 18 : 24,
+                    fontWeight: 800,
+                    lineHeight: 1.4,
+                    marginBottom: 12,
+                  }}
+                >
+                  {quickView.product.title}
                 </div>
 
-                <div style={styles.modalActionRow}>
-                  <div style={styles.modalQtyWrap}>
+                <div style={styles.modalPriceRow}>
+                  <span
+                    style={{
+                      ...styles.modalOldPrice,
+                      fontSize: isMobile ? 16 : 22,
+                    }}
+                  >
+                    {money(quickView.product.mrp)}
+                  </span>
+                  <span
+                    style={{
+                      ...styles.modalSalePrice,
+                      fontSize: isMobile ? 22 : 30,
+                    }}
+                  >
+                    {money(quickView.product.sale_price)}
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    ...styles.modalActionRow,
+                    flexDirection: isMobile ? "column" : "row",
+                    alignItems: isMobile ? "stretch" : "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      ...styles.modalQtyWrap,
+                      width: isMobile ? "100%" : "auto",
+                      justifyContent: isMobile ? "space-between" : "flex-start",
+                    }}
+                  >
                     <button
                       style={styles.modalQtyBtn}
                       onClick={() =>
@@ -395,10 +679,14 @@ export default function CategoryProducts() {
                   </div>
 
                   <button
-                    style={styles.modalAddCartBtn}
-                    onClick={() =>
-                      handleAddToCart(quickView.product!, quickView.qty)
-                    }
+                    style={{
+                      ...styles.modalAddCartBtn,
+                      minWidth: isMobile ? "100%" : 390,
+                      width: isMobile ? "100%" : "auto",
+                      height: isMobile ? 46 : 54,
+                      fontSize: isMobile ? 15 : 18,
+                    }}
+                    onClick={() => handleAddToCart(quickView.product!, quickView.qty)}
                   >
                     Add To Cart
                   </button>
@@ -406,7 +694,14 @@ export default function CategoryProducts() {
 
                 <div style={styles.modalDivider} />
 
-                <div style={styles.modalMeta}>
+                <div
+                  style={{
+                    ...styles.modalMeta,
+                    flexDirection: isMobile ? "column" : "row",
+                    gap: isMobile ? 10 : 28,
+                    fontSize: isMobile ? 14 : 16,
+                  }}
+                >
                   <span>SKU: {quickView.product.sku || "-"}</span>
                   <span>Category: {quickView.product.category_name || "-"}</span>
                   <span>Brand: {quickView.product.brand || "-"}</span>
@@ -429,7 +724,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   hero: {
     position: "relative",
-    height: 320,
     backgroundSize: "cover",
     backgroundPosition: "center",
     overflow: "hidden",
@@ -450,7 +744,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   heroTitle: {
     color: "#fff",
-    fontSize: 72,
     fontWeight: 800,
     lineHeight: 1,
     textShadow: "0 10px 30px rgba(0,0,0,0.35)",
@@ -458,7 +751,6 @@ const styles: Record<string, React.CSSProperties> = {
   heroCrumb: {
     marginTop: 14,
     color: "#fff",
-    fontSize: 15,
     fontWeight: 600,
     opacity: 0.95,
     display: "flex",
@@ -472,28 +764,24 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: 1460,
     margin: "0 auto",
     padding: "34px 20px 70px",
+    boxSizing: "border-box",
   },
   filterCard: {
     background: "#fff",
-    borderRadius: 18,
-    padding: 26,
     boxShadow: "0 12px 30px rgba(0,0,0,0.10)",
   },
   filterTopRow: {
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
     gap: 18,
     flexWrap: "wrap",
   },
   filterTitle: {
-    fontSize: 32,
     fontWeight: 500,
     color: "#111",
   },
   searchRow: {
     display: "flex",
-    alignItems: "center",
     gap: 14,
     flexWrap: "wrap",
   },
@@ -504,7 +792,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 999,
     padding: "10px 12px",
     gap: 8,
-    minWidth: 340,
   },
   searchInput: {
     border: "none",
@@ -520,8 +807,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 18,
   },
   backBtn: {
-    width: 44,
-    height: 44,
     borderRadius: 999,
     border: "none",
     background: "#eef3ff",
@@ -536,9 +821,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   filterBottomRow: {
     display: "flex",
-    justifyContent: "center",
     alignItems: "center",
-    gap: 18,
     flexWrap: "wrap",
   },
   selectPill: {
@@ -549,12 +832,9 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 15,
     background: "#fff",
     outline: "none",
-    minWidth: 170,
   },
   sectionTitle: {
-    fontSize: 30,
     fontWeight: 900,
-    margin: "34px 0 20px",
     textTransform: "uppercase",
   },
   emptyBox: {
@@ -567,15 +847,11 @@ const styles: Record<string, React.CSSProperties> = {
   },
   productGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
-    gap: 18,
     marginTop: 12,
   },
   productCard: {
     position: "relative",
     border: "1px solid #e5e7eb",
-    borderRadius: 20,
-    padding: 18,
     background: "#fff",
     display: "flex",
     flexDirection: "column",
@@ -584,46 +860,31 @@ const styles: Record<string, React.CSSProperties> = {
   },
   saleBadge: {
     position: "absolute",
-    top: 18,
-    left: 18,
     zIndex: 2,
     background: "#f9caca",
     color: "#111",
-    borderRadius: 8,
-    padding: "8px 14px",
-    fontSize: 14,
     fontWeight: 900,
   },
   quickViewBtn: {
     position: "absolute",
-    top: 14,
-    right: 14,
     zIndex: 2,
-    width: 56,
-    height: 56,
     borderRadius: 999,
     border: "none",
     background: "#fff",
     boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
     cursor: "pointer",
-    fontSize: 24,
   },
   productImg: {
     width: "100%",
-    height: 330,
     objectFit: "contain",
     background: "#fff",
-    borderRadius: 12,
   },
   productShortLabel: {
-    marginTop: 8,
-    fontSize: 14,
     color: "#94a3b8",
     textTransform: "uppercase",
   },
   productTitle: {
     margin: "4px 0 2px",
-    fontSize: 20,
     fontWeight: 500,
     lineHeight: 1.4,
     color: "#0f172a",
@@ -637,36 +898,28 @@ const styles: Record<string, React.CSSProperties> = {
   oldPrice: {
     textDecoration: "line-through",
     color: "#9ca3af",
-    fontSize: 18,
   },
   salePrice: {
-    fontSize: 22,
     fontWeight: 900,
     color: "#0f172a",
   },
   gstWrap: {
     display: "flex",
-    alignItems: "center",
-    gap: 10,
     flexWrap: "wrap",
   },
   gstText: {
-    fontSize: 16,
     color: "#374151",
     fontWeight: 700,
   },
   discountPill: {
     color: "#ef4444",
     fontWeight: 800,
-    fontSize: 16,
     background: "#fee2e2",
-    padding: "4px 8px",
     borderRadius: 6,
   },
   productBottom: {
     marginTop: "auto",
     display: "grid",
-    gap: 12,
   },
   qtyWrap: {
     display: "inline-flex",
@@ -674,33 +927,24 @@ const styles: Record<string, React.CSSProperties> = {
     border: "1px solid #d1d5db",
     borderRadius: 999,
     overflow: "hidden",
-    width: "fit-content",
   },
   qtyBtn: {
-    width: 42,
-    height: 42,
     border: "none",
     background: "#f9fafb",
-    fontSize: 24,
     fontWeight: 900,
     cursor: "pointer",
   },
   qtyValue: {
-    minWidth: 48,
     textAlign: "center",
     fontWeight: 900,
     padding: "0 10px",
-    fontSize: 16,
   },
   addCartBtn: {
     width: "100%",
-    height: 56,
-    borderRadius: 18,
     border: "none",
     background: "linear-gradient(90deg, #4f86ff, #1d4ed8)",
     color: "#fff",
     fontWeight: 900,
-    fontSize: 16,
     cursor: "pointer",
   },
   modalOverlay: {
@@ -714,33 +958,27 @@ const styles: Record<string, React.CSSProperties> = {
   },
   modalCard: {
     width: "100%",
-    maxWidth: 1380,
     background: "#fff",
     position: "relative",
-    padding: 28,
     boxSizing: "border-box",
   },
   modalClose: {
     position: "absolute",
-    top: 18,
-    right: 18,
     border: "none",
     background: "transparent",
     cursor: "pointer",
-    fontSize: 34,
     lineHeight: 1,
+    zIndex: 2,
   },
   modalGrid: {
     display: "grid",
-    gridTemplateColumns: "0.9fr 1.1fr",
-    gap: 28,
     alignItems: "start",
   },
   modalMainImage: {
     width: "100%",
-    height: 560,
     objectFit: "contain",
     background: "#fff",
+    borderRadius: 10,
   },
   modalPriceRow: {
     display: "flex",
@@ -750,18 +988,15 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: 10,
   },
   modalOldPrice: {
-    fontSize: 22,
     color: "#9ca3af",
     textDecoration: "line-through",
   },
   modalSalePrice: {
-    fontSize: 30,
     fontWeight: 900,
     color: "#1f2937",
   },
   modalActionRow: {
     display: "flex",
-    alignItems: "center",
     gap: 16,
     marginTop: 18,
     flexWrap: "wrap",
@@ -786,14 +1021,11 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 18,
   },
   modalAddCartBtn: {
-    minWidth: 390,
-    height: 54,
     border: "none",
     borderRadius: 999,
     background: "#0b86d7",
     color: "#fff",
     fontWeight: 900,
-    fontSize: 18,
     cursor: "pointer",
     padding: "0 24px",
   },
@@ -805,9 +1037,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   modalMeta: {
     display: "flex",
-    gap: 28,
     flexWrap: "wrap",
-    fontSize: 16,
     color: "#1f2937",
   },
 };
