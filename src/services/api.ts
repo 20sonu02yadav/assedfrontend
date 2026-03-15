@@ -15,7 +15,7 @@ export function setAuthToken(accessToken: string | null) {
   }
 }
 
-export type Role = "Individual Customer" | "B2B";
+export type Role = "Individual Customer" | "B2B" | "B2C";
 
 function onlyDigits(value: string) {
   return String(value || "").replace(/\D/g, "");

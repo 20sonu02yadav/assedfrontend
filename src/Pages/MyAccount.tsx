@@ -544,6 +544,7 @@ export default function MyAccount() {
                   <option value="">- - - Select User Role - - -</option>
                   <option value="Individual Customer">Individual Customer</option>
                   <option value="B2B">B2B</option>
+                  <option value="B2C">B2C</option>
                 </select>
 
                 <label className="label" style={{ marginTop: 16 }}>
