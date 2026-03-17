@@ -542,17 +542,24 @@ export default function CategoryProducts() {
                       </button>
                     </div>
 
-                    <button
+                   <button
                       style={{
                         ...styles.addCartBtn,
                         height: isMobile ? 42 : 56,
                         borderRadius: isMobile ? 12 : 18,
                         fontSize: isMobile ? 12 : 16,
+                        background: p.is_sale
+                          ? "linear-gradient(90deg, #4f86ff, #1d4ed8)"
+                          : "#9ca3af",
+                        cursor: p.is_sale ? "pointer" : "not-allowed",
                       }}
-                      disabled={busyId === p.id}
-                      onClick={() => handleAddToCart(p, qty)}
+                      disabled={busyId === p.id || !p.is_sale}
+                      onClick={() => {
+                        if (!p.is_sale) return;
+                        handleAddToCart(p, qty);
+                      }}
                     >
-                      {busyId === p.id ? "ADDING..." : "ADD TO CART"}
+                      {!p.is_sale ? "OUT OF STOCK" : busyId === p.id ? "ADDING..." : "ADD TO CART"}
                     </button>
                   </div>
                 </div>

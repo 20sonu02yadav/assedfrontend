@@ -943,7 +943,17 @@ export default function Home() {
                         alt={p.title}
                         loading="lazy"
                       />
-                      <span className="fpSale">{p.is_sale ? "SALE" : "NEW"}</span>
+                      {!p.is_sale ? (
+                              <span
+                                className="fpSale"
+                                style={{ background: "#b91c1c" }}
+                              >
+                                OUT OF STOCK
+                              </span>
+                            ) : (
+                              <span className="fpSale">{p.is_sale ? "SALE" : "NEW"}</span>
+                            )}
+                     
                     </a>
 
                     <button
@@ -1017,14 +1027,23 @@ export default function Home() {
                       <button
                         className="fpBtn"
                         type="button"
-                        disabled={busyId === p.id}
-                        onClick={() => handleAddToCart(p, qty)}
+                        disabled={busyId === p.id || !p.is_sale}
+                        onClick={() => {
+                          if (!p.is_sale) return;
+                          handleAddToCart(p, qty);
+                        }}
+                        style={{
+                          background: p.is_sale
+                            ? "linear-gradient(90deg,#4f86ff,#1d4ed8)"
+                            : "#9ca3af",
+                          cursor: p.is_sale ? "pointer" : "not-allowed",
+                        }}
                       >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                           <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 10V8a6 6 0 0112 0v2" />
                           <rect x="5" y="10" width="14" height="12" rx="2" strokeWidth="2" />
                         </svg>
-                        {busyId === p.id ? "ADDING..." : "ADD TO CART"}
+                        {!p.is_sale ? "OUT OF STOCK" : busyId === p.id ? "ADDING..." : "ADD TO CART"}
                       </button>
                     </div>
                   </article>

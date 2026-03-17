@@ -20,7 +20,32 @@ function money(v?: string | number) {
   const n = Number(v || 0);
   return `₹${n.toFixed(2)}`;
 }
+function toTitleCaseLabel(value: string) {
+  return value
+    .replace(/_/g, " ")
+    .replace(/-/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(" ")
+    .map((word) =>
+      word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : word
+    )
+    .join(" ");
+}
 
+function formatSpecValue(value: unknown) {
+  if (value === null || value === undefined) return "-";
+
+  if (typeof value === "boolean") {
+    return value ? "Yes" : "No";
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item)).join(", ");
+  }
+
+  return String(value);
+}
 function flattenTree(nodes: CategoryNode[]): CategoryNode[] {
   const out: CategoryNode[] = [];
 
@@ -249,12 +274,33 @@ export default function ProductDetailPage() {
     product.images?.[0]?.image_url ||
     "https://dummyimage.com/600x600/f3f4f6/111827&text=No+Image";
 
-  const specsList: string[] = Array.isArray(product.specs)
-    ? product.specs
-    : typeof product.specs === "object" && product.specs !== null
-    ? Object.entries(product.specs).map(([k, v]) => `${k}: ${String(v)}`)
-    : [];
-
+  const specsList: { label: string; value: string }[] = Array.isArray(product.specs)
+  ? product.specs
+      .filter((item) => {
+        const raw = String(item || "").toLowerCase().replace(/\s+/g, "").replace(/-/g, "_");
+        return !raw.includes("b2b_price");
+      })
+      .map((item) => {
+        const rawText = String(item || "");
+        const parts = rawText.split(":");
+        if (parts.length >= 2) {
+          const label = toTitleCaseLabel(parts[0]);
+          const value = parts.slice(1).join(":").trim();
+          return { label, value };
+        }
+        return { label: toTitleCaseLabel(rawText), value: "" };
+      })
+  : typeof product.specs === "object" && product.specs !== null
+  ? Object.entries(product.specs)
+      .filter(([k]) => {
+        const normalized = String(k).toLowerCase().replace(/\s+/g, "").replace(/-/g, "_");
+        return normalized !== "b2b_price";
+      })
+      .map(([k, v]) => ({
+        label: toTitleCaseLabel(k),
+        value: formatSpecValue(v),
+      }))
+  : [];
   return (
     <div style={styles.page}>
       <div
@@ -337,6 +383,8 @@ export default function ProductDetailPage() {
               {!isMobile && <div style={styles.zoomIcon}>⌕</div>}
             </div>
 
+            
+
             {product.images?.length > 1 ? (
               <div
                 style={{
@@ -344,6 +392,7 @@ export default function ProductDetailPage() {
                   justifyContent: isMobile ? "center" : "flex-start",
                 }}
               >
+                
                 {product.images.map((img) => (
                   <button
                     key={img.id}
@@ -366,6 +415,22 @@ export default function ProductDetailPage() {
           </div>
 
           <div>
+            {!product.is_sale ? (
+  <div
+    style={{
+      display: "inline-block",
+      marginBottom: 10,
+      background: "#fee2e2",
+      color: "#b91c1c",
+      padding: "8px 14px",
+      borderRadius: 999,
+      fontWeight: 800,
+      fontSize: isMobile ? 12 : 14,
+    }}
+  >
+    Out Of Stock
+  </div>
+) : null}
             <h1
               style={{
                 ...styles.title,
@@ -454,18 +519,24 @@ export default function ProductDetailPage() {
               </div>
 
               <button
-                style={{
-                  ...styles.addCartBtn,
-                  width: isMobile ? "100%" : "auto",
-                  minWidth: isMobile ? "100%" : 230,
-                  height: isMobile ? 50 : 54,
-                  fontSize: isMobile ? 18 : 22,
-                }}
-                disabled={busyCart}
-                onClick={() => handleAddToCartNow(qty)}
-              >
-                {busyCart ? "Adding..." : "Add To Cart"}
-              </button>
+  style={{
+    ...styles.addCartBtn,
+    width: isMobile ? "100%" : "auto",
+    minWidth: isMobile ? "100%" : 230,
+    height: isMobile ? 50 : 54,
+    fontSize: isMobile ? 18 : 22,
+    background: product.is_sale ? "#1d8fe1" : "#9ca3af",
+    cursor: product.is_sale ? "pointer" : "not-allowed",
+    opacity: product.is_sale ? 1 : 0.9,
+  }}
+  disabled={busyCart || !product.is_sale}
+  onClick={() => {
+    if (!product.is_sale) return;
+    handleAddToCartNow(qty);
+  }}
+>
+  {!product.is_sale ? "Out Of Stock" : busyCart ? "Adding..." : "Add To Cart"}
+</button>
             </div>
 
             <div
@@ -571,20 +642,28 @@ export default function ProductDetailPage() {
                 ) : null}
 
                 {specsList.length > 0 ? (
-                  <div style={styles.specsList}>
-                    {specsList.map((item, idx) => (
-                      <div
-                        key={idx}
-                        style={{
-                          ...styles.specLine,
-                          fontSize: isMobile ? 15 : 18,
-                        }}
-                      >
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
+                <div style={styles.specsList}>
+                  {specsList.map((item, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        ...styles.specLine,
+                        fontSize: isMobile ? 15 : 18,
+                        display: "grid",
+                        gridTemplateColumns: isMobile ? "1fr" : "220px 1fr",
+                        gap: 10,
+                        padding: "10px 12px",
+                        background: "#fff",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: 10,
+                      }}
+                    >
+                      <strong style={{ color: "#111827" }}>{item.label}</strong>
+                      <span style={{ color: "#374151" }}>{item.value || "-"}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
               </div>
             ) : (
               <div style={styles.reviewsList}>
@@ -763,6 +842,25 @@ export default function ProductDetailPage() {
                 <div key={p.id} style={styles.relatedCard}>
                   {p.is_sale ? <div style={styles.smallSaleBadge}>Sale!</div> : null}
 
+                  {!p.is_sale ? (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 8,
+                        right: 8,
+                        background: "#fee2e2",
+                        color: "#b91c1c",
+                        padding: "4px 10px",
+                        borderRadius: 999,
+                        fontSize: 11,
+                        fontWeight: 800,
+                        zIndex: 3,
+                      }}
+                    >
+                      Out Of Stock
+                    </div>
+                  ) : null}
+
                   <div
                     style={{ cursor: "pointer" }}
                     onClick={() => navigate(`/product/${p.slug}`)}
@@ -843,16 +941,22 @@ export default function ProductDetailPage() {
                   </div>
 
                   <button
-                    style={{
-                      ...styles.relatedCartBtn,
-                      minWidth: isMobile ? "100%" : 150,
-                      height: isMobile ? 38 : 42,
-                      fontSize: isMobile ? 12 : 14,
-                    }}
-                    onClick={() => handleRelatedAddToCart(p)}
-                  >
-                    ADD TO CART
-                  </button>
+                  style={{
+                    ...styles.relatedCartBtn,
+                    minWidth: isMobile ? "100%" : 150,
+                    height: isMobile ? 38 : 42,
+                    fontSize: isMobile ? 12 : 14,
+                    background: p.is_sale ? "#0b76c5" : "#9ca3af",
+                    cursor: p.is_sale ? "pointer" : "not-allowed",
+                  }}
+                  disabled={!p.is_sale}
+                  onClick={() => {
+                    if (!p.is_sale) return;
+                    handleRelatedAddToCart(p);
+                  }}
+                >
+                  {p.is_sale ? "ADD TO CART" : "OUT OF STOCK"}
+                </button>
                 </div>
               ))}
             </div>

@@ -717,6 +717,25 @@ export default function Store() {
                                 -{p.discount_percent}%
                               </span>
                             ) : null}
+
+                            {!p.is_sale ? (
+                                  <div
+                                    style={{
+                                      position: "absolute",
+                                      top: 10,
+                                      left: 10,
+                                      background: "#fee2e2",
+                                      color: "#b91c1c",
+                                      padding: "4px 10px",
+                                      borderRadius: 999,
+                                      fontSize: 11,
+                                      fontWeight: 800,
+                                      zIndex: 2,
+                                    }}
+                                  >
+                                    Out Of Stock
+                                  </div>
+                                ) : null}
                           </div>
 
                           <div
@@ -785,12 +804,20 @@ export default function Store() {
                               width: isMobile ? "100%" : undefined,
                               height: isMobile ? 40 : 44,
                               fontSize: isMobile ? 12 : 14,
+                              background: p.is_sale
+                                ? "linear-gradient(90deg, #4f86ff, #1d4ed8)"
+                                : "#9ca3af",
+                              cursor: p.is_sale ? "pointer" : "not-allowed",
                             }}
-                            disabled={busyId === p.id}
-                            onClick={() => handleAddToCart(p)}
+                            disabled={busyId === p.id || !p.is_sale}
+                            onClick={() => {
+                              if (!p.is_sale) return;
+                              handleAddToCart(p);
+                            }}
                           >
-                            {busyId === p.id ? "Adding..." : "ADD TO CART"}
+                            {!p.is_sale ? "OUT OF STOCK" : busyId === p.id ? "Adding..." : "ADD TO CART"}
                           </button>
+
                         </div>
                       </div>
                     );
@@ -1061,6 +1088,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     flexDirection: "column",
     gap: 10,
+    position: "relative",
   },
   productImg: {
     width: "100%",
