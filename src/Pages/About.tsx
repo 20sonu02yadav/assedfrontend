@@ -1,25 +1,173 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-/**
- * About.tsx (single file)
- * Pure React / No WordPress / No WooCommerce
- * Layout matches your screenshot:
- * - Transparent top nav over hero
- * - Who We Are (left text card + right rounded image)
- * - Strengths & Capabilities (2x2 wide cards with icons)
- * - Industries We Serve (3x2 image grid)
- * - Purpose Vision & Mission (3 cards)
- * - Core Value (4 cards)
- * - Brands row
- * - Same black footer + bottom copyright bar
- * - Floating cart + back-to-top
- */
+type SimpleCard = {
+  title: string;
+  desc: string;
+  icon: string;
+};
 
-type SimpleCard = { title: string; desc: string; icon: React.ReactNode };
-type ImgCard = { title: string; img: string };
+type ImgCard = {
+  title: string;
+  img: string;
+};
+
+type BrandCard = {
+  alt: string;
+  src: string;
+};
+
+type AboutApiResponse = {
+  hero_title: string;
+  hero_background_image: string;
+  who_we_are_title: string;
+  who_we_are_description: string;
+  who_we_are_image: string;
+  strengths_section_title: string;
+  industries_section_title: string;
+  purpose_section_title: string;
+  core_values_section_title: string;
+  brands_section_title: string;
+  brands_note: string;
+  strengths: SimpleCard[];
+  industries: ImgCard[];
+  purpose_items: SimpleCard[];
+  core_values: SimpleCard[];
+  brands: BrandCard[];
+};
+
+const API_BASE = "https://attenbackend.clickconnectmedia.cloud";
+const ABOUT_API = `${API_BASE}/api/about/`;
+
+const defaultData: AboutApiResponse = {
+  hero_title: "About Us",
+  hero_background_image:
+    "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-qhung999-3351909.jpg",
+  who_we_are_title: "Who We Are",
+  who_we_are_description:
+    "Tunturu is a leading engineering solutions provider specializing in comprehensive water management systems for diverse industries and applications with a strong focus on efficiency, sustainability, and cutting-edge technology, we deliver turnkey solutions for irrigation,industrial water management,urban and rural water supply, and environmental sustainability projects.",
+  who_we_are_image:
+    "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-hoang-nc-483165236-16057288.jpg",
+  strengths_section_title: "Our Strengths & Capabilities",
+  industries_section_title: "Industries We Serve",
+  purpose_section_title: "Our Purpose Vision & Mission",
+  core_values_section_title: "Our Core Value",
+  brands_section_title: "Brands We Represent",
+  brands_note:
+    "We are proud to serve as Super Stockist / Master Franchise / State Distributor for the above brands in Karnataka.",
+  strengths: [
+    {
+      title: "Turnkey Project Execution",
+      desc: "From survey and design to supply, installation, and maintenance.",
+      icon: "gears",
+    },
+    {
+      title: "Experienced Engineering Team",
+      desc: "Highly skilled professionals with expertise.",
+      icon: "people",
+    },
+    {
+      title: "Use of Advanced Technology",
+      desc: "HDPE piping with electro fusion fittings, automation, and smart water management solution",
+      icon: "monitor",
+    },
+    {
+      title: "Sustainable & Cost-Effective Solution",
+      desc: "Ensuring long-term reliability, minimal maintenance, and environmental benefits.",
+      icon: "leaf",
+    },
+  ],
+  industries: [
+    {
+      title: "Tea & Coffee Plantations",
+      img: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-aravind-p-s-1808524778-30204867-768x1024.jpg",
+    },
+    {
+      title: "Mining & Industrial Sectors",
+      img: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-grunzibaer-4993793-1024x682.jpg",
+    },
+    {
+      title: "Railway Infrastructure",
+      img: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-sliceisop-1591446-819x1024.jpg",
+    },
+    {
+      title: "Construction & Real Estate",
+      img: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-ratnesh-tiwari-234109907-34452045-1024x768.jpg",
+    },
+    {
+      title: "Resorts, Hotels & Commercial Complexes",
+      img: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-mikhail-nilov-9400916-1024x682.jpg",
+    },
+    {
+      title: "Agriculture & Horticulture",
+      img: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-dmitry-kharitonov-911287485-36081124-1024x682.jpg",
+    },
+  ],
+  purpose_items: [
+    {
+      title: "Our Purpose",
+      desc: "To empower communities through sustainable engineering solutions. We aim to improve lives and contribute to a better world.",
+      icon: "target",
+    },
+    {
+      title: "Our Vision",
+      desc: "To be a global leader in providing accessible and impactful engineering aid. We aspire to transform the landscape of engineering aid.",
+      icon: "vision",
+    },
+    {
+      title: "Our Mission",
+      desc: "Provide expert engineering services to underserved communities. Develop innovative and sustainable solutions for global challenges",
+      icon: "flag",
+    },
+  ],
+  core_values: [
+    {
+      title: "Integrity",
+      desc: "Unwavering commitment to honesty, transparency, & ethical practices.",
+      icon: "handshake_shield",
+    },
+    {
+      title: "Innovation",
+      desc: "Driving progress through continuous improvement. Solving complex problems with novel approaches.",
+      icon: "bulb",
+    },
+    {
+      title: "Collaboration",
+      desc: "Fostering teamwork and partnerships. Leveraging diverse perspectives for better outcomes.",
+      icon: "handshake",
+    },
+    {
+      title: "Sustainability",
+      desc: "Designing solutions that protect the environment. Promoting long-term benefits for communities.",
+      icon: "recycle_leaf",
+    },
+  ],
+  brands: [
+    {
+      alt: "TOTAL",
+      src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/5.jpg",
+    },
+    {
+      alt: "Mr Light",
+      src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/4.jpg",
+    },
+    {
+      alt: "AURA",
+      src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/2.jpg",
+    },
+    {
+      alt: "PHILIPS Flashlight",
+      src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/6.png",
+    },
+    {
+      alt: "PHILIPS Batteries",
+      src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/7.png",
+    },
+  ],
+};
 
 export default function About() {
   const [_showTop, setShowTop] = useState(false);
+  const [pageData, setPageData] = useState<AboutApiResponse>(defaultData);
 
   useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 650);
@@ -28,136 +176,64 @@ export default function About() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const strengths = useMemo<SimpleCard[]>(
-    () => [
-      {
-        title: "Turnkey Project Execution",
-        desc: "From survey and design to supply, installation, and maintenance.",
-        icon: <IconGears />,
-      },
-      {
-        title: "Experienced Engineering Team",
-        desc: "Highly skilled professionals with expertise.",
-        icon: <IconPeople />,
-      },
-      {
-        title: "Use of Advanced Technology",
-        desc: "HDPE piping with electro fusion fittings, automation, and smart water management solution",
-        icon: <IconMonitor />,
-      },
-      {
-        title: "Sustainable & Cost-Effective Solution",
-        desc: "Ensuring long-term reliability, minimal maintenance, and environmental benefits.",
-        icon: <IconLeaf />,
-      },
-    ],
-    []
-  );
+  useEffect(() => {
+    const fetchAboutData = async () => {
+      try {
+        const res = await fetch(ABOUT_API);
+        if (!res.ok) {
+          throw new Error(`Failed to fetch about data: ${res.status}`);
+        }
 
-  const industries = useMemo<ImgCard[]>(
-    () => [
-      { title: "Tea & Coffee Plantations", img: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-aravind-p-s-1808524778-30204867-768x1024.jpg" },
-      { title: "Mining & Industrial Sectors", img: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-grunzibaer-4993793-1024x682.jpg" },
-      { title: "Railway Infrastructure", img: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-sliceisop-1591446-819x1024.jpg" },
-      { title: "Construction & Real Estate", img: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-ratnesh-tiwari-234109907-34452045-1024x768.jpg" },
-      { title: "Resorts, Hotels & Commercial Complexes", img: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-mikhail-nilov-9400916-1024x682.jpg" },
-      { title: "Agriculture & Horticulture", img: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-dmitry-kharitonov-911287485-36081124-1024x682.jpg" },
-    ],
-    []
-  );
+        const data = await res.json();
 
-  const purpose = useMemo<SimpleCard[]>(
-    () => [
-      {
-        title: "Our Purpose",
-        desc: "To empower communities through sustainable engineering solutions. We aim to improve lives and contribute to a better world.",
-        icon: <IconTarget />,
-      },
-      {
-        title: "Our Vision",
-        desc: "To be a global leader in providing accessible and impactful engineering aid. We aspire to transform the landscape of engineering aid.",
-        icon: <IconVision />,
-      },
-      {
-        title: "Our Mission",
-        desc: "Provide expert engineering services to underserved communities. Develop innovative and sustainable solutions for global challenges",
-        icon: <IconFlag />,
-      },
-    ],
-    []
-  );
+        setPageData({
+          ...defaultData,
+          ...data,
+          strengths: data?.strengths?.length ? data.strengths : defaultData.strengths,
+          industries: data?.industries?.length ? data.industries : defaultData.industries,
+          purpose_items: data?.purpose_items?.length ? data.purpose_items : defaultData.purpose_items,
+          core_values: data?.core_values?.length ? data.core_values : defaultData.core_values,
+          brands: data?.brands?.length ? data.brands : defaultData.brands,
+        });
+      } catch (error) {
+        console.error("About API fallback used:", error);
+        setPageData(defaultData);
+      }
+    };
 
-  const core = useMemo<SimpleCard[]>(
-    () => [
-      {
-        title: "Integrity",
-        desc: "Unwavering commitment to honesty, transparency, & ethical practices.",
-        icon: <IconHandshakeShield />,
-      },
-      {
-        title: "Innovation",
-        desc: "Driving progress through continuous improvement. Solving complex problems with novel approaches.",
-        icon: <IconBulb />,
-      },
-      {
-        title: "Collaboration",
-        desc: "Fostering teamwork and partnerships. Leveraging diverse perspectives for better outcomes.",
-        icon: <IconHandshake />,
-      },
-      {
-        title: "Sustainability",
-        desc: "Designing solutions that protect the environment. Promoting long-term benefits for communities.",
-        icon: <IconRecycleLeaf />,
-      },
-    ],
-    []
-  );
-
-  const brands = useMemo(
-    () => [
-      { alt: "TOTAL", src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/5.jpg" },
-      { alt: "Mr Light", src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/4.jpg" },
-      { alt: "AURA", src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/2.jpg" },
-      { alt: "PHILIPS Flashlight", src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/6.png" },
-      { alt: "PHILIPS Batteries", src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/7.png" },
-    ],
-    []
-  );
+    fetchAboutData();
+  }, []);
 
   return (
     <>
       <style>{css}</style>
 
       <div className="aPage">
-        {/* HEADER */}
-        
-
-        {/* HERO */}
-        <section className="aHero">
+        <section
+          className="aHero"
+          style={{
+            background: `url("${pageData.hero_background_image}") center/cover no-repeat`,
+            backgroundColor: "#1b1b1b",
+          }}
+        >
           <div className="aHeroOverlay" />
           <div className="aHeroInner">
-            <h1 className="aHeroTitle">About Us</h1>
+            <h1 className="aHeroTitle">{pageData.hero_title}</h1>
           </div>
         </section>
 
-        {/* WHO WE ARE */}
         <section className="aSection aSectionGray">
           <div className="aContainer">
             <div className="aWhoGrid">
               <div className="aWhoTextCard">
-                <h2 className="aLeftTitle">Who We Are</h2>
+                <h2 className="aLeftTitle">{pageData.who_we_are_title}</h2>
                 <div className="aLeftLine" />
-                <p className="aPara">
-                  Tunturu is a leading engineering solutions provider specializing in comprehensive water management
-                  systems for diverse industries and applications with a strong focus on efficiency, sustainability, and
-                  cutting-edge technology, we deliver turnkey solutions for irrigation,industrial water
-                  management,urban and rural water supply, and environmental sustainability projects.
-                </p>
+                <p className="aPara">{pageData.who_we_are_description}</p>
               </div>
 
               <div className="aWhoImageCard">
                 <img
-                  src="https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-hoang-nc-483165236-16057288.jpg"
+                  src={pageData.who_we_are_image}
                   alt="Who we are"
                   className="aWhoImg"
                   onError={(e) => {
@@ -171,18 +247,17 @@ export default function About() {
           </div>
         </section>
 
-        {/* Strengths */}
         <section className="aSection">
           <div className="aContainer">
             <div className="aTitleBlock">
-              <h2 className="aH2">Our Strengths &amp; Capabilities</h2>
+              <h2 className="aH2">{pageData.strengths_section_title}</h2>
               <div className="aUnderline wide" />
             </div>
 
             <div className="aStrengthGrid">
-              {strengths.map((s) => (
+              {pageData.strengths.map((s) => (
                 <div key={s.title} className="aWideCard">
-                  <div className="aWideIcon">{s.icon}</div>
+                  <div className="aWideIcon">{renderIcon(s.icon)}</div>
                   <div className="aWideBody">
                     <div className="aWideTitle">{s.title}</div>
                     <div className="aWideDesc">{s.desc}</div>
@@ -193,16 +268,15 @@ export default function About() {
           </div>
         </section>
 
-        {/* Industries */}
         <section className="aSection">
           <div className="aContainer">
             <div className="aTitleBlock">
-              <h2 className="aH2">Industries We Serve</h2>
+              <h2 className="aH2">{pageData.industries_section_title}</h2>
               <div className="aUnderline" />
             </div>
 
             <div className="aIndustriesGrid">
-              {industries.map((it) => (
+              {pageData.industries.map((it) => (
                 <div key={it.title} className="aIndustryCard">
                   <div className="aIndustryImageWrap">
                     <img
@@ -223,18 +297,17 @@ export default function About() {
           </div>
         </section>
 
-        {/* Purpose / Vision / Mission */}
         <section className="aSection">
           <div className="aContainer">
             <div className="aTitleBlock">
-              <h2 className="aH2">Our Purpose Vision &amp; Mission</h2>
+              <h2 className="aH2">{pageData.purpose_section_title}</h2>
               <div className="aUnderline wide" />
             </div>
 
             <div className="aGrid3">
-              {purpose.map((c) => (
+              {pageData.purpose_items.map((c) => (
                 <div key={c.title} className="aCard">
-                  <div className="aIconBig">{c.icon}</div>
+                  <div className="aIconBig">{renderIcon(c.icon)}</div>
                   <div className="aCardTitle">{c.title}</div>
                   <div className="aCardDesc">{c.desc}</div>
                 </div>
@@ -243,18 +316,17 @@ export default function About() {
           </div>
         </section>
 
-        {/* Core Value */}
         <section className="aSection">
           <div className="aContainer">
             <div className="aTitleBlock">
-              <h2 className="aH2">Our Core Value</h2>
+              <h2 className="aH2">{pageData.core_values_section_title}</h2>
               <div className="aUnderline" />
             </div>
 
             <div className="aGrid4">
-              {core.map((c) => (
+              {pageData.core_values.map((c) => (
                 <div key={c.title} className="aCard">
-                  <div className="aIconBig light">{c.icon}</div>
+                  <div className="aIconBig light">{renderIcon(c.icon)}</div>
                   <div className="aCardTitle">{c.title}</div>
                   <div className="aCardDesc">{c.desc}</div>
                 </div>
@@ -263,16 +335,15 @@ export default function About() {
           </div>
         </section>
 
-        {/* Brands */}
         <section className="aBrands">
           <div className="aContainer">
             <div className="aTitleBlock tight">
-              <h2 className="aH2">Brands We Represent</h2>
+              <h2 className="aH2">{pageData.brands_section_title}</h2>
               <div className="aUnderline" />
             </div>
 
             <div className="aBrandsRow">
-              {brands.map((b) => (
+              {pageData.brands.map((b) => (
                 <div key={b.alt} className="aBrandTile" title={b.alt}>
                   <img
                     src={b.src}
@@ -288,23 +359,42 @@ export default function About() {
               ))}
             </div>
 
-            <div className="aBrandsNote">
-              We are proud to serve as Super Stockist / Master Franchise / State Distributor for the above brands in
-              Karnataka.
-            </div>
+            <div className="aBrandsNote">{pageData.brands_note}</div>
           </div>
         </section>
-
-        {/* FOOTER (same as screenshot) */}
-       
-
-        {/* Floating cart button */}
-        
       </div>
     </>
   );
 }
 
+function renderIcon(iconName: string) {
+  switch (iconName) {
+    case "gears":
+      return <IconGears />;
+    case "people":
+      return <IconPeople />;
+    case "monitor":
+      return <IconMonitor />;
+    case "leaf":
+      return <IconLeaf />;
+    case "target":
+      return <IconTarget />;
+    case "vision":
+      return <IconVision />;
+    case "flag":
+      return <IconFlag />;
+    case "handshake_shield":
+      return <IconHandshakeShield />;
+    case "bulb":
+      return <IconBulb />;
+    case "handshake":
+      return <IconHandshake />;
+    case "recycle_leaf":
+      return <IconRecycleLeaf />;
+    default:
+      return <IconGears />;
+  }
+}
 
 const blue = "#4067a6";
 const lightBlue = "#7A8AD6";
@@ -317,21 +407,12 @@ function Svg96({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* Strength icons (filled-ish like screenshot) */
 function IconGears() {
   return (
     <Svg96>
       <path d="M40 32l6-6 6 6-6 6-6-6z" fill={blue} opacity=".2" />
-      <path
-        d="M34 46c0-8 6-14 14-14s14 6 14 14-6 14-14 14-14-6-14-14z"
-        fill={blue}
-        opacity=".25"
-      />
-      <path
-        d="M30 46c0-10 8-18 18-18s18 8 18 18-8 18-18 18-18-8-18-18z"
-        stroke={blue}
-        strokeWidth="4"
-      />
+      <path d="M34 46c0-8 6-14 14-14s14 6 14 14-6 14-14 14-14-6-14-14z" fill={blue} opacity=".25" />
+      <path d="M30 46c0-10 8-18 18-18s18 8 18 18-8 18-18 18-18-8-18-18z" stroke={blue} strokeWidth="4" />
       <path d="M48 22v8M48 62v8M24 46h8M64 46h8" stroke={blue} strokeWidth="4" strokeLinecap="round" />
       <path d="M32 30l6 6M58 56l6 6M32 62l6-6M58 36l6-6" stroke={blue} strokeWidth="4" strokeLinecap="round" />
       <circle cx="60" cy="64" r="10" fill={blue} opacity=".22" />
@@ -387,7 +468,6 @@ function IconLeaf() {
   );
 }
 
-/* Purpose / values icons (outline like screenshot) */
 function IconTarget() {
   return (
     <Svg96>
@@ -460,7 +540,6 @@ function IconRecycleLeaf() {
   );
 }
 
-/* ========================= CSS ========================= */
 const css = `
   :root{
     --gray: #f4f6f8;
@@ -486,17 +565,10 @@ const css = `
   @media (max-width: 900px){
     .aContainer{ width: calc(100% - 24px); }
   }
-  @media (max-width: 980px){
-    .aNavLink, .aCaret, .aNavSpacer{ display:none; }
-    .aBrandText{ display:block; }
-    .aHeader{ background: rgba(0,0,0,.35); }
-  }
 
-  /* Hero */
   .aHero{
     height: 520px;
     position: relative;
-    background: url("https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-qhung999-3351909.jpg") center/cover no-repeat;
     background-color:#1b1b1b;
   }
   .aHeroOverlay{ position:absolute; inset:0; background: rgba(0,0,0,.30); }
@@ -519,7 +591,6 @@ const css = `
     .aHeroTitle{ font-size: 54px; }
   }
 
-  /* Sections */
   .aSection{ padding: 84px 0; }
   .aSectionGray{ background: var(--gray); }
 
@@ -538,7 +609,6 @@ const css = `
   .aUnderline{ width:140px; height:3px; background: var(--blue); opacity:.85; }
   .aUnderline.wide{ width: 190px; }
 
-  /* Who We Are grid */
   .aWhoGrid{
     display:grid;
     grid-template-columns: 1.05fr .95fr;
@@ -588,7 +658,6 @@ const css = `
     display:block;
   }
 
-  /* Strengths wide cards 2x2 */
   .aStrengthGrid{
     display:grid;
     grid-template-columns: repeat(2, minmax(0,1fr));
@@ -627,7 +696,6 @@ const css = `
     opacity:.85;
   }
 
-  /* Industries 3x2 */
   .aIndustriesGrid{
     display:grid;
     grid-template-columns: repeat(3, minmax(0,1fr));
@@ -659,7 +727,6 @@ const css = `
     color:#222;
   }
 
-  /* Cards */
   .aGrid3{
     display:grid;
     grid-template-columns: repeat(3, minmax(0,1fr));
@@ -715,7 +782,6 @@ const css = `
     opacity:.90;
   }
 
-  /* Brands */
   .aBrands{ padding: 80px 0 70px; background:#fff; }
   .aBrandsRow{
     margin-top: 18px;
@@ -743,125 +809,6 @@ const css = `
     font-size: 18px;
   }
 
-  /* Footer (black) */
-  .aFooter{
-    background:#000;
-    color:#fff;
-    padding: 84px 0 0;
-  }
-  .aFooterGrid{
-    display:grid;
-    grid-template-columns: 1.25fr 1fr 1fr;
-    gap: 60px;
-    align-items: start;
-    padding-bottom: 70px;
-  }
-  @media (max-width: 980px){
-    .aFooterGrid{ grid-template-columns: 1fr; gap: 34px; }
-  }
-
-  .aFooterLogoText{
-    font-weight: 900;
-    font-size: 44px;
-    letter-spacing: 1px;
-    color: #2ea0ff;
-    margin-bottom: 18px;
-  }
-  .aFooterText{ opacity: .92; line-height: 2.0; font-size: 16px; }
-  .aFooterHeading{ font-weight: 900; font-size: 22px; margin-bottom: 8px; }
-  .aFooterLine{ width: 86px; height: 2px; background:#fff; opacity:.75; margin-bottom: 18px; }
-  .aFooterLink{
-    display:block;
-    color:#fff;
-    text-decoration:none;
-    opacity:.90;
-    padding: 7px 0;
-    font-size: 16px;
-  }
-  .aFooterLink:hover{ opacity: 1; text-decoration: underline; }
-
-  .aSocialRow{ margin-top: 18px; display:flex; gap:12px; }
-  .aSocialBtn{
-    width: 36px;
-    height: 36px;
-    border-radius: 999px;
-    background:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  .aFooterBottom{
-    border-top: 1px solid rgba(255,255,255,.08);
-    padding: 22px 0;
-  }
-  .aFooterBottomRow{
-    display:flex;
-    justify-content: space-between;
-    align-items:center;
-    gap: 12px;
-    opacity: .95;
-  }
-
-  /* Floating cart + back to top */
-  .aFloatCart{
-    position: fixed;
-    right: 28px;
-    bottom: 40px;
-    width: 74px;
-    height: 74px;
-    border: none;
-    border-radius: 999px;
-    background: #1976d2;
-    box-shadow: 0 14px 28px rgba(0,0,0,.28);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    z-index: 80;
-  }
-  .aFloatCart:hover{ transform: translateY(-1px); }
-  .aFloatBadge{
-    position:absolute;
-    top: 10px;
-    left: 10px;
-    width: 22px;
-    height: 22px;
-    border-radius: 999px;
-    background: #2dd4bf;
-    color: #fff;
-    font-weight: 900;
-    font-size: 12px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow: 0 8px 16px rgba(0,0,0,.25);
-  }
-
-  .aBackTop{
-    position: fixed;
-    left: 24px;
-    bottom: 34px;
-    width: 62px;
-    height: 62px;
-    border-radius: 999px;
-    border: none;
-    background: #9aa7ff;
-    box-shadow: 0 14px 28px rgba(0,0,0,.22);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    z-index: 80;
-  }
-  .aBackArrow{
-    font-size: 26px;
-    color: #111;
-    font-weight: 900;
-    transform: translateY(-1px);
-  }
-
-  /* image fallback */
   .aImgFallback{
     background: linear-gradient(135deg, #dde6f2, #f5f7fb);
   }

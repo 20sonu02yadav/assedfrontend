@@ -1,11 +1,27 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { API_BASE_URL } from "../services/api";
 
 export default function RefundReturns() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    // Optional: body class set (build error avoid) — NO "|| prevBodyClass"
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/refund/`);
+        setData(response.data);
+      } catch (error) {
+        console.error("Error loading refund page:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+
     const prevTitle = document.title;
     const prevBodyClass = document.body.className;
-
     document.title = "Refund & Returns";
     document.body.className = `${prevBodyClass} tunturu-page`.trim();
 
@@ -15,20 +31,21 @@ export default function RefundReturns() {
     };
   }, []);
 
-  //const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+  if (loading) return <div style={{textAlign:'center', padding:'100px'}}>Loading...</div>;
+
+  const heroStyle = {
+    backgroundImage: `url(${data?.final_hero_image || "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-pavel-danilyuk-6407384.jpg"})`,
+  };
 
   return (
     <div className="rr-page">
       <style>{css}</style>
 
-      {/* HEADER */}
-  
-
       {/* HERO */}
-      <section className="rr-hero">
+      <section className="rr-hero" style={heroStyle}>
         <div className="rr-hero-overlay" />
         <div className="rr-hero-content">
-          <h1>Refund and Returns</h1>
+          <h1>{data?.hero_title || "Refund and Returns"}</h1>
         </div>
       </section>
 
@@ -36,54 +53,23 @@ export default function RefundReturns() {
       <main className="rr-main">
         <div className="rr-container">
           <div className="rr-grid">
-            <div className="rr-block">
-              <h2>Return Eligibility</h2>
-              <p className="rr-sub">
-                Returns are accepted within <b>7 days</b> of delivery if:
-              </p>
-              <ul>
-                <li>Product is unused</li>
-                <li>Product is in original packaging</li>
-                <li>Product is defective or damaged</li>
-              </ul>
-            </div>
-
-            <div className="rr-block">
-              <h2>Non-Returnable Items</h2>
-              <ul>
-                <li>Used tools</li>
-                <li>Custom or bulk orders</li>
-                <li>Clearance items</li>
-              </ul>
-            </div>
-
-            <div className="rr-block">
-              <h2>Refund Process</h2>
-              <ul>
-                <li>Once approved, refunds will be processed within 5–7 business days.</li>
-                <li>Refund will be credited to the original payment method.</li>
-              </ul>
-            </div>
-
-            <div className="rr-block">
-              <h2>Damaged Products</h2>
-              <p className="rr-sub">If you receive a damaged product:</p>
-              <ul>
-                <li>Notify us within 48 hours</li>
-                <li>Share photos/videos as proof</li>
-              </ul>
-            </div>
+            {data?.blocks?.map((block: any, index: number) => (
+              <div className="rr-block" key={index}>
+                <h2>{block.title}</h2>
+                {block.subtitle && <p className="rr-sub">{block.subtitle}</p>}
+                <ul>
+                  {block.content_list?.map((item: string, i: number) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
       </main>
-
-
-      {/* FOOTER */}
-      
     </div>
   );
 }
-
 /** Single-file CSS (same look + spacing like screenshot) */
 const css = `
 /* Page reset (fix Vite default center-layout issue) */
