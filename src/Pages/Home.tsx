@@ -2300,7 +2300,7 @@ export default function Home() {
         </div>
 
         <div className="fpGst">
-          GST ({p.gst_percent}%) {inr(Number(p.gst_amount || 0))}
+          GST ({p.gst_percent}%)
         </div>
 
         <div className="fpQtyWrap">

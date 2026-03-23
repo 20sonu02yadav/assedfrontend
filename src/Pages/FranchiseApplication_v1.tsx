@@ -1,57 +1,32 @@
-import React, { useEffect, useMemo, useState } from "react";
+
+import React, { useMemo, useState } from "react";
+
+// const LOGO_URL =
+//   "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/cropped-TUNTURU-LOGO-scaled-1-2048x681.png";
+
+const HERO_BG =
+  "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=2400&q=80";
 
 type TypeOfBusiness = "Proprietorship" | "Partnership" | "Pvt Ltd" | "Ltd Co" | "Other";
 type NatureOfBusiness = "Retail" | "Wholesale" | "Distribution" | "Online" | "Other";
 type YesNo = "Yes" | "No";
 
-
-
-// ✅ DIRECT LOCALHOST API (NO IMPORT)
-const API_BASE = "https://attenbackend.clickconnectmedia.cloud";
-
-const SETTINGS_API = `${API_BASE}/api/dealer/settings/`;
+const API_BASE = (import.meta as any).env?.VITE_API_BASE || "https://attenbackend.clickconnectmedia.cloud";
 const ENDPOINT = `${API_BASE}/api/franchise-applications/`;
 
 export default function FranchiseApplication() {
-
-  // ✅ SETTINGS STATE
-  const [settings, setSettings] = useState({
-    hero_title: "Franchise Application",
-    final_hero_image:
-      "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c",
-    form_bg_color: "#efefef",
-    page_bg_color: "#f4f6f8",
-  });
-
-  const [loadingSettings, setLoadingSettings] = useState(true);
-
-  // ✅ FETCH SETTINGS
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const res = await fetch(SETTINGS_API);
-        const data = await res.json();
-        setSettings(data);
-      } catch (err) {
-        console.log("Settings fallback");
-      } finally {
-        setLoadingSettings(false);
-      }
-    };
-    fetchSettings();
-  }, []);
-
   const yearsOptions = useMemo(
     () => ["Less than 1", "1-2", "3-5", "6-10", "10+"] as const,
     []
   );
 
-  // ======= ALL YOUR ORIGINAL STATES (UNCHANGED) =======
+  // radio states
   const [typeOfBusiness, setTypeOfBusiness] = useState<TypeOfBusiness>("Proprietorship");
   const [natureOfBusiness, setNatureOfBusiness] = useState<NatureOfBusiness>("Retail");
   const [warehouse, setWarehouse] = useState<YesNo>("No");
   const [yearsInOperation, setYearsInOperation] = useState<(typeof yearsOptions)[number]>("Less than 1");
 
+  // field states
   const [registeredBusinessName, setRegisteredBusinessName] = useState("");
   const [tradingName, setTradingName] = useState("");
   const [gstin, setGstin] = useState("");
@@ -68,18 +43,21 @@ export default function FranchiseApplication() {
   const [annualTurnover, setAnnualTurnover] = useState("");
   const [warehouseDetails, setWarehouseDetails] = useState("");
   const [existingDealerships, setExistingDealerships] = useState("");
+
   const [confirm, setConfirm] = useState(false);
 
+  // ui states
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // ======= SUBMIT (UNCHANGED) =======
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSuccessMsg(null);
+    setErrorMsg(null);
 
     if (!confirm) {
-      setErrorMsg("Please confirm");
+      setErrorMsg("Please confirm that the information provided is accurate.");
       return;
     }
 
@@ -116,31 +94,55 @@ export default function FranchiseApplication() {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Failed");
+      const data = await res.json().catch(() => ({}));
 
-      setSuccessMsg("Submitted successfully!");
+      if (!res.ok) {
+        // DRF validation object -> show best message
+        const firstKey = data && typeof data === "object" ? Object.keys(data)[0] : null;
+        const firstVal =
+          firstKey && Array.isArray(data[firstKey]) ? data[firstKey][0] : data?.detail || "Submission failed";
+        setErrorMsg(String(firstVal));
+        return;
+      }
+
+      setSuccessMsg("Application submitted successfully!");
+      // reset form
+      setRegisteredBusinessName("");
+      setTradingName("");
+      setGstin("");
+      setCity("");
+      setStateName("");
+      setPostalCode("");
+      setPrimaryContactPerson("");
+      setDesignation("");
+      setEmail("");
+      setAlternateContactPerson("");
+      setMainProductCategories("");
+      setGeographicalCoverage("");
+      setNumberOfEmployees("");
+      setAnnualTurnover("");
+      setWarehouseDetails("");
+      setExistingDealerships("");
+      setConfirm(false);
+      setTypeOfBusiness("Proprietorship");
+      setNatureOfBusiness("Retail");
+      setWarehouse("No");
+      setYearsInOperation("Less than 1");
     } catch (err: any) {
-      setErrorMsg(err.message);
+      setErrorMsg(err?.message || "Network error. Please try again.");
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (loadingSettings) return <div>Loading...</div>;
-
-  // ======= UI (ONLY DYNAMIC VALUES CHANGED) =======
   return (
-    <div style={{ ...styles.page, background: settings.page_bg_color }}>
+    <div style={styles.page}>
+     
 
-      <section
-        style={{
-          ...styles.hero,
-          backgroundImage: `url(${settings.final_hero_image})`,
-        }}
-      >
+      <section style={{ ...styles.hero, backgroundImage: `url(${HERO_BG})` }}>
         <div style={styles.heroDim} />
         <div style={styles.heroContent}>
-          <h1 style={styles.heroTitle}>{settings.hero_title}</h1>
+          <h1 style={styles.heroTitle}>Franchise Application</h1>
         </div>
       </section>
 
