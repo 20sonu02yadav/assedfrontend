@@ -400,7 +400,7 @@ type ContactApiResponse = {
   help_cards: HelpCard[];
 };
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://attenbackend.clickconnectmedia.cloud";
 const CONTACT_API = `${API_BASE}/api/contactus/`;
 const CONTACT_SUBMIT_API = `${API_BASE}/api/contactus/submit/`;
 

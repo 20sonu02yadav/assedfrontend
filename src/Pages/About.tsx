@@ -35,7 +35,7 @@ type AboutApiResponse = {
   brands: BrandCard[];
 };
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://attenbackend.clickconnectmedia.cloud";
 const ABOUT_API = `${API_BASE}/api/about/`;
 
 const defaultData: AboutApiResponse = {
