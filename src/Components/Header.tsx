@@ -547,7 +547,7 @@ export default function Header() {
             >
               <NavLink to="/about">ABOUT</NavLink>
               <NavLink to="/contact">CONTACT US</NavLink>
-              <NavLink to="https://attenbackend.clickconnectmedia.cloud/admin/">
+              <NavLink to="http://127.0.0.1:8000/admin/">
   Admin Login
 </NavLink>
               <span style={styles.price}>₹0.00</span>
@@ -656,7 +656,7 @@ export default function Header() {
               <MobileLink to="/about" close={() => setMobileOpen(false)}>ABOUT</MobileLink>
               <MobileLink to="/contact" close={() => setMobileOpen(false)}>CONTACT</MobileLink>
               <MobileLink to="/dealer" close={() => setMobileOpen(false)}>DEALER</MobileLink>
-              <MobileLink to="https://attenbackend.clickconnectmedia.cloud/admin/" close={() => setMobileOpen(false)}>ADMIN LOGIN</MobileLink>
+              <MobileLink to="http://127.0.0.1:8000/admin/" close={() => setMobileOpen(false)}>ADMIN LOGIN</MobileLink>
               
             </div>
           </div>

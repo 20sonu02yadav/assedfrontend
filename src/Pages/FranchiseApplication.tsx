@@ -7,7 +7,7 @@ type YesNo = "Yes" | "No";
 
 
 // ✅ DIRECT LOCALHOST API (NO IMPORT)
-const API_BASE = "https://attenbackend.clickconnectmedia.cloud";
+const API_BASE = "http://127.0.0.1:8000";
 
 const SETTINGS_API = `${API_BASE}/api/dealer/settings/`;
 const ENDPOINT = `${API_BASE}/api/franchise-applications/`;

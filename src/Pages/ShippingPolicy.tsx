@@ -211,7 +211,7 @@ type ShippingPolicyApiResponse = {
   sections: ShippingSection[];
 };
 
-const API_BASE = "https://attenbackend.clickconnectmedia.cloud";
+const API_BASE = "http://127.0.0.1:8000";
 const SHIPPING_POLICY_API = `${API_BASE}/api/shippingpolicy/`;
 
 const defaultData: ShippingPolicyApiResponse = {

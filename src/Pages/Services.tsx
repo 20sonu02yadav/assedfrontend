@@ -748,7 +748,7 @@ type ServicesApiResponse = {
   process_cards: Card[];
 };
 
-const API_BASE = "https://attenbackend.clickconnectmedia.cloud";
+const API_BASE = "http://127.0.0.1:8000";
 const SERVICES_API = `${API_BASE}/api/services/`;
 
 const defaultData: ServicesApiResponse = {

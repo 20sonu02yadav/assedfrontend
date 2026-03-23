@@ -408,7 +408,7 @@ type PrivacyApiResponse = {
   };
 };
 
-const API_BASE = "https://attenbackend.clickconnectmedia.cloud";
+const API_BASE = "http://127.0.0.1:8000";
 const PRIVACY_API = `${API_BASE}/api/privacy/`;
 
 const defaultData: PrivacyApiResponse = {
