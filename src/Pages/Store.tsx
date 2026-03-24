@@ -3264,7 +3264,7 @@ export default function Store() {
                               fontSize: isMobile ? 11 : 13,
                             }}
                           >
-                            GST ({p.gst_percent}%)
+                            GST ({p.gst_percent}%) Inclusive of tax
                           </div>
                         </div>
 

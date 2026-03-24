@@ -3683,7 +3683,7 @@ export default function Home() {
                       </div>
 
                       <div className="fpGst">
-                        GST ({p.gst_percent}%)
+                        GST ({p.gst_percent}%) Inclusive of tax
                       </div>
 
                       <div className="fpQtyWrap">

@@ -3300,7 +3300,7 @@ export default function ProductDetailPage() {
                 fontSize: isMobile ? 16 : 22,
               }}
             >
-              GST ({product.gst_percent}%)
+              GST ({product.gst_percent}%) Inclusive of tax
             </div>
 
             <div
@@ -3798,7 +3798,7 @@ export default function ProductDetailPage() {
                         fontSize: isMobile ? 12 : 15,
                       }}
                     >
-                      GST ({p.gst_percent}%)
+                      GST ({p.gst_percent}%) Inclusive of tax
                     </div>
                   </div>
 

@@ -478,7 +478,7 @@ export default function CategoryProducts() {
                           fontSize: isMobile ? 11 : 16,
                         }}
                       >
-                        GST ({p.gst_percent}%)
+                        GST ({p.gst_percent}%) Inclusive of tax
                       </span>
                       {p.discount_percent ? (
                         <span
