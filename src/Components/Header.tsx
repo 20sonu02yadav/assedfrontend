@@ -4163,14 +4163,15 @@ function MobileLink({ to, children, close }: any) {
 
 const styles: any = {
   header: {
-    position: "absolute",
-    top: 0,
-    width: "100%",
-    zIndex: 999,
-    background: "transparent",
-    backdropFilter: "none",
-    boxShadow: "none",
-  },
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  zIndex: 9999,
+  background: "transparent", // ya apna color
+  backdropFilter: "blur(2px)",
+  boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
+},
   inner: {
     minHeight: 76,
     display: "flex",

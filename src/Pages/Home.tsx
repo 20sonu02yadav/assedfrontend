@@ -1,4 +1,1234 @@
-// // import { useEffect, useMemo, useRef, useState } from "react";
+// // // import { useEffect, useMemo, useRef, useState } from "react";
+// // // import { useNavigate } from "react-router-dom";
+// // // import { addProductToHybridCart } from "../services/cartHelper";
+// // // import { fetchProducts, type ProductListItem } from "../services/storeApi";
+
+// // // type Offer = {
+// // //   id: string;
+// // //   title: string;
+// // //   desc: string;
+// // //   image: string;
+// // //   href: string;
+// // //   cta: string;
+// // // };
+
+// // // function inr(n: number) {
+// // //   try {
+// // //     return new Intl.NumberFormat("en-IN", {
+// // //       style: "currency",
+// // //       currency: "INR",
+// // //       maximumFractionDigits: 0,
+// // //     }).format(n);
+// // //   } catch {
+// // //     return `₹${Math.round(n)}`;
+// // //   }
+// // // }
+
+// // // function Stars({ count = 5 }: { count?: number }) {
+// // //   const c = Math.max(0, Math.min(5, count));
+// // //   return (
+// // //     <div className="stars" aria-label={`${c} stars`}>
+// // //       {Array.from({ length: 5 }).map((_, i) => (
+// // //         <span key={i} className={`star ${i < c ? "on" : ""}`} aria-hidden="true">
+// // //           ★
+// // //         </span>
+// // //       ))}
+// // //     </div>
+// // //   );
+// // // }
+
+// // // type QuickViewState = {
+// // //   open: boolean;
+// // //   product: ProductListItem | null;
+// // //   qty: number;
+// // // };
+
+// // // export default function Home() {
+// // //   const navigate = useNavigate();
+
+// // //   const heroBg =
+// // //     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-nishantaneja-12105083.jpg";
+
+// // //   const promo1 =
+// // //     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-theshuttervision-8811529.jpg";
+// // //   const promo2 =
+// // //     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-osman-sran-95404891-22798290.jpg";
+// // //   const promo3 =
+// // //     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-matreding-6835302.jpg";
+
+// // //   const specialEditionBg = "/image.png";
+
+// // //   const brandLogos = useMemo(
+// // //     () => [
+// // //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.40.26-PM.jpeg", alt: "TOTAL" },
+// // //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.23-PM.jpeg", alt: "FOCUS" },
+// // //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.29-PM.jpeg", alt: "DuCaR" },
+// // //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.32-PM.jpeg", alt: "Mr Light" },
+// // //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.35-PM.jpeg", alt: "Gravis" },
+// // //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.30-PM.jpeg", alt: "PHILIPS" },
+// // //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.38-PM.jpeg", alt: "AMEROCOOK" },
+// // //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.26-PM.jpeg", alt: "SMART LIGHT" },
+// // //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.40-PM.jpeg", alt: "ZIG GAK" },
+// // //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.35-PM.jpeg", alt: "ENGLISH ROYAL" },
+// // //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.16-PM.jpeg", alt: "PHILIPS ACCESSORIES" },
+// // //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.20-PM.jpeg", alt: "PHILIPS BATTERIES" },
+// // //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.23-PM.jpeg", alt: "PHILIPS FLASHLIGHT" },
+// // //     ],
+// // //     []
+// // //   );
+
+// // //   const offers: Offer[] = useMemo(
+// // //     () => [
+// // //       {
+// // //         id: "o1",
+// // //         title: "20% Off",
+// // //         desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac dictum.",
+// // //         image: promo1,
+// // //         href: "/store",
+// // //         cta: "SHOP NOW",
+// // //       },
+// // //       {
+// // //         id: "o2",
+// // //         title: "Latest Tools For You",
+// // //         desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac dictum.",
+// // //         image: promo2,
+// // //         href: "/store",
+// // //         cta: "SHOP NOW",
+// // //       },
+// // //       {
+// // //         id: "o3",
+// // //         title: "New Arrival",
+// // //         desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac dictum.",
+// // //         image: promo3,
+// // //         href: "/store",
+// // //         cta: "CHECK OUT",
+// // //       },
+// // //     ],
+// // //     [promo1, promo2, promo3]
+// // //   );
+
+// // //   const brandsRef = useRef<HTMLDivElement | null>(null);
+
+// // //   const [featured, setFeatured] = useState<ProductListItem[]>([]);
+// // //   const [featuredLoading, setFeaturedLoading] = useState(true);
+// // //   const [busyId, setBusyId] = useState<number | null>(null);
+// // //   const [qtyMap, setQtyMap] = useState<Record<number, number>>({});
+// // //   const [quickView, setQuickView] = useState<QuickViewState>({
+// // //     open: false,
+// // //     product: null,
+// // //     qty: 1,
+// // //   });
+
+// // //   useEffect(() => {
+// // //     async function loadFeatured() {
+// // //       setFeaturedLoading(true);
+// // //       try {
+// // //         const data = await fetchProducts();
+// // //         const topProducts = data.slice(0, 10);
+// // //         setFeatured(topProducts);
+
+// // //         const nextQty: Record<number, number> = {};
+// // //         topProducts.forEach((p) => {
+// // //           nextQty[p.id] = 1;
+// // //         });
+// // //         setQtyMap(nextQty);
+// // //       } catch {
+// // //         setFeatured([]);
+// // //       } finally {
+// // //         setFeaturedLoading(false);
+// // //       }
+// // //     }
+
+// // //     loadFeatured();
+// // //   }, []);
+
+// // //   useEffect(() => {
+// // //     if (!quickView.open) return;
+
+// // //     const prev = document.body.style.overflow;
+// // //     document.body.style.overflow = "hidden";
+
+// // //     return () => {
+// // //       document.body.style.overflow = prev;
+// // //     };
+// // //   }, [quickView.open]);
+
+// // //   function setQty(productId: number, qty: number) {
+// // //     setQtyMap((prev) => ({
+// // //       ...prev,
+// // //       [productId]: Math.max(1, qty),
+// // //     }));
+// // //   }
+
+// // //   async function handleAddToCart(product: ProductListItem, qty: number) {
+// // //     try {
+// // //       setBusyId(product.id);
+// // //       await addProductToHybridCart(product, qty);
+// // //       alert("Added to cart ✅");
+// // //     } catch {
+// // //       alert("Something went wrong while adding to cart.");
+// // //     } finally {
+// // //       setBusyId(null);
+// // //     }
+// // //   }
+
+// // //   return (
+// // //     <div className="home">
+// // //       <style>{`
+// // //         @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap');
+
+// // //         :root{
+// // //           --blue:#2ea3f2;
+// // //           --blue2:#1b76c4;
+// // //         }
+
+// // //         *{box-sizing:border-box}
+// // //         body{
+// // //           margin:0;
+// // //           font-family:Lato, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+// // //           background:#f3f5f7;
+// // //         }
+// // //         a{text-decoration:none; color:inherit}
+// // //         .container{
+// // //           width:100%;
+// // //           max-width:1600px;
+// // //           margin:auto;
+// // //           padding-left:40px;
+// // //           padding-right:40px;
+// // //         }
+
+// // //         .hero{
+// // //           position:relative;
+// // //           height:100vh;
+// // //           min-height:720px;
+// // //           overflow:hidden;
+// // //           background:#061b27;
+// // //         }
+// // //         .heroBgImg{
+// // //           position:absolute;
+// // //           inset:0;
+// // //           width:100%;
+// // //           height:100%;
+// // //           object-fit:cover;
+// // //           object-position:center;
+// // //         }
+// // //         .heroOverlay{
+// // //           position:absolute;
+// // //           inset:0;
+// // //           background: linear-gradient(90deg, rgba(0,0,0,.75) 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.10) 100%);
+// // //         }
+// // //         .heroOverlay2{
+// // //           position:absolute;
+// // //           inset:0;
+// // //           background: rgba(10, 90, 140, .22);
+// // //           mix-blend-mode: multiply;
+// // //           pointer-events:none;
+// // //         }
+
+// // //         .heroContent{
+// // //           position:relative;
+// // //           z-index:2;
+// // //           height:100%;
+// // //           display:flex;
+// // //           align-items:center;
+// // //           justify-content:center;
+// // //           text-align:center;
+// // //         }
+// // //         .heroText{
+// // //           color:#fff;
+// // //           max-width:760px;
+// // //           margin:auto;
+// // //           text-align:center;
+// // //         }
+// // //         .heroH1{font-size:64px; margin:0 0 12px; font-weight:900; line-height:1.05}
+// // //         .heroH3{margin:0 0 28px; font-size:26px; font-weight:800; opacity:.95}
+// // //         .heroBtn{
+// // //           background:#fff; color:#111; border:none;
+// // //           padding:12px 22px; border-radius:999px;
+// // //           font-weight:900; cursor:pointer;
+// // //           box-shadow:0 10px 20px rgba(0,0,0,.18);
+// // //         }
+
+// // //         .section{padding:60px 0}
+// // //         .titleWrap{display:flex; flex-direction:column; gap:10px; margin-bottom:34px}
+// // //         .titleWrap.center{align-items:center}
+// // //         .titleWrap.left{align-items:flex-start}
+// // //         .title{margin:0; font-size:48px; font-weight:900; color:#0b0b0b; text-align:center}
+// // //         .titleWrap.left .title{text-align:left}
+// // //         .underline{width:180px; height:3px; background:#8aa0ff}
+
+// // //         .brandsBox{
+// // //           width:100%;
+// // //           background:#fff;
+// // //           padding:60px 0;
+// // //         }
+// // //         .brandsRow{
+// // //           display:flex;
+// // //           align-items:center;
+// // //           justify-content:space-between;
+// // //           gap:18px;
+// // //         }
+// // //         .brandsScroll{
+// // //           overflow-x:auto;
+// // //           overflow-y:hidden;
+// // //           display:flex;
+// // //           align-items:center;
+// // //           justify-content:flex-start;
+// // //           gap:80px;
+// // //           padding:20px 0;
+// // //           height:160px;
+// // //           flex:1;
+// // //           scroll-behavior:smooth;
+// // //         }
+// // //         .brandsScroll::-webkit-scrollbar{height:0}
+// // //         .brandLogo{
+// // //           min-width:240px;
+// // //           height:160px;
+// // //           display:flex;
+// // //           align-items:center;
+// // //           justify-content:center;
+// // //         }
+// // //         .brandLogo img{
+// // //           max-height:150px;
+// // //           max-width:220px;
+// // //           object-fit:contain;
+// // //         }
+// // //         .brandArrow{
+// // //           width:60px;
+// // //           height:60px;
+// // //           border-radius:50%;
+// // //           border:none;
+// // //           background:linear-gradient(135deg,#3b82f6,#2563eb);
+// // //           display:flex;
+// // //           align-items:center;
+// // //           justify-content:center;
+// // //           cursor:pointer;
+// // //           transition:all .3s ease;
+// // //           box-shadow:0 10px 25px rgba(0,0,0,.15);
+// // //           color:#fff;
+// // //           flex:0 0 auto;
+// // //         }
+// // //         .brandArrow:hover{
+// // //           transform:translateY(-4px);
+// // //           box-shadow:0 18px 35px rgba(0,0,0,.25);
+// // //         }
+
+// // //         .promoGrid{display:grid; grid-template-columns:repeat(3,1fr); gap:28px}
+// // //         .promo{
+// // //           border-radius:22px; overflow:hidden; position:relative;
+// // //           min-height:420px; background-size:cover; background-position:center;
+// // //           box-shadow:0 10px 25px rgba(0,0,0,.08);
+// // //         }
+// // //         .promo::before{
+// // //           content:"";
+// // //           position:absolute;
+// // //           inset:0;
+// // //           background:rgba(0,0,0,.55);
+// // //         }
+// // //         .promoBody{
+// // //           position:absolute;
+// // //           left:36px;
+// // //           right:36px;
+// // //           bottom:36px;
+// // //           color:#fff;
+// // //         }
+// // //         .promoH{margin:0 0 10px; font-weight:900; font-size:34px}
+// // //         .promoSub{margin:0 0 18px; opacity:.92; line-height:1.7; font-size:16px}
+// // //         .promoBtn{
+// // //           background:#fff; color:#111; border:none;
+// // //           padding:12px 22px; border-radius:999px;
+// // //           font-weight:900; cursor:pointer;
+// // //         }
+
+// // //         .fpSection{background:#f3f5f7; padding:70px 0}
+// // //         .fpGrid{
+// // //           display:grid;
+// // //           grid-template-columns:repeat(5,1fr);
+// // //           gap:22px;
+// // //         }
+// // //         .fpCard{
+// // //           background:#fff;
+// // //           border-radius:24px;
+// // //           overflow:hidden;
+// // //           border:1px solid #e7e7e7;
+// // //           box-shadow:0 10px 25px rgba(0,0,0,.08);
+// // //           position:relative;
+// // //         }
+// // //         .fpImgWrap{
+// // //           position:relative;
+// // //           background:#f7f7f7;
+// // //           height:280px;
+// // //           display:block;
+// // //           cursor:pointer;
+// // //         }
+// // //         .fpImg{
+// // //           width:100%;
+// // //           height:100%;
+// // //           object-fit:contain;
+// // //           padding:20px;
+// // //         }
+// // //         .fpSale{
+// // //           position:absolute;
+// // //           top:14px;
+// // //           left:14px;
+// // //           background:#e74b3c;
+// // //           color:#fff;
+// // //           font-weight:900;
+// // //           font-size:12px;
+// // //           padding:8px 14px;
+// // //           border-radius:8px;
+// // //         }
+// // //         .fpEye{
+// // //           position:absolute;
+// // //           top:14px;
+// // //           right:14px;
+// // //           width:58px;
+// // //           height:58px;
+// // //           border-radius:999px;
+// // //           background:#fff;
+// // //           display:grid;
+// // //           place-items:center;
+// // //           color:#444;
+// // //           box-shadow:0 8px 16px rgba(0,0,0,.12);
+// // //           border:none;
+// // //           cursor:pointer;
+// // //         }
+// // //         .fpBody{padding:18px 18px 20px}
+// // //         .fpCat{
+// // //           color:#9aa1aa;
+// // //           font-size:12px;
+// // //           font-weight:900;
+// // //           margin-bottom:10px;
+// // //           text-transform:uppercase;
+// // //         }
+// // //         .fpTitle{
+// // //           margin:0 0 14px;
+// // //           font-size:18px;
+// // //           font-weight:900;
+// // //           line-height:1.25;
+// // //           color:#1f2937;
+// // //           min-height:68px;
+// // //           cursor:pointer;
+// // //         }
+// // //         .fpPriceRow{
+// // //           display:flex;
+// // //           align-items:flex-end;
+// // //           gap:10px;
+// // //           margin-bottom:8px;
+// // //           flex-wrap:wrap;
+// // //         }
+// // //         .fpOld{
+// // //           color:#9aa1aa;
+// // //           text-decoration:line-through;
+// // //           font-weight:900;
+// // //           font-size:15px;
+// // //         }
+// // //         .fpNow{
+// // //           font-weight:900;
+// // //           font-size:20px;
+// // //           color:#111827;
+// // //         }
+// // //         .fpOff{
+// // //           font-size:12px;
+// // //           font-weight:900;
+// // //           background:#ffe9ea;
+// // //           color:#e74b3c;
+// // //           padding:4px 8px;
+// // //           border-radius:6px;
+// // //         }
+// // //         .fpGst{
+// // //           font-size:14px;
+// // //           font-weight:800;
+// // //           color:#4b5563;
+// // //           margin-bottom:16px;
+// // //         }
+// // //         .fpQtyWrap{
+// // //           display:inline-flex;
+// // //           align-items:center;
+// // //           border:1px solid #d1d5db;
+// // //           border-radius:999px;
+// // //           overflow:hidden;
+// // //           margin-bottom:14px;
+// // //         }
+// // //         .fpQtyBtn{
+// // //           width:36px;
+// // //           height:36px;
+// // //           border:none;
+// // //           background:#f9fafb;
+// // //           font-size:20px;
+// // //           font-weight:900;
+// // //           cursor:pointer;
+// // //         }
+// // //         .fpQtyValue{
+// // //           min-width:38px;
+// // //           text-align:center;
+// // //           font-weight:900;
+// // //           font-size:14px;
+// // //           padding:0 8px;
+// // //         }
+// // //         .fpBtn{
+// // //           width:100%;
+// // //           background:linear-gradient(90deg,#4f86ff,#1d4ed8);
+// // //           color:#fff;
+// // //           border:none;
+// // //           padding:16px 12px;
+// // //           border-radius:14px;
+// // //           font-weight:900;
+// // //           cursor:pointer;
+// // //           display:flex;
+// // //           align-items:center;
+// // //           justify-content:center;
+// // //           gap:10px;
+// // //         }
+// // //         .fpBtn:disabled{opacity:.7; cursor:not-allowed}
+
+// // //         .specialBannerWrap{
+// // //           width:100%;
+// // //           padding:70px 40px;
+// // //         }
+// // //         .specialBanner{
+// // //           border-radius:28px;
+// // //           overflow:hidden;
+// // //           min-height:430px;
+// // //           background-image:url(${specialEditionBg});
+// // //           background-size:cover;
+// // //           background-position:center;
+// // //           position:relative;
+// // //         }
+// // //         .specialBanner::before{
+// // //           content:"";
+// // //           position:absolute;
+// // //           inset:0;
+// // //           background:linear-gradient(90deg, rgba(0,0,0,.68) 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.05) 100%);
+// // //         }
+// // //         .specialContent{
+// // //           position:absolute;
+// // //           left:60px;
+// // //           top:60px;
+// // //           max-width:520px;
+// // //           color:#fff;
+// // //           z-index:2;
+// // //         }
+// // //         .smallLabel{font-weight:900; opacity:.9; margin-bottom:12px; font-size:18px}
+// // //         .specialH{margin:0 0 14px; font-size:52px; font-weight:900}
+// // //         .specialP{margin:0 0 20px; line-height:1.8; opacity:.92; font-size:17px}
+// // //         .specialStrong{margin:0 0 24px; font-weight:900; font-size:20px}
+
+// // //         .features{background:#f3f5f7; padding:70px 0}
+// // //         .featGrid{display:grid; grid-template-columns:repeat(4,1fr); gap:24px; text-align:center}
+// // //         .featItem h4{margin:14px 0 10px; font-size:20px; font-weight:900}
+// // //         .featItem p{margin:0; color:#555; line-height:1.8; max-width:280px; margin-inline:auto}
+// // //         .featIcon{width:48px; height:48px; margin:0 auto; color:#111; opacity:.9}
+
+// // //         .reviews{padding:70px 0; background:#fff}
+// // //         .reviewGrid{display:grid; grid-template-columns:repeat(4,1fr); gap:28px; margin-top:30px; text-align:center}
+// // //         .avatar{width:90px; height:90px; border-radius:999px; object-fit:cover; margin-bottom:16px}
+// // //         .rName{font-weight:900; margin:0 0 8px; font-size:18px}
+// // //         .stars{display:flex; justify-content:center; gap:4px; margin-bottom:14px}
+// // //         .star{font-size:18px; color:#e8b04d; opacity:.35}
+// // //         .star.on{opacity:1}
+// // //         .rText{margin:0; color:#444; line-height:2; padding:0 14px}
+
+// // //         .qvOverlay{
+// // //           position:fixed;
+// // //           inset:0;
+// // //           background:rgba(0,0,0,.55);
+// // //           z-index:9999;
+// // //           display:grid;
+// // //           place-items:center;
+// // //           padding:20px;
+// // //         }
+// // //         .qvCard{
+// // //           width:min(1380px, 96vw);
+// // //           background:#fff;
+// // //           position:relative;
+// // //           padding:28px;
+// // //           box-sizing:border-box;
+// // //           border-radius:18px;
+// // //           max-height:92vh;
+// // //           overflow:auto;
+// // //         }
+// // //         .qvClose{
+// // //           position:absolute;
+// // //           top:18px;
+// // //           right:18px;
+// // //           border:none;
+// // //           background:transparent;
+// // //           cursor:pointer;
+// // //           font-size:34px;
+// // //           line-height:1;
+// // //           color:#1f2937;
+// // //           z-index:2;
+// // //         }
+// // //         .qvGrid{
+// // //           display:grid;
+// // //           grid-template-columns:0.9fr 1.1fr;
+// // //           gap:28px;
+// // //           align-items:start;
+// // //         }
+// // //         .qvMainImage{
+// // //           width:100%;
+// // //           height:560px;
+// // //           object-fit:contain;
+// // //           background:#fff;
+// // //         }
+// // //         .qvThumbRow{
+// // //           margin-top:18px;
+// // //           display:flex;
+// // //           justify-content:center;
+// // //         }
+// // //         .qvThumb{
+// // //           width:110px;
+// // //           height:90px;
+// // //           object-fit:contain;
+// // //           background:#fff;
+// // //         }
+// // //         .qvProductTitle{
+// // //           font-size:28px;
+// // //           font-weight:900;
+// // //           line-height:1.3;
+// // //           margin:0 0 16px;
+// // //           color:#111827;
+// // //         }
+// // //         .qvPriceRow{
+// // //           display:flex;
+// // //           align-items:center;
+// // //           gap:10px;
+// // //           flex-wrap:wrap;
+// // //           margin-top:10px;
+// // //         }
+// // //         .qvOld{
+// // //           font-size:22px;
+// // //           color:#9ca3af;
+// // //           text-decoration:line-through;
+// // //           font-weight:900;
+// // //         }
+// // //         .qvNow{
+// // //           font-size:30px;
+// // //           font-weight:900;
+// // //           color:#1f2937;
+// // //         }
+// // //         .qvActionRow{
+// // //           display:flex;
+// // //           align-items:center;
+// // //           gap:16px;
+// // //           margin-top:18px;
+// // //           flex-wrap:wrap;
+// // //         }
+// // //         .qvQty{
+// // //           display:inline-flex;
+// // //           align-items:center;
+// // //           border:1px solid #d1d5db;
+// // //           height:42px;
+// // //           border-radius:999px;
+// // //           overflow:hidden;
+// // //         }
+// // //         .qvQtyBtn{
+// // //           width:46px;
+// // //           height:40px;
+// // //           border:none;
+// // //           background:#fff;
+// // //           cursor:pointer;
+// // //           font-size:24px;
+// // //         }
+// // //         .qvQtyValue{
+// // //           min-width:46px;
+// // //           text-align:center;
+// // //           font-size:18px;
+// // //           font-weight:900;
+// // //         }
+// // //         .qvAdd{
+// // //           min-width:390px;
+// // //           height:54px;
+// // //           border:none;
+// // //           border-radius:999px;
+// // //           background:#0b86d7;
+// // //           color:#fff;
+// // //           font-weight:900;
+// // //           font-size:18px;
+// // //           cursor:pointer;
+// // //           padding:0 24px;
+// // //         }
+// // //         .qvDivider{
+// // //           height:1px;
+// // //           background:#e5e7eb;
+// // //           margin-top:18px;
+// // //           margin-bottom:16px;
+// // //         }
+// // //         .qvMeta{
+// // //           display:flex;
+// // //           gap:28px;
+// // //           flex-wrap:wrap;
+// // //           font-size:16px;
+// // //           color:#1f2937;
+// // //         }
+// // //         .qvShare{
+// // //           display:flex;
+// // //           align-items:center;
+// // //           gap:16px;
+// // //           margin-top:26px;
+// // //           font-size:16px;
+// // //           color:#374151;
+// // //           flex-wrap:wrap;
+// // //         }
+// // //         .qvShareIcon{
+// // //           font-weight:800;
+// // //           font-size:18px;
+// // //         }
+
+// // //         @media (max-width:1400px){
+// // //           .fpGrid{grid-template-columns:repeat(4,1fr)}
+// // //         }
+
+// // //         @media (max-width:1180px){
+// // //           .heroH1 { font-size: 48px; }
+// // //           .title { font-size: 40px; }
+// // //           .promoGrid { grid-template-columns:repeat(2,1fr); }
+// // //           .fpGrid { grid-template-columns:repeat(3,1fr); }
+// // //           .reviewGrid { grid-template-columns:repeat(2,1fr); }
+// // //           .featGrid { grid-template-columns:repeat(2,1fr); }
+// // //           .specialContent { left: 40px; top: 40px; max-width: 450px; }
+// // //           .specialH { font-size: 40px; }
+// // //           .qvGrid { grid-template-columns:1fr; }
+// // //           .qvMainImage { height: 400px; }
+// // //           .qvAdd { min-width: 250px; }
+// // //           .brandsScroll { gap: 40px; }
+// // //           .brandLogo { min-width: 180px; }
+// // //         }
+
+// // //         @media (max-width:768px){
+// // //           .container{
+// // //             padding-left:18px;
+// // //             padding-right:18px;
+// // //           }
+// // //           .hero{
+// // //             height:420px;
+// // //             min-height:420px;
+// // //           }
+// // //           .heroText{padding-top:30px}
+// // //           .heroH1{font-size:36px}
+// // //           .heroH3{font-size:18px}
+// // //           .heroBtn{margin-top:10px}
+// // //           .title{font-size:34px}
+// // //           .section{padding:40px 0}
+// // //           .promoGrid{grid-template-columns:1fr}
+// // //           .promo{min-height:320px}
+// // //           .promoBody{left:24px; right:24px; bottom:24px}
+// // //           .promoH{font-size:28px}
+// // //           .promoSub{font-size:15px}
+// // //           .fpGrid{grid-template-columns:repeat(2,1fr); gap:18px}
+// // //           .fpImgWrap{height:230px}
+// // //           .fpTitle{font-size:16px; min-height:auto}
+// // //           .fpNow{font-size:18px}
+// // //           .brandsBox{padding:30px 0}
+// // //           .brandsRow{gap:10px}
+// // //           .brandsScroll{gap:20px; height:120px}
+// // //           .brandLogo{min-width:140px; height:120px}
+// // //           .brandLogo img{max-height:100px; max-width:140px}
+// // //           .brandArrow{width:44px; height:44px}
+// // //           .specialBannerWrap{padding:40px 0 10px}
+// // //           .specialBanner{min-height:350px}
+// // //           .specialContent{left:24px; top:24px; right:24px; max-width:100%}
+// // //           .specialH{font-size:32px}
+// // //           .specialP{font-size:15px}
+// // //           .specialStrong{font-size:16px}
+// // //           .features{padding:40px 0}
+// // //           .featGrid{gap:16px}
+// // //           .featItem h4{font-size:18px}
+// // //           .featItem p{font-size:14px}
+// // //           .reviews{padding:40px 0}
+// // //           .reviewGrid{gap:20px}
+// // //           .avatar{width:70px; height:70px}
+// // //           .rName{font-size:16px}
+// // //           .rText{font-size:14px; line-height:1.6}
+// // //           .qvCard{padding:20px}
+// // //           .qvMainImage{height:300px}
+// // //           .qvClose{font-size:28px; top:12px; right:12px}
+// // //           .qvProductTitle{font-size:22px}
+// // //           .qvNow{font-size:24px}
+// // //           .qvOld{font-size:18px}
+// // //           .qvQtyBtn{width:40px; height:36px; font-size:20px}
+// // //           .qvAdd{min-width:200px; height:48px; font-size:16px}
+// // //           .qvMeta{gap:16px; font-size:14px}
+// // //         }
+
+// // //         @media (max-width:480px){
+// // //           .hero{
+// // //             height:360px;
+// // //             min-height:360px;
+// // //           }
+// // //           .heroH1{font-size:30px}
+// // //           .heroH3{font-size:16px}
+// // //           .heroBtn{padding:10px 18px; font-size:14px}
+// // //           .title{font-size:28px}
+// // //           .underline{width:120px}
+// // //           .promo{min-height:280px}
+// // //           .promoBody{left:18px; right:18px; bottom:18px}
+// // //           .promoH{font-size:24px}
+// // //           .promoSub{font-size:14px; margin-bottom:12px}
+// // //           .promoBtn{padding:10px 18px; font-size:13px}
+// // //           .fpGrid{grid-template-columns:repeat(2,1fr); gap:12px}
+// // //           .fpCard{border-radius:16px}
+// // //           .fpImgWrap{height:165px}
+// // //           .fpImg{padding:12px}
+// // //           .fpEye{width:38px; height:38px; top:10px; right:10px}
+// // //           .fpSale{font-size:10px; padding:5px 9px; top:10px; left:10px}
+// // //           .fpBody{padding:12px}
+// // //           .fpCat{font-size:10px; margin-bottom:6px}
+// // //           .fpTitle{font-size:13px; line-height:1.3; margin-bottom:10px}
+// // //           .fpPriceRow{gap:6px}
+// // //           .fpOld{font-size:11px}
+// // //           .fpNow{font-size:14px}
+// // //           .fpOff{font-size:10px; padding:3px 5px}
+// // //           .fpGst{font-size:11px; margin-bottom:10px}
+// // //           .fpQtyWrap{width:100%; justify-content:space-between; margin-bottom:10px}
+// // //           .fpQtyBtn{width:32px; height:32px; font-size:18px}
+// // //           .fpQtyValue{min-width:32px; font-size:12px}
+// // //           .fpBtn{padding:12px 8px; font-size:12px; border-radius:10px}
+// // //           .brandsBox{padding:20px 0}
+// // //           .brandsScroll{gap:15px; height:100px}
+// // //           .brandLogo{min-width:120px; height:100px}
+// // //           .brandLogo img{max-height:80px; max-width:120px}
+// // //           .brandArrow{width:38px; height:38px}
+// // //           .specialBanner{min-height:300px}
+// // //           .specialContent{left:18px; top:18px}
+// // //           .smallLabel{font-size:14px}
+// // //           .specialH{font-size:26px; margin-bottom:8px}
+// // //           .specialP{font-size:13px; line-height:1.5; margin-bottom:12px}
+// // //           .specialStrong{font-size:14px; margin-bottom:16px}
+// // //           .featGrid{grid-template-columns:1fr; gap:20px}
+// // //           .featIcon{width:40px; height:40px}
+// // //           .featItem h4{font-size:16px; margin:8px 0 4px}
+// // //           .featItem p{font-size:13px; max-width:100%}
+// // //           .reviewGrid{grid-template-columns:1fr}
+// // //           .avatar{width:60px; height:60px}
+// // //           .star{font-size:16px}
+// // //           .rText{font-size:13px}
+// // //           .qvCard{padding:16px}
+// // //           .qvMainImage{height:220px}
+// // //           .qvProductTitle{font-size:18px}
+// // //           .qvNow{font-size:22px}
+// // //           .qvOld{font-size:16px}
+// // //           .qvActionRow{gap:10px; flex-direction:column; align-items:stretch}
+// // //           .qvQty{height:38px; width:100%; justify-content:space-between}
+// // //           .qvQtyBtn{width:36px; height:36px; font-size:18px}
+// // //           .qvQtyValue{min-width:36px; font-size:16px}
+// // //           .qvAdd{min-width:100%; height:44px; font-size:15px; padding:0 16px}
+// // //           .qvMeta{gap:10px; font-size:12px; flex-direction:column}
+// // //           .qvShare{gap:10px; font-size:14px; margin-top:16px}
+// // //           .qvShareIcon{font-size:16px}
+// // //         }
+
+// // //         @media (max-width:360px){
+// // //           .heroH1{font-size:26px}
+// // //           .heroH3{font-size:15px}
+// // //           .title{font-size:24px}
+// // //           .brandLogo{min-width:100px}
+// // //           .brandLogo img{max-width:90px}
+// // //           .promoH{font-size:22px}
+// // //           .fpGrid{grid-template-columns:1fr}
+// // //         }
+
+// // //         @media (max-height: 600px) and (orientation: landscape) {
+// // //           .hero { min-height: 400px; }
+// // //           .heroText { padding-top: 20px; }
+// // //         }
+// // //       `}</style>
+
+// // //       <section className="hero">
+// // //         <img className="heroBgImg" src={heroBg} alt="Hero Background" />
+// // //         <div className="heroOverlay" />
+// // //         <div className="heroOverlay2" />
+
+// // //         <div className="container heroContent">
+// // //           <div className="heroText">
+// // //             <h1 className="heroH1">Tunturu Tools India</h1>
+// // //             <h3 className="heroH3">25% Off On All Products</h3>
+// // //             <button className="heroBtn" type="button" onClick={() => navigate("/store")}>
+// // //               SHOP TOOL
+// // //             </button>
+// // //           </div>
+// // //         </div>
+// // //       </section>
+
+// // //       <section className="brandsBox">
+// // //         <div className="container">
+// // //           <div className="brandsRow">
+// // //             <button
+// // //               className="brandArrow"
+// // //               onClick={() => brandsRef.current?.scrollBy({ left: -320, behavior: "smooth" })}
+// // //               aria-label="Previous"
+// // //             >
+// // //               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+// // //                 <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
+// // //               </svg>
+// // //             </button>
+
+// // //             <div className="brandsScroll" ref={brandsRef}>
+// // //               {brandLogos.map((b) => (
+// // //                 <div className="brandLogo" key={b.alt}>
+// // //                   <img src={b.src} alt={b.alt} />
+// // //                 </div>
+// // //               ))}
+// // //             </div>
+
+// // //             <button
+// // //               className="brandArrow"
+// // //               onClick={() => brandsRef.current?.scrollBy({ left: 320, behavior: "smooth" })}
+// // //               aria-label="Next"
+// // //             >
+// // //               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+// // //                 <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
+// // //               </svg>
+// // //             </button>
+// // //           </div>
+// // //         </div>
+// // //       </section>
+
+// // //       <section className="section">
+// // //         <div className="container">
+// // //           <div className="titleWrap left">
+// // //             <h2 className="title">Special offers</h2>
+// // //             <div className="underline" />
+// // //           </div>
+
+// // //           <div className="promoGrid">
+// // //             {offers.map((o) => (
+// // //               <div key={o.id} className="promo" style={{ backgroundImage: `url(${o.image})` }}>
+// // //                 <div className="promoBody">
+// // //                   <h3 className="promoH">{o.title}</h3>
+// // //                   <p className="promoSub">{o.desc}</p>
+// // //                   <button className="promoBtn" onClick={() => navigate(o.href)}>
+// // //                     {o.cta}
+// // //                   </button>
+// // //                 </div>
+// // //               </div>
+// // //             ))}
+// // //           </div>
+// // //         </div>
+// // //       </section>
+
+// // //       <section className="fpSection">
+// // //         <div className="container">
+// // //           <div className="titleWrap center">
+// // //             <h2 className="title">Featured Products</h2>
+// // //             <div className="underline" />
+// // //           </div>
+
+// // //           {featuredLoading ? (
+// // //             <div style={{ textAlign: "center", padding: "30px 0", fontWeight: 900 }}>
+// // //               Loading products...
+// // //             </div>
+// // //           ) : (
+// // //             <div className="fpGrid">
+// // //               {featured.map((p) => {
+// // //                 const qty = qtyMap[p.id] || 1;
+
+// // //                 return (
+// // //                   <article className="fpCard" key={p.id}>
+// // //                     <a
+// // //                       className="fpImgWrap"
+// // //                       href={`/product/${p.slug}`}
+// // //                       onClick={(e) => {
+// // //                         e.preventDefault();
+// // //                         navigate(`/product/${p.slug}`);
+// // //                       }}
+// // //                     >
+// // //                       <img
+// // //                         className="fpImg"
+// // //                         src={
+// // //                           p.image ||
+// // //                           "https://dummyimage.com/500x420/f3f4f6/111827&text=No+Image"
+// // //                         }
+// // //                         alt={p.title}
+// // //                         loading="lazy"
+// // //                       />
+// // //                       {!p.is_sale ? (
+// // //                               <span
+// // //                                 className="fpSale"
+// // //                                 style={{ background: "#b91c1c" }}
+// // //                               >
+// // //                                 OUT OF STOCK
+// // //                               </span>
+// // //                             ) : (
+// // //                               <span className="fpSale">{p.is_sale ? "SALE" : "NEW"}</span>
+// // //                             )}
+                     
+// // //                     </a>
+
+// // //                     <button
+// // //                       className="fpEye"
+// // //                       aria-label="Quick view"
+// // //                       title="Quick view"
+// // //                       onClick={() =>
+// // //                         setQuickView({
+// // //                           open: true,
+// // //                           product: p,
+// // //                           qty: qtyMap[p.id] || 1,
+// // //                         })
+// // //                       }
+// // //                     >
+// // //                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+// // //                         <path
+// // //                           strokeWidth="2"
+// // //                           strokeLinecap="round"
+// // //                           strokeLinejoin="round"
+// // //                           d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"
+// // //                         />
+// // //                         <circle cx="12" cy="12" r="3" strokeWidth="2" />
+// // //                       </svg>
+// // //                     </button>
+
+// // //                     <div className="fpBody">
+// // //                       <div className="fpCat">
+// // //                         {p.short_category_label || p.category_name || "UNCATEGORIZED"}
+// // //                       </div>
+
+// // //                       <h3
+// // //                         className="fpTitle"
+// // //                         title={p.title}
+// // //                         onClick={() => navigate(`/product/${p.slug}`)}
+// // //                       >
+// // //                         {p.title.toUpperCase()}
+// // //                       </h3>
+
+// // //                       <div className="fpPriceRow">
+// // //                         {Number(p.mrp) > Number(p.sale_price) ? (
+// // //                           <span className="fpOld">{inr(Number(p.mrp))}</span>
+// // //                         ) : null}
+// // //                         <span className="fpNow">{inr(Number(p.sale_price))}</span>
+// // //                         {p.discount_percent ? (
+// // //                           <span className="fpOff">-{p.discount_percent}%</span>
+// // //                         ) : null}
+// // //                       </div>
+
+// // //                       <div className="fpGst">
+// // //                         GST ({p.gst_percent}%) {inr(Number(p.gst_amount || 0))}
+// // //                       </div>
+
+// // //                       <div className="fpQtyWrap">
+// // //                         <button
+// // //                           className="fpQtyBtn"
+// // //                           onClick={() => setQty(p.id, qty - 1)}
+// // //                           type="button"
+// // //                         >
+// // //                           −
+// // //                         </button>
+// // //                         <div className="fpQtyValue">{qty}</div>
+// // //                         <button
+// // //                           className="fpQtyBtn"
+// // //                           onClick={() => setQty(p.id, qty + 1)}
+// // //                           type="button"
+// // //                         >
+// // //                           +
+// // //                         </button>
+// // //                       </div>
+
+// // //                       <button
+// // //                         className="fpBtn"
+// // //                         type="button"
+// // //                         disabled={busyId === p.id || !p.is_sale}
+// // //                         onClick={() => {
+// // //                           if (!p.is_sale) return;
+// // //                           handleAddToCart(p, qty);
+// // //                         }}
+// // //                         style={{
+// // //                           background: p.is_sale
+// // //                             ? "linear-gradient(90deg,#4f86ff,#1d4ed8)"
+// // //                             : "#9ca3af",
+// // //                           cursor: p.is_sale ? "pointer" : "not-allowed",
+// // //                         }}
+// // //                       >
+// // //                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+// // //                           <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 10V8a6 6 0 0112 0v2" />
+// // //                           <rect x="5" y="10" width="14" height="12" rx="2" strokeWidth="2" />
+// // //                         </svg>
+// // //                         {!p.is_sale ? "OUT OF STOCK" : busyId === p.id ? "ADDING..." : "ADD TO CART"}
+// // //                       </button>
+// // //                     </div>
+// // //                   </article>
+// // //                 );
+// // //               })}
+// // //             </div>
+// // //           )}
+
+// // //           <div className="specialBannerWrap">
+// // //             <div className="specialBanner">
+// // //               <div className="specialContent">
+// // //                 <div className="smallLabel">Limited Time Offer</div>
+// // //                 <h3 className="specialH">Special Edition</h3>
+// // //                 <p className="specialP">
+// // //                   Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis,
+// // //                   pulvinar dapibus leo.
+// // //                 </p>
+// // //                 <p className="specialStrong">
+// // //                   Buy This Toolkit At 20% Discount, Use Code OFF20
+// // //                 </p>
+// // //                 <button className="promoBtn" onClick={() => navigate("/store")}>
+// // //                   SHOP NOW
+// // //                 </button>
+// // //               </div>
+// // //             </div>
+// // //           </div>
+// // //         </div>
+// // //       </section>
+
+// // //       <section className="features">
+// // //         <div className="container">
+// // //           <div className="featGrid">
+// // //             {["Fast Shipping", "Best Quality", "Best Offers", "Secure Payments"].map((t) => (
+// // //               <div className="featItem" key={t}>
+// // //                 <div className="featIcon" aria-hidden="true">
+// // //                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+// // //                     <circle cx="12" cy="12" r="9" strokeWidth="2" />
+// // //                     <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 7v10" />
+// // //                   </svg>
+// // //                 </div>
+// // //                 <h4>{t}</h4>
+// // //                 <p>It elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</p>
+// // //               </div>
+// // //             ))}
+// // //           </div>
+// // //         </div>
+// // //       </section>
+
+// // //       <section className="reviews">
+// // //         <div className="container">
+// // //           <div className="titleWrap center">
+// // //             <h2 className="title">Reviews of Our Valued Customers</h2>
+// // //             <div className="underline" />
+// // //           </div>
+
+// // //           <div className="reviewGrid">
+// // //             {[
+// // //               { name: "Andrew", img: "https://randomuser.me/api/portraits/men/32.jpg", stars: 5 },
+// // //               { name: "Paul", img: "https://randomuser.me/api/portraits/men/44.jpg", stars: 5 },
+// // //               { name: "Michale", img: "https://randomuser.me/api/portraits/women/65.jpg", stars: 5 },
+// // //               { name: "Lucy", img: "https://randomuser.me/api/portraits/women/68.jpg", stars: 5 },
+// // //             ].map((r) => (
+// // //               <div key={r.name}>
+// // //                 <img className="avatar" src={r.img} alt={r.name} />
+// // //                 <p className="rName">{r.name}</p>
+// // //                 <Stars count={r.stars} />
+// // //                 <p className="rText">
+// // //                   The product was nice, offering quality tools and good value for money.
+// // //                 </p>
+// // //               </div>
+// // //             ))}
+// // //           </div>
+// // //         </div>
+// // //       </section>
+
+// // //       {quickView.open && quickView.product && (
+// // //         <div
+// // //           className="qvOverlay"
+// // //           onClick={() => setQuickView({ open: false, product: null, qty: 1 })}
+// // //         >
+// // //           <div className="qvCard" onClick={(e) => e.stopPropagation()}>
+// // //             <button
+// // //               className="qvClose"
+// // //               onClick={() => setQuickView({ open: false, product: null, qty: 1 })}
+// // //             >
+// // //               ✕
+// // //             </button>
+
+// // //             <div className="qvGrid">
+// // //               <div>
+// // //                 <img
+// // //                   className="qvMainImage"
+// // //                   src={
+// // //                     quickView.product.image ||
+// // //                     "https://dummyimage.com/700x520/f3f4f6/111827&text=No+Image"
+// // //                   }
+// // //                   alt={quickView.product.title}
+// // //                 />
+
+// // //                 <div className="qvThumbRow">
+// // //                   <img
+// // //                     className="qvThumb"
+// // //                     src={
+// // //                       quickView.product.image ||
+// // //                       "https://dummyimage.com/120x90/f3f4f6/111827&text=No+Image"
+// // //                     }
+// // //                     alt="thumb"
+// // //                   />
+// // //                 </div>
+// // //               </div>
+
+// // //               <div>
+// // //                 <h3 className="qvProductTitle">{quickView.product.title}</h3>
+
+// // //                 <div className="qvPriceRow">
+// // //                   {Number(quickView.product.mrp) > Number(quickView.product.sale_price) ? (
+// // //                     <span className="qvOld">{inr(Number(quickView.product.mrp))}</span>
+// // //                   ) : null}
+// // //                   <span className="qvNow">{inr(Number(quickView.product.sale_price))}</span>
+// // //                 </div>
+
+// // //                 <div className="qvActionRow">
+// // //                   <div className="qvQty">
+// // //                     <button
+// // //                       className="qvQtyBtn"
+// // //                       onClick={() =>
+// // //                         setQuickView((prev) => ({
+// // //                           ...prev,
+// // //                           qty: Math.max(1, prev.qty - 1),
+// // //                         }))
+// // //                       }
+// // //                     >
+// // //                       -
+// // //                     </button>
+
+// // //                     <div className="qvQtyValue">{quickView.qty}</div>
+
+// // //                     <button
+// // //                       className="qvQtyBtn"
+// // //                       onClick={() =>
+// // //                         setQuickView((prev) => ({
+// // //                           ...prev,
+// // //                           qty: prev.qty + 1,
+// // //                         }))
+// // //                       }
+// // //                     >
+// // //                       +
+// // //                     </button>
+// // //                   </div>
+
+// // //                   <button
+// // //                     className="qvAdd"
+// // //                     onClick={() => handleAddToCart(quickView.product!, quickView.qty)}
+// // //                   >
+// // //                     Add To Cart
+// // //                   </button>
+// // //                 </div>
+
+// // //                 <div className="qvDivider" />
+
+// // //                 <div className="qvMeta">
+// // //                   <span>SKU: {quickView.product.sku || "-"}</span>
+// // //                   <span>Category: {quickView.product.category_name || "-"}</span>
+// // //                   <span>Brand: {quickView.product.brand || "-"}</span>
+// // //                 </div>
+
+// // //                 <div className="qvShare">
+// // //                   <span>Share:</span>
+// // //                   <span className="qvShareIcon">f</span>
+// // //                   <span className="qvShareIcon">𝕏</span>
+// // //                   <span className="qvShareIcon">p</span>
+// // //                   <span className="qvShareIcon">in</span>
+// // //                   <span className="qvShareIcon">✈</span>
+// // //                 </div>
+// // //               </div>
+// // //             </div>
+// // //           </div>
+// // //         </div>
+// // //       )}
+// // //     </div>
+// // //   );
+// // // }
+
+
+// // import { useEffect, useRef, useState } from "react";
 // // import { useNavigate } from "react-router-dom";
 // // import { addProductToHybridCart } from "../services/cartHelper";
 // // import { fetchProducts, type ProductListItem } from "../services/storeApi";
@@ -10,6 +1240,45 @@
 // //   image: string;
 // //   href: string;
 // //   cta: string;
+// // };
+
+// // type BrandLogo = {
+// //   src: string;
+// //   alt: string;
+// // };
+
+// // type Feature = {
+// //   title: string;
+// //   desc: string;
+// // };
+
+// // type Review = {
+// //   name: string;
+// //   img: string;
+// //   stars: number;
+// //   text: string;
+// // };
+
+// // type HomeApiResponse = {
+// //   hero_title: string;
+// //   hero_subtitle: string;
+// //   hero_button_text: string;
+// //   hero_button_link: string;
+// //   hero_background_image: string;
+// //   special_offers_title: string;
+// //   featured_products_title: string;
+// //   special_banner_small_label: string;
+// //   special_banner_title: string;
+// //   special_banner_description: string;
+// //   special_banner_strong_text: string;
+// //   special_banner_button_text: string;
+// //   special_banner_button_link: string;
+// //   special_banner_background_image: string;
+// //   reviews_title: string;
+// //   brand_logos: BrandLogo[];
+// //   offers: Offer[];
+// //   features: Feature[];
+// //   reviews: Review[];
 // // };
 
 // // function inr(n: number) {
@@ -43,72 +1312,87 @@
 // //   qty: number;
 // // };
 
+// // const API_BASE = "https://attenbackend.clickconnectmedia.cloud";
+// // const HOME_API = `${API_BASE}/api/home/`;
+
+// // const defaultHomeData: HomeApiResponse = {
+// //   hero_title: "Tunturu Tools India",
+// //   hero_subtitle: "25% Off On All Products",
+// //   hero_button_text: "SHOP TOOL",
+// //   hero_button_link: "/store",
+// //   hero_background_image:
+// //     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-nishantaneja-12105083.jpg",
+// //   special_offers_title: "Special offers",
+// //   featured_products_title: "Featured Products",
+// //   special_banner_small_label: "Limited Time Offer",
+// //   special_banner_title: "Special Edition",
+// //   special_banner_description:
+// //     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.",
+// //   special_banner_strong_text: "Buy This Toolkit At 20% Discount, Use Code OFF20",
+// //   special_banner_button_text: "SHOP NOW",
+// //   special_banner_button_link: "/store",
+// //   special_banner_background_image: "/image.png",
+// //   reviews_title: "Reviews of Our Valued Customers",
+// //   brand_logos: [
+// //     { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.40.26-PM.jpeg", alt: "TOTAL" },
+// //     { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.23-PM.jpeg", alt: "FOCUS" },
+// //     { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.29-PM.jpeg", alt: "DuCaR" },
+// //     { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.32-PM.jpeg", alt: "Mr Light" },
+// //     { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.35-PM.jpeg", alt: "Gravis" },
+// //     { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.30-PM.jpeg", alt: "PHILIPS" },
+// //     { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.38-PM.jpeg", alt: "AMEROCOOK" },
+// //     { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.26-PM.jpeg", alt: "SMART LIGHT" },
+// //     { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.40-PM.jpeg", alt: "ZIG GAK" },
+// //     { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.35-PM.jpeg", alt: "ENGLISH ROYAL" },
+// //     { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.16-PM.jpeg", alt: "PHILIPS ACCESSORIES" },
+// //     { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.20-PM.jpeg", alt: "PHILIPS BATTERIES" },
+// //     { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.23-PM.jpeg", alt: "PHILIPS FLASHLIGHT" },
+// //   ],
+// //   offers: [
+// //     {
+// //       id: "o1",
+// //       title: "20% Off",
+// //       desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac dictum.",
+// //       image: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-theshuttervision-8811529.jpg",
+// //       href: "/store",
+// //       cta: "SHOP NOW",
+// //     },
+// //     {
+// //       id: "o2",
+// //       title: "Latest Tools For You",
+// //       desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac dictum.",
+// //       image: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-osman-sran-95404891-22798290.jpg",
+// //       href: "/store",
+// //       cta: "SHOP NOW",
+// //     },
+// //     {
+// //       id: "o3",
+// //       title: "New Arrival",
+// //       desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac dictum.",
+// //       image: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-matreding-6835302.jpg",
+// //       href: "/store",
+// //       cta: "CHECK OUT",
+// //     },
+// //   ],
+// //   features: [
+// //     { title: "Fast Shipping", desc: "It elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo." },
+// //     { title: "Best Quality", desc: "It elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo." },
+// //     { title: "Best Offers", desc: "It elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo." },
+// //     { title: "Secure Payments", desc: "It elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo." },
+// //   ],
+// //   reviews: [
+// //     { name: "Andrew", img: "https://randomuser.me/api/portraits/men/32.jpg", stars: 5, text: "The product was nice, offering quality tools and good value for money." },
+// //     { name: "Paul", img: "https://randomuser.me/api/portraits/men/44.jpg", stars: 5, text: "The product was nice, offering quality tools and good value for money." },
+// //     { name: "Michale", img: "https://randomuser.me/api/portraits/women/65.jpg", stars: 5, text: "The product was nice, offering quality tools and good value for money." },
+// //     { name: "Lucy", img: "https://randomuser.me/api/portraits/women/68.jpg", stars: 5, text: "The product was nice, offering quality tools and good value for money." },
+// //   ],
+// // };
+
 // // export default function Home() {
 // //   const navigate = useNavigate();
-
-// //   const heroBg =
-// //     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-nishantaneja-12105083.jpg";
-
-// //   const promo1 =
-// //     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-theshuttervision-8811529.jpg";
-// //   const promo2 =
-// //     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-osman-sran-95404891-22798290.jpg";
-// //   const promo3 =
-// //     "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/pexels-matreding-6835302.jpg";
-
-// //   const specialEditionBg = "/image.png";
-
-// //   const brandLogos = useMemo(
-// //     () => [
-// //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.40.26-PM.jpeg", alt: "TOTAL" },
-// //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.23-PM.jpeg", alt: "FOCUS" },
-// //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.29-PM.jpeg", alt: "DuCaR" },
-// //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.32-PM.jpeg", alt: "Mr Light" },
-// //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.35-PM.jpeg", alt: "Gravis" },
-// //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.30-PM.jpeg", alt: "PHILIPS" },
-// //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.38-PM.jpeg", alt: "AMEROCOOK" },
-// //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.49.26-PM.jpeg", alt: "SMART LIGHT" },
-// //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.40-PM.jpeg", alt: "ZIG GAK" },
-// //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.35-PM.jpeg", alt: "ENGLISH ROYAL" },
-// //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.16-PM.jpeg", alt: "PHILIPS ACCESSORIES" },
-// //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.20-PM.jpeg", alt: "PHILIPS BATTERIES" },
-// //       { src: "https://dev-tunturu.pantheonsite.io/wp-content/uploads/2026/02/WhatsApp-Image-2026-02-16-at-5.39.23-PM.jpeg", alt: "PHILIPS FLASHLIGHT" },
-// //     ],
-// //     []
-// //   );
-
-// //   const offers: Offer[] = useMemo(
-// //     () => [
-// //       {
-// //         id: "o1",
-// //         title: "20% Off",
-// //         desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac dictum.",
-// //         image: promo1,
-// //         href: "/store",
-// //         cta: "SHOP NOW",
-// //       },
-// //       {
-// //         id: "o2",
-// //         title: "Latest Tools For You",
-// //         desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac dictum.",
-// //         image: promo2,
-// //         href: "/store",
-// //         cta: "SHOP NOW",
-// //       },
-// //       {
-// //         id: "o3",
-// //         title: "New Arrival",
-// //         desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac dictum.",
-// //         image: promo3,
-// //         href: "/store",
-// //         cta: "CHECK OUT",
-// //       },
-// //     ],
-// //     [promo1, promo2, promo3]
-// //   );
-
 // //   const brandsRef = useRef<HTMLDivElement | null>(null);
 
+// //   const [homeData, setHomeData] = useState<HomeApiResponse>(defaultHomeData);
 // //   const [featured, setFeatured] = useState<ProductListItem[]>([]);
 // //   const [featuredLoading, setFeaturedLoading] = useState(true);
 // //   const [busyId, setBusyId] = useState<number | null>(null);
@@ -118,6 +1402,31 @@
 // //     product: null,
 // //     qty: 1,
 // //   });
+
+// //   useEffect(() => {
+// //     const fetchHomeData = async () => {
+// //       try {
+// //         const res = await fetch(HOME_API);
+// //         if (!res.ok) {
+// //           throw new Error(`Failed to fetch home data: ${res.status}`);
+// //         }
+// //         const data = await res.json();
+// //         setHomeData({
+// //           ...defaultHomeData,
+// //           ...data,
+// //           brand_logos: data?.brand_logos?.length ? data.brand_logos : defaultHomeData.brand_logos,
+// //           offers: data?.offers?.length ? data.offers : defaultHomeData.offers,
+// //           features: data?.features?.length ? data.features : defaultHomeData.features,
+// //           reviews: data?.reviews?.length ? data.reviews : defaultHomeData.reviews,
+// //         });
+// //       } catch (error) {
+// //         console.error("Home API fallback used:", error);
+// //         setHomeData(defaultHomeData);
+// //       }
+// //     };
+
+// //     fetchHomeData();
+// //   }, []);
 
 // //   useEffect(() => {
 // //     async function loadFeatured() {
@@ -332,6 +1641,15 @@
 // //           bottom:36px;
 // //           color:#fff;
 // //         }
+// //           .fpOutStock {
+// //             margin-left: 10px;
+// //             background: #b91c1c;
+// //             color: #fff;
+// //             font-size: 12px;
+// //             font-weight: 700;
+// //             padding: 4px 8px;
+// //             border-radius: 6px;
+// //           }
 // //         .promoH{margin:0 0 10px; font-weight:900; font-size:34px}
 // //         .promoSub{margin:0 0 18px; opacity:.92; line-height:1.7; font-size:16px}
 // //         .promoBtn{
@@ -490,7 +1808,6 @@
 // //           border-radius:28px;
 // //           overflow:hidden;
 // //           min-height:430px;
-// //           background-image:url(${specialEditionBg});
 // //           background-size:cover;
 // //           background-position:center;
 // //           position:relative;
@@ -836,16 +2153,20 @@
 // //       `}</style>
 
 // //       <section className="hero">
-// //         <img className="heroBgImg" src={heroBg} alt="Hero Background" />
+// //         <img className="heroBgImg" src={homeData.hero_background_image} alt="Hero Background" />
 // //         <div className="heroOverlay" />
 // //         <div className="heroOverlay2" />
 
 // //         <div className="container heroContent">
 // //           <div className="heroText">
-// //             <h1 className="heroH1">Tunturu Tools India</h1>
-// //             <h3 className="heroH3">25% Off On All Products</h3>
-// //             <button className="heroBtn" type="button" onClick={() => navigate("/store")}>
-// //               SHOP TOOL
+// //             <h1 className="heroH1">{homeData.hero_title}</h1>
+// //             <h3 className="heroH3">{homeData.hero_subtitle}</h3>
+// //             <button
+// //               className="heroBtn"
+// //               type="button"
+// //               onClick={() => navigate(homeData.hero_button_link)}
+// //             >
+// //               {homeData.hero_button_text}
 // //             </button>
 // //           </div>
 // //         </div>
@@ -865,7 +2186,7 @@
 // //             </button>
 
 // //             <div className="brandsScroll" ref={brandsRef}>
-// //               {brandLogos.map((b) => (
+// //               {homeData.brand_logos.map((b) => (
 // //                 <div className="brandLogo" key={b.alt}>
 // //                   <img src={b.src} alt={b.alt} />
 // //                 </div>
@@ -888,12 +2209,12 @@
 // //       <section className="section">
 // //         <div className="container">
 // //           <div className="titleWrap left">
-// //             <h2 className="title">Special offers</h2>
+// //             <h2 className="title">{homeData.special_offers_title}</h2>
 // //             <div className="underline" />
 // //           </div>
 
 // //           <div className="promoGrid">
-// //             {offers.map((o) => (
+// //             {homeData.offers.map((o) => (
 // //               <div key={o.id} className="promo" style={{ backgroundImage: `url(${o.image})` }}>
 // //                 <div className="promoBody">
 // //                   <h3 className="promoH">{o.title}</h3>
@@ -911,7 +2232,7 @@
 // //       <section className="fpSection">
 // //         <div className="container">
 // //           <div className="titleWrap center">
-// //             <h2 className="title">Featured Products</h2>
+// //             <h2 className="title">{homeData.featured_products_title}</h2>
 // //             <div className="underline" />
 // //           </div>
 
@@ -922,150 +2243,127 @@
 // //           ) : (
 // //             <div className="fpGrid">
 // //               {featured.map((p) => {
-// //                 const qty = qtyMap[p.id] || 1;
+// //   const qty = qtyMap[p.id] || 1;
 
-// //                 return (
-// //                   <article className="fpCard" key={p.id}>
-// //                     <a
-// //                       className="fpImgWrap"
-// //                       href={`/product/${p.slug}`}
-// //                       onClick={(e) => {
-// //                         e.preventDefault();
-// //                         navigate(`/product/${p.slug}`);
-// //                       }}
-// //                     >
-// //                       <img
-// //                         className="fpImg"
-// //                         src={
-// //                           p.image ||
-// //                           "https://dummyimage.com/500x420/f3f4f6/111827&text=No+Image"
-// //                         }
-// //                         alt={p.title}
-// //                         loading="lazy"
-// //                       />
-// //                       {!p.is_sale ? (
-// //                               <span
-// //                                 className="fpSale"
-// //                                 style={{ background: "#b91c1c" }}
-// //                               >
-// //                                 OUT OF STOCK
-// //                               </span>
-// //                             ) : (
-// //                               <span className="fpSale">{p.is_sale ? "SALE" : "NEW"}</span>
-// //                             )}
-                     
-// //                     </a>
+// //   return (
+// //     <article className="fpCard" key={p.id}>
+// //       <a
+// //         className="fpImgWrap"
+// //         href={`/product/${p.slug}`}
+// //         onClick={(e) => {
+// //           e.preventDefault();
+// //           navigate(`/product/${p.slug}`);
+// //         }}
+// //       >
+// //         <img
+// //           className="fpImg"
+// //           src={p.image || "https://dummyimage.com/500x420/f3f4f6/111827&text=No+Image"}
+// //           alt={p.title}
+// //           loading="lazy"
+// //         />
+// //         {/* Display Stock Out label */}
+// //         {!p.is_sale ? (
+// //           <span className="_fpSale">
+            
+// //           </span>
+// //         ) : (
+// //           <span className="fpSale">{p.is_sale ? "SALE" : "NEW"}</span>
+// //         )}
+// //       </a>
 
-// //                     <button
-// //                       className="fpEye"
-// //                       aria-label="Quick view"
-// //                       title="Quick view"
-// //                       onClick={() =>
-// //                         setQuickView({
-// //                           open: true,
-// //                           product: p,
-// //                           qty: qtyMap[p.id] || 1,
-// //                         })
-// //                       }
-// //                     >
-// //                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-// //                         <path
-// //                           strokeWidth="2"
-// //                           strokeLinecap="round"
-// //                           strokeLinejoin="round"
-// //                           d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"
-// //                         />
-// //                         <circle cx="12" cy="12" r="3" strokeWidth="2" />
-// //                       </svg>
-// //                     </button>
+// //       {/* Product Title, Price, Add to Cart Section */}
+// //       <div className="fpBody">
+// //         <div className="fpCat">
+// //           {p.short_category_label || p.category_name || "UNCATEGORIZED"}
+// //         </div>
 
-// //                     <div className="fpBody">
-// //                       <div className="fpCat">
-// //                         {p.short_category_label || p.category_name || "UNCATEGORIZED"}
-// //                       </div>
+// //         <h3
+// //           className="fpTitle"
+// //           title={p.title}
+// //           onClick={() => navigate(`/product/${p.slug}`)}
+// //         >
+// //           {p.title.toUpperCase()}
+// //         </h3>
 
-// //                       <h3
-// //                         className="fpTitle"
-// //                         title={p.title}
-// //                         onClick={() => navigate(`/product/${p.slug}`)}
-// //                       >
-// //                         {p.title.toUpperCase()}
-// //                       </h3>
+// //         <div className="fpPriceRow">
+// //           {Number(p.mrp) > Number(p.sale_price) ? (
+// //             <span className="fpOld">{inr(Number(p.mrp))}</span>
+// //           ) : null}
+// //           <span className="fpNow">{inr(Number(p.sale_price))}</span>
+// //           {p.discount_percent ? (
+// //             <span className="fpOff">-{p.discount_percent}%</span>
+// //           ) : null}
 
-// //                       <div className="fpPriceRow">
-// //                         {Number(p.mrp) > Number(p.sale_price) ? (
-// //                           <span className="fpOld">{inr(Number(p.mrp))}</span>
-// //                         ) : null}
-// //                         <span className="fpNow">{inr(Number(p.sale_price))}</span>
-// //                         {p.discount_percent ? (
-// //                           <span className="fpOff">-{p.discount_percent}%</span>
-// //                         ) : null}
-// //                       </div>
+// //           {!p.is_sale && (
+// //             <span className="fpOutStock">OUT OF STOCK</span>
+// //           )}
+// //         </div>
 
-// //                       <div className="fpGst">
-// //                         GST ({p.gst_percent}%) {inr(Number(p.gst_amount || 0))}
-// //                       </div>
+// //         <div className="fpGst">
+// //           GST ({p.gst_percent}%)
+// //         </div>
 
-// //                       <div className="fpQtyWrap">
-// //                         <button
-// //                           className="fpQtyBtn"
-// //                           onClick={() => setQty(p.id, qty - 1)}
-// //                           type="button"
-// //                         >
-// //                           −
-// //                         </button>
-// //                         <div className="fpQtyValue">{qty}</div>
-// //                         <button
-// //                           className="fpQtyBtn"
-// //                           onClick={() => setQty(p.id, qty + 1)}
-// //                           type="button"
-// //                         >
-// //                           +
-// //                         </button>
-// //                       </div>
+// //         <div className="fpQtyWrap">
+// //           <button
+// //             className="fpQtyBtn"
+// //             onClick={() => setQty(p.id, qty - 1)}
+// //             type="button"
+// //           >
+// //             −
+// //           </button>
+// //           <div className="fpQtyValue">{qty}</div>
+// //           <button
+// //             className="fpQtyBtn"
+// //             onClick={() => setQty(p.id, qty + 1)}
+// //             type="button"
+// //           >
+// //             +
+// //           </button>
+// //         </div>
 
-// //                       <button
-// //                         className="fpBtn"
-// //                         type="button"
-// //                         disabled={busyId === p.id || !p.is_sale}
-// //                         onClick={() => {
-// //                           if (!p.is_sale) return;
-// //                           handleAddToCart(p, qty);
-// //                         }}
-// //                         style={{
-// //                           background: p.is_sale
-// //                             ? "linear-gradient(90deg,#4f86ff,#1d4ed8)"
-// //                             : "#9ca3af",
-// //                           cursor: p.is_sale ? "pointer" : "not-allowed",
-// //                         }}
-// //                       >
-// //                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-// //                           <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 10V8a6 6 0 0112 0v2" />
-// //                           <rect x="5" y="10" width="14" height="12" rx="2" strokeWidth="2" />
-// //                         </svg>
-// //                         {!p.is_sale ? "OUT OF STOCK" : busyId === p.id ? "ADDING..." : "ADD TO CART"}
-// //                       </button>
-// //                     </div>
-// //                   </article>
-// //                 );
-// //               })}
+// //         <button
+// //           className="fpBtn"
+// //           type="button"
+// //           disabled={busyId === p.id || !p.is_sale}
+// //           onClick={() => {
+// //             if (!p.is_sale) return;
+// //             handleAddToCart(p, qty);
+// //           }}
+// //           style={{
+// //             background: p.is_sale
+// //               ? "linear-gradient(90deg,#4f86ff,#1d4ed8)"
+// //               : "#9ca3af",
+// //             cursor: p.is_sale ? "pointer" : "not-allowed",
+// //           }}
+// //         >
+// //           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+// //             <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 10V8a6 6 0 0112 0v2" />
+// //             <rect x="5" y="10" width="14" height="12" rx="2" strokeWidth="2" />
+// //           </svg>
+// //           {!p.is_sale ? "OUT OF STOCK" : busyId === p.id ? "ADDING..." : "ADD TO CART"}
+// //         </button>
+// //       </div>
+// //     </article>
+// //   );
+// // })}
 // //             </div>
 // //           )}
 
 // //           <div className="specialBannerWrap">
-// //             <div className="specialBanner">
+// //             <div
+// //               className="specialBanner"
+// //               style={{ backgroundImage: `url(${homeData.special_banner_background_image})` }}
+// //             >
 // //               <div className="specialContent">
-// //                 <div className="smallLabel">Limited Time Offer</div>
-// //                 <h3 className="specialH">Special Edition</h3>
-// //                 <p className="specialP">
-// //                   Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis,
-// //                   pulvinar dapibus leo.
-// //                 </p>
-// //                 <p className="specialStrong">
-// //                   Buy This Toolkit At 20% Discount, Use Code OFF20
-// //                 </p>
-// //                 <button className="promoBtn" onClick={() => navigate("/store")}>
-// //                   SHOP NOW
+// //                 <div className="smallLabel">{homeData.special_banner_small_label}</div>
+// //                 <h3 className="specialH">{homeData.special_banner_title}</h3>
+// //                 <p className="specialP">{homeData.special_banner_description}</p>
+// //                 <p className="specialStrong">{homeData.special_banner_strong_text}</p>
+// //                 <button
+// //                   className="promoBtn"
+// //                   onClick={() => navigate(homeData.special_banner_button_link)}
+// //                 >
+// //                   {homeData.special_banner_button_text}
 // //                 </button>
 // //               </div>
 // //             </div>
@@ -1076,16 +2374,16 @@
 // //       <section className="features">
 // //         <div className="container">
 // //           <div className="featGrid">
-// //             {["Fast Shipping", "Best Quality", "Best Offers", "Secure Payments"].map((t) => (
-// //               <div className="featItem" key={t}>
+// //             {homeData.features.map((f) => (
+// //               <div className="featItem" key={f.title}>
 // //                 <div className="featIcon" aria-hidden="true">
 // //                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
 // //                     <circle cx="12" cy="12" r="9" strokeWidth="2" />
 // //                     <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 7v10" />
 // //                   </svg>
 // //                 </div>
-// //                 <h4>{t}</h4>
-// //                 <p>It elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</p>
+// //                 <h4>{f.title}</h4>
+// //                 <p>{f.desc}</p>
 // //               </div>
 // //             ))}
 // //           </div>
@@ -1095,24 +2393,17 @@
 // //       <section className="reviews">
 // //         <div className="container">
 // //           <div className="titleWrap center">
-// //             <h2 className="title">Reviews of Our Valued Customers</h2>
+// //             <h2 className="title">{homeData.reviews_title}</h2>
 // //             <div className="underline" />
 // //           </div>
 
 // //           <div className="reviewGrid">
-// //             {[
-// //               { name: "Andrew", img: "https://randomuser.me/api/portraits/men/32.jpg", stars: 5 },
-// //               { name: "Paul", img: "https://randomuser.me/api/portraits/men/44.jpg", stars: 5 },
-// //               { name: "Michale", img: "https://randomuser.me/api/portraits/women/65.jpg", stars: 5 },
-// //               { name: "Lucy", img: "https://randomuser.me/api/portraits/women/68.jpg", stars: 5 },
-// //             ].map((r) => (
+// //             {homeData.reviews.map((r) => (
 // //               <div key={r.name}>
 // //                 <img className="avatar" src={r.img} alt={r.name} />
 // //                 <p className="rName">{r.name}</p>
 // //                 <Stars count={r.stars} />
-// //                 <p className="rText">
-// //                   The product was nice, offering quality tools and good value for money.
-// //                 </p>
+// //                 <p className="rText">{r.text}</p>
 // //               </div>
 // //             ))}
 // //           </div>
@@ -1227,7 +2518,6 @@
 // //   );
 // // }
 
-
 // import { useEffect, useRef, useState } from "react";
 // import { useNavigate } from "react-router-dom";
 // import { addProductToHybridCart } from "../services/cartHelper";
@@ -1310,6 +2600,7 @@
 //   open: boolean;
 //   product: ProductListItem | null;
 //   qty: number;
+//   tempQty: string; // temporary for manual edit in quick view
 // };
 
 // const API_BASE = "https://attenbackend.clickconnectmedia.cloud";
@@ -1397,10 +2688,12 @@
 //   const [featuredLoading, setFeaturedLoading] = useState(true);
 //   const [busyId, setBusyId] = useState<number | null>(null);
 //   const [qtyMap, setQtyMap] = useState<Record<number, number>>({});
+//   const [tempQtyMap, setTempQtyMap] = useState<Record<number, string>>({});
 //   const [quickView, setQuickView] = useState<QuickViewState>({
 //     open: false,
 //     product: null,
 //     qty: 1,
+//     tempQty: "1",
 //   });
 
 //   useEffect(() => {
@@ -1437,10 +2730,13 @@
 //         setFeatured(topProducts);
 
 //         const nextQty: Record<number, number> = {};
+//         const nextTemp: Record<number, string> = {};
 //         topProducts.forEach((p) => {
 //           nextQty[p.id] = 1;
+//           nextTemp[p.id] = "1";
 //         });
 //         setQtyMap(nextQty);
+//         setTempQtyMap(nextTemp);
 //       } catch {
 //         setFeatured([]);
 //       } finally {
@@ -1467,6 +2763,11 @@
 //       ...prev,
 //       [productId]: Math.max(1, qty),
 //     }));
+//     // Also reset the temporary input to the new number
+//     setTempQtyMap((prev) => ({
+//       ...prev,
+//       [productId]: String(Math.max(1, qty)),
+//     }));
 //   }
 
 //   async function handleAddToCart(product: ProductListItem, qty: number) {
@@ -1481,6 +2782,41 @@
 //     }
 //   }
 
+//   function handleQtyInputChange(productId: number, value: string) {
+//     setTempQtyMap((prev) => ({
+//       ...prev,
+//       [productId]: value,
+//     }));
+//   }
+
+//   function handleQtyBlur(productId: number) {
+//     const raw = tempQtyMap[productId];
+//     let newQty = parseInt(raw, 10);
+//     if (isNaN(newQty) || newQty < 1) newQty = 1;
+//     setQty(productId, newQty);
+//   }
+
+//   // Quick view handlers
+//   function handleQuickViewQtyChange(value: string) {
+//     setQuickView((prev) => ({ ...prev, tempQty: value }));
+//   }
+
+//   function handleQuickViewQtyBlur() {
+//     let newQty = parseInt(quickView.tempQty, 10);
+//     if (isNaN(newQty) || newQty < 1) newQty = 1;
+//     setQuickView((prev) => ({ ...prev, qty: newQty, tempQty: String(newQty) }));
+//   }
+
+//   function quickViewIncrement() {
+//     const newQty = quickView.qty + 1;
+//     setQuickView((prev) => ({ ...prev, qty: newQty, tempQty: String(newQty) }));
+//   }
+
+//   function quickViewDecrement() {
+//     const newQty = Math.max(1, quickView.qty - 1);
+//     setQuickView((prev) => ({ ...prev, qty: newQty, tempQty: String(newQty) }));
+//   }
+
 //   return (
 //     <div className="home">
 //       <style>{`
@@ -1491,19 +2827,27 @@
 //           --blue2:#1b76c4;
 //         }
 
-//         *{box-sizing:border-box}
+//         *{
+//           box-sizing:border-box;
+//         }
 //         body{
 //           margin:0;
 //           font-family:Lato, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 //           background:#f3f5f7;
+//           overflow-x: hidden;
 //         }
 //         a{text-decoration:none; color:inherit}
 //         .container{
 //           width:100%;
 //           max-width:1600px;
 //           margin:auto;
-//           padding-left:40px;
-//           padding-right:40px;
+//           padding-left:40px !important;
+//           padding-right:40px !important;
+//           box-sizing:border-box;
+//         }
+
+//         .home {
+//           overflow-x: hidden;
 //         }
 
 //         .hero{
@@ -1622,10 +2966,19 @@
 //           box-shadow:0 18px 35px rgba(0,0,0,.25);
 //         }
 
-//         .promoGrid{display:grid; grid-template-columns:repeat(3,1fr); gap:28px}
+//         .promoGrid{
+//           display:grid;
+//           grid-template-columns:repeat(3,1fr);
+//           gap:28px;
+//           margin:0;
+//         }
 //         .promo{
-//           border-radius:22px; overflow:hidden; position:relative;
-//           min-height:420px; background-size:cover; background-position:center;
+//           border-radius:22px;
+//           overflow:hidden;
+//           position:relative;
+//           min-height:420px;
+//           background-size:cover;
+//           background-position:center;
 //           box-shadow:0 10px 25px rgba(0,0,0,.08);
 //         }
 //         .promo::before{
@@ -1641,15 +2994,15 @@
 //           bottom:36px;
 //           color:#fff;
 //         }
-//           .fpOutStock {
-//             margin-left: 10px;
-//             background: #b91c1c;
-//             color: #fff;
-//             font-size: 12px;
-//             font-weight: 700;
-//             padding: 4px 8px;
-//             border-radius: 6px;
-//           }
+//         .fpOutStock {
+//           margin-left: 10px;
+//           background: #b91c1c;
+//           color: #fff;
+//           font-size: 12px;
+//           font-weight: 700;
+//           padding: 4px 8px;
+//           border-radius: 6px;
+//         }
 //         .promoH{margin:0 0 10px; font-weight:900; font-size:34px}
 //         .promoSub{margin:0 0 18px; opacity:.92; line-height:1.7; font-size:16px}
 //         .promoBtn{
@@ -1761,12 +3114,13 @@
 //           margin-bottom:16px;
 //         }
 //         .fpQtyWrap{
-//           display:inline-flex;
+//           display:flex;
 //           align-items:center;
 //           border:1px solid #d1d5db;
 //           border-radius:999px;
 //           overflow:hidden;
 //           margin-bottom:14px;
+//           background:#fff;
 //         }
 //         .fpQtyBtn{
 //           width:36px;
@@ -1776,13 +3130,29 @@
 //           font-size:20px;
 //           font-weight:900;
 //           cursor:pointer;
+//           display:flex;
+//           align-items:center;
+//           justify-content:center;
+//           transition:background 0.2s;
 //         }
-//         .fpQtyValue{
-//           min-width:38px;
-//           text-align:center;
-//           font-weight:900;
-//           font-size:14px;
-//           padding:0 8px;
+//         .fpQtyBtn:hover {
+//           background:#e5e7eb;
+//         }
+//         .fpQtyInput {
+//           width: 50px;
+//           text-align: center;
+//           font-weight: 900;
+//           font-size: 14px;
+//           border: none;
+//           padding: 0 4px;
+//           outline: none;
+//           background: transparent;
+//           -moz-appearance: textfield;
+//         }
+//         .fpQtyInput::-webkit-inner-spin-button,
+//         .fpQtyInput::-webkit-outer-spin-button {
+//           -webkit-appearance: none;
+//           margin: 0;
 //         }
 //         .fpBtn{
 //           width:100%;
@@ -1939,6 +3309,7 @@
 //           height:42px;
 //           border-radius:999px;
 //           overflow:hidden;
+//           background:#fff;
 //         }
 //         .qvQtyBtn{
 //           width:46px;
@@ -1947,12 +3318,25 @@
 //           background:#fff;
 //           cursor:pointer;
 //           font-size:24px;
+//           transition:background 0.2s;
 //         }
-//         .qvQtyValue{
-//           min-width:46px;
-//           text-align:center;
-//           font-size:18px;
-//           font-weight:900;
+//         .qvQtyBtn:hover {
+//           background:#f3f4f6;
+//         }
+//         .qvQtyInput {
+//           width: 60px;
+//           text-align: center;
+//           font-size: 18px;
+//           font-weight: 900;
+//           border: none;
+//           background: transparent;
+//           outline: none;
+//           -moz-appearance: textfield;
+//         }
+//         .qvQtyInput::-webkit-inner-spin-button,
+//         .qvQtyInput::-webkit-outer-spin-button {
+//           -webkit-appearance: none;
+//           margin: 0;
 //         }
 //         .qvAdd{
 //           min-width:390px;
@@ -1993,6 +3377,7 @@
 //           font-size:18px;
 //         }
 
+//         /* Responsive fixes */
 //         @media (max-width:1400px){
 //           .fpGrid{grid-template-columns:repeat(4,1fr)}
 //         }
@@ -2015,8 +3400,8 @@
 
 //         @media (max-width:768px){
 //           .container{
-//             padding-left:18px;
-//             padding-right:18px;
+//             padding-left:18px !important;
+//             padding-right:18px !important;
 //           }
 //           .hero{
 //             height:420px;
@@ -2065,6 +3450,7 @@
 //           .qvNow{font-size:24px}
 //           .qvOld{font-size:18px}
 //           .qvQtyBtn{width:40px; height:36px; font-size:20px}
+//           .qvQtyInput{width:50px; font-size:16px}
 //           .qvAdd{min-width:200px; height:48px; font-size:16px}
 //           .qvMeta{gap:16px; font-size:14px}
 //         }
@@ -2100,7 +3486,7 @@
 //           .fpGst{font-size:11px; margin-bottom:10px}
 //           .fpQtyWrap{width:100%; justify-content:space-between; margin-bottom:10px}
 //           .fpQtyBtn{width:32px; height:32px; font-size:18px}
-//           .fpQtyValue{min-width:32px; font-size:12px}
+//           .fpQtyInput{width:40px; font-size:12px}
 //           .fpBtn{padding:12px 8px; font-size:12px; border-radius:10px}
 //           .brandsBox{padding:20px 0}
 //           .brandsScroll{gap:15px; height:100px}
@@ -2129,7 +3515,7 @@
 //           .qvActionRow{gap:10px; flex-direction:column; align-items:stretch}
 //           .qvQty{height:38px; width:100%; justify-content:space-between}
 //           .qvQtyBtn{width:36px; height:36px; font-size:18px}
-//           .qvQtyValue{min-width:36px; font-size:16px}
+//           .qvQtyInput{width:50px; font-size:16px}
 //           .qvAdd{min-width:100%; height:44px; font-size:15px; padding:0 16px}
 //           .qvMeta{gap:10px; font-size:12px; flex-direction:column}
 //           .qvShare{gap:10px; font-size:14px; margin-top:16px}
@@ -2243,109 +3629,114 @@
 //           ) : (
 //             <div className="fpGrid">
 //               {featured.map((p) => {
-//   const qty = qtyMap[p.id] || 1;
+//                 const qty = qtyMap[p.id] || 1;
+//                 const tempQty = tempQtyMap[p.id] ?? String(qty);
 
-//   return (
-//     <article className="fpCard" key={p.id}>
-//       <a
-//         className="fpImgWrap"
-//         href={`/product/${p.slug}`}
-//         onClick={(e) => {
-//           e.preventDefault();
-//           navigate(`/product/${p.slug}`);
-//         }}
-//       >
-//         <img
-//           className="fpImg"
-//           src={p.image || "https://dummyimage.com/500x420/f3f4f6/111827&text=No+Image"}
-//           alt={p.title}
-//           loading="lazy"
-//         />
-//         {/* Display Stock Out label */}
-//         {!p.is_sale ? (
-//           <span className="_fpSale">
-            
-//           </span>
-//         ) : (
-//           <span className="fpSale">{p.is_sale ? "SALE" : "NEW"}</span>
-//         )}
-//       </a>
+//                 return (
+//                   <article className="fpCard" key={p.id}>
+//                     <a
+//                       className="fpImgWrap"
+//                       href={`/product/${p.slug}`}
+//                       onClick={(e) => {
+//                         e.preventDefault();
+//                         navigate(`/product/${p.slug}`);
+//                       }}
+//                     >
+//                       <img
+//                         className="fpImg"
+//                         src={p.image || "https://dummyimage.com/500x420/f3f4f6/111827&text=No+Image"}
+//                         alt={p.title}
+//                         loading="lazy"
+//                       />
+//                       {p.is_sale ? (
+//                         <span className="fpSale">SALE</span>
+//                       ) : (
+//                         <span className="fpSale" style={{ background: "#4b5563" }}>NEW</span>
+//                       )}
+//                     </a>
 
-//       {/* Product Title, Price, Add to Cart Section */}
-//       <div className="fpBody">
-//         <div className="fpCat">
-//           {p.short_category_label || p.category_name || "UNCATEGORIZED"}
-//         </div>
+//                     <div className="fpBody">
+//                       <div className="fpCat">
+//                         {p.short_category_label || p.category_name || "UNCATEGORIZED"}
+//                       </div>
 
-//         <h3
-//           className="fpTitle"
-//           title={p.title}
-//           onClick={() => navigate(`/product/${p.slug}`)}
-//         >
-//           {p.title.toUpperCase()}
-//         </h3>
+//                       <h3
+//                         className="fpTitle"
+//                         title={p.title}
+//                         onClick={() => navigate(`/product/${p.slug}`)}
+//                       >
+//                         {p.title.toUpperCase()}
+//                       </h3>
 
-//         <div className="fpPriceRow">
-//           {Number(p.mrp) > Number(p.sale_price) ? (
-//             <span className="fpOld">{inr(Number(p.mrp))}</span>
-//           ) : null}
-//           <span className="fpNow">{inr(Number(p.sale_price))}</span>
-//           {p.discount_percent ? (
-//             <span className="fpOff">-{p.discount_percent}%</span>
-//           ) : null}
+//                       <div className="fpPriceRow">
+//                         {Number(p.mrp) > Number(p.sale_price) ? (
+//                           <span className="fpOld">{inr(Number(p.mrp))}</span>
+//                         ) : null}
+//                         <span className="fpNow">{inr(Number(p.sale_price))}</span>
+//                         {p.discount_percent ? (
+//                           <span className="fpOff">-{p.discount_percent}%</span>
+//                         ) : null}
 
-//           {!p.is_sale && (
-//             <span className="fpOutStock">OUT OF STOCK</span>
-//           )}
-//         </div>
+//                         {!p.is_sale && (
+//                           <span className="fpOutStock">OUT OF STOCK</span>
+//                         )}
+//                       </div>
 
-//         <div className="fpGst">
-//           GST ({p.gst_percent}%)
-//         </div>
+//                       <div className="fpGst">
+//                         GST ({p.gst_percent}%) Inclusive of tax
+//                       </div>
 
-//         <div className="fpQtyWrap">
-//           <button
-//             className="fpQtyBtn"
-//             onClick={() => setQty(p.id, qty - 1)}
-//             type="button"
-//           >
-//             −
-//           </button>
-//           <div className="fpQtyValue">{qty}</div>
-//           <button
-//             className="fpQtyBtn"
-//             onClick={() => setQty(p.id, qty + 1)}
-//             type="button"
-//           >
-//             +
-//           </button>
-//         </div>
+//                       <div className="fpQtyWrap">
+//                         <button
+//                           className="fpQtyBtn"
+//                           onClick={() => setQty(p.id, qty - 1)}
+//                           type="button"
+//                         >
+//                           −
+//                         </button>
+//                         <input
+//                           type="text"
+//                           inputMode="numeric"
+//                           className="fpQtyInput"
+//                           value={tempQty}
+//                           onChange={(e) => handleQtyInputChange(p.id, e.target.value)}
+//                           onBlur={() => handleQtyBlur(p.id)}
+//                           disabled={busyId === p.id}
+//                         />
+//                         <button
+//                           className="fpQtyBtn"
+//                           onClick={() => setQty(p.id, qty + 1)}
+//                           type="button"
+//                         >
+//                           +
+//                         </button>
+//                       </div>
 
-//         <button
-//           className="fpBtn"
-//           type="button"
-//           disabled={busyId === p.id || !p.is_sale}
-//           onClick={() => {
-//             if (!p.is_sale) return;
-//             handleAddToCart(p, qty);
-//           }}
-//           style={{
-//             background: p.is_sale
-//               ? "linear-gradient(90deg,#4f86ff,#1d4ed8)"
-//               : "#9ca3af",
-//             cursor: p.is_sale ? "pointer" : "not-allowed",
-//           }}
-//         >
-//           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-//             <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 10V8a6 6 0 0112 0v2" />
-//             <rect x="5" y="10" width="14" height="12" rx="2" strokeWidth="2" />
-//           </svg>
-//           {!p.is_sale ? "OUT OF STOCK" : busyId === p.id ? "ADDING..." : "ADD TO CART"}
-//         </button>
-//       </div>
-//     </article>
-//   );
-// })}
+//                       <button
+//                         className="fpBtn"
+//                         type="button"
+//                         disabled={busyId === p.id || !p.is_sale}
+//                         onClick={() => {
+//                           if (!p.is_sale) return;
+//                           handleAddToCart(p, qty);
+//                         }}
+//                         style={{
+//                           background: p.is_sale
+//                             ? "linear-gradient(90deg,#4f86ff,#1d4ed8)"
+//                             : "#9ca3af",
+//                           cursor: p.is_sale ? "pointer" : "not-allowed",
+//                         }}
+//                       >
+//                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+//                           <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 10V8a6 6 0 0112 0v2" />
+//                           <rect x="5" y="10" width="14" height="12" rx="2" strokeWidth="2" />
+//                         </svg>
+//                         {!p.is_sale ? "OUT OF STOCK" : busyId === p.id ? "ADDING..." : "ADD TO CART"}
+//                       </button>
+//                     </div>
+//                   </article>
+//                 );
+//               })}
 //             </div>
 //           )}
 
@@ -2413,12 +3804,12 @@
 //       {quickView.open && quickView.product && (
 //         <div
 //           className="qvOverlay"
-//           onClick={() => setQuickView({ open: false, product: null, qty: 1 })}
+//           onClick={() => setQuickView({ open: false, product: null, qty: 1, tempQty: "1" })}
 //         >
 //           <div className="qvCard" onClick={(e) => e.stopPropagation()}>
 //             <button
 //               className="qvClose"
-//               onClick={() => setQuickView({ open: false, product: null, qty: 1 })}
+//               onClick={() => setQuickView({ open: false, product: null, qty: 1, tempQty: "1" })}
 //             >
 //               ✕
 //             </button>
@@ -2460,26 +3851,21 @@
 //                   <div className="qvQty">
 //                     <button
 //                       className="qvQtyBtn"
-//                       onClick={() =>
-//                         setQuickView((prev) => ({
-//                           ...prev,
-//                           qty: Math.max(1, prev.qty - 1),
-//                         }))
-//                       }
+//                       onClick={quickViewDecrement}
 //                     >
 //                       -
 //                     </button>
-
-//                     <div className="qvQtyValue">{quickView.qty}</div>
-
+//                     <input
+//                       type="text"
+//                       inputMode="numeric"
+//                       className="qvQtyInput"
+//                       value={quickView.tempQty}
+//                       onChange={(e) => handleQuickViewQtyChange(e.target.value)}
+//                       onBlur={handleQuickViewQtyBlur}
+//                     />
 //                     <button
 //                       className="qvQtyBtn"
-//                       onClick={() =>
-//                         setQuickView((prev) => ({
-//                           ...prev,
-//                           qty: prev.qty + 1,
-//                         }))
-//                       }
+//                       onClick={quickViewIncrement}
 //                     >
 //                       +
 //                     </button>
@@ -2600,7 +3986,7 @@ type QuickViewState = {
   open: boolean;
   product: ProductListItem | null;
   qty: number;
-  tempQty: string; // temporary for manual edit in quick view
+  tempQty: string;
 };
 
 const API_BASE = "https://attenbackend.clickconnectmedia.cloud";
@@ -2763,7 +4149,6 @@ export default function Home() {
       ...prev,
       [productId]: Math.max(1, qty),
     }));
-    // Also reset the temporary input to the new number
     setTempQtyMap((prev) => ({
       ...prev,
       [productId]: String(Math.max(1, qty)),
@@ -2796,7 +4181,6 @@ export default function Home() {
     setQty(productId, newQty);
   }
 
-  // Quick view handlers
   function handleQuickViewQtyChange(value: string) {
     setQuickView((prev) => ({ ...prev, tempQty: value }));
   }
@@ -2822,22 +4206,28 @@ export default function Home() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap');
 
-        :root{
+        :root {
           --blue:#2ea3f2;
           --blue2:#1b76c4;
         }
 
-        *{
+        * {
           box-sizing:border-box;
         }
-        body{
+
+        body {
           margin:0;
           font-family:Lato, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
           background:#f3f5f7;
           overflow-x: hidden;
         }
-        a{text-decoration:none; color:inherit}
-        .container{
+
+        a {
+          text-decoration:none;
+          color:inherit;
+        }
+
+        .container {
           width:100%;
           max-width:1600px;
           margin:auto;
@@ -2850,14 +4240,15 @@ export default function Home() {
           overflow-x: hidden;
         }
 
-        .hero{
+        .hero {
           position:relative;
           height:100vh;
           min-height:720px;
           overflow:hidden;
           background:#061b27;
         }
-        .heroBgImg{
+
+        .heroBgImg {
           position:absolute;
           inset:0;
           width:100%;
@@ -2865,12 +4256,14 @@ export default function Home() {
           object-fit:cover;
           object-position:center;
         }
-        .heroOverlay{
+
+        .heroOverlay {
           position:absolute;
           inset:0;
           background: linear-gradient(90deg, rgba(0,0,0,.75) 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.10) 100%);
         }
-        .heroOverlay2{
+
+        .heroOverlay2 {
           position:absolute;
           inset:0;
           background: rgba(10, 90, 140, .22);
@@ -2878,7 +4271,7 @@ export default function Home() {
           pointer-events:none;
         }
 
-        .heroContent{
+        .heroContent {
           position:relative;
           z-index:2;
           height:100%;
@@ -2887,41 +4280,90 @@ export default function Home() {
           justify-content:center;
           text-align:center;
         }
-        .heroText{
+
+        .heroText {
           color:#fff;
           max-width:760px;
           margin:auto;
           text-align:center;
         }
-        .heroH1{font-size:64px; margin:0 0 12px; font-weight:900; line-height:1.05}
-        .heroH3{margin:0 0 28px; font-size:26px; font-weight:800; opacity:.95}
-        .heroBtn{
-          background:#fff; color:#111; border:none;
-          padding:12px 22px; border-radius:999px;
-          font-weight:900; cursor:pointer;
+
+        .heroH1 {
+          font-size:64px;
+          margin:0 0 12px;
+          font-weight:900;
+          line-height:1.05;
+        }
+
+        .heroH3 {
+          margin:0 0 28px;
+          font-size:26px;
+          font-weight:800;
+          opacity:.95;
+        }
+
+        .heroBtn {
+          background:#fff;
+          color:#111;
+          border:none;
+          padding:12px 22px;
+          border-radius:999px;
+          font-weight:900;
+          cursor:pointer;
           box-shadow:0 10px 20px rgba(0,0,0,.18);
         }
 
-        .section{padding:60px 0}
-        .titleWrap{display:flex; flex-direction:column; gap:10px; margin-bottom:34px}
-        .titleWrap.center{align-items:center}
-        .titleWrap.left{align-items:flex-start}
-        .title{margin:0; font-size:48px; font-weight:900; color:#0b0b0b; text-align:center}
-        .titleWrap.left .title{text-align:left}
-        .underline{width:180px; height:3px; background:#8aa0ff}
+        .section {
+          padding:60px 0;
+        }
 
-        .brandsBox{
+        .titleWrap {
+          display:flex;
+          flex-direction:column;
+          gap:10px;
+          margin-bottom:34px;
+        }
+
+        .titleWrap.center {
+          align-items:center;
+        }
+
+        .titleWrap.left {
+          align-items:flex-start;
+        }
+
+        .title {
+          margin:0;
+          font-size:48px;
+          font-weight:900;
+          color:#0b0b0b;
+          text-align:center;
+        }
+
+        .titleWrap.left .title {
+          text-align:left;
+        }
+
+        .underline {
+          width:180px;
+          height:3px;
+          background:#8aa0ff;
+        }
+
+        .brandsBox {
           width:100%;
           background:#fff;
           padding:60px 0;
         }
-        .brandsRow{
+
+        .brandsRow {
           display:flex;
           align-items:center;
           justify-content:space-between;
           gap:18px;
         }
-        .brandsScroll{
+
+        .brandsScroll {
           overflow-x:auto;
           overflow-y:hidden;
           display:flex;
@@ -2933,20 +4375,26 @@ export default function Home() {
           flex:1;
           scroll-behavior:smooth;
         }
-        .brandsScroll::-webkit-scrollbar{height:0}
-        .brandLogo{
+
+        .brandsScroll::-webkit-scrollbar {
+          height:0;
+        }
+
+        .brandLogo {
           min-width:240px;
           height:160px;
           display:flex;
           align-items:center;
           justify-content:center;
         }
-        .brandLogo img{
+
+        .brandLogo img {
           max-height:150px;
           max-width:220px;
           object-fit:contain;
         }
-        .brandArrow{
+
+        .brandArrow {
           width:60px;
           height:60px;
           border-radius:50%;
@@ -2961,18 +4409,20 @@ export default function Home() {
           color:#fff;
           flex:0 0 auto;
         }
-        .brandArrow:hover{
+
+        .brandArrow:hover {
           transform:translateY(-4px);
           box-shadow:0 18px 35px rgba(0,0,0,.25);
         }
 
-        .promoGrid{
+        .promoGrid {
           display:grid;
           grid-template-columns:repeat(3,1fr);
           gap:28px;
           margin:0;
         }
-        .promo{
+
+        .promo {
           border-radius:22px;
           overflow:hidden;
           position:relative;
@@ -2981,19 +4431,22 @@ export default function Home() {
           background-position:center;
           box-shadow:0 10px 25px rgba(0,0,0,.08);
         }
-        .promo::before{
+
+        .promo::before {
           content:"";
           position:absolute;
           inset:0;
           background:rgba(0,0,0,.55);
         }
-        .promoBody{
+
+        .promoBody {
           position:absolute;
           left:36px;
           right:36px;
           bottom:36px;
           color:#fff;
         }
+
         .fpOutStock {
           margin-left: 10px;
           background: #b91c1c;
@@ -3002,104 +4455,112 @@ export default function Home() {
           font-weight: 700;
           padding: 4px 8px;
           border-radius: 6px;
-        }
-        .promoH{margin:0 0 10px; font-weight:900; font-size:34px}
-        .promoSub{margin:0 0 18px; opacity:.92; line-height:1.7; font-size:16px}
-        .promoBtn{
-          background:#fff; color:#111; border:none;
-          padding:12px 22px; border-radius:999px;
-          font-weight:900; cursor:pointer;
+          white-space: nowrap;
         }
 
-        .fpSection{background:#f3f5f7; padding:70px 0}
-        .fpGrid{
+        .promoH {
+          margin:0 0 10px;
+          font-weight:900;
+          font-size:34px;
+        }
+
+        .promoSub {
+          margin:0 0 18px;
+          opacity:.92;
+          line-height:1.7;
+          font-size:16px;
+        }
+
+        .promoBtn {
+          background:#fff;
+          color:#111;
+          border:none;
+          padding:12px 22px;
+          border-radius:999px;
+          font-weight:900;
+          cursor:pointer;
+        }
+
+        .fpSection {
+          background:#f3f5f7;
+          padding:70px 0;
+        }
+
+        .fpGrid {
           display:grid;
           grid-template-columns:repeat(5,1fr);
           gap:22px;
         }
-        .fpCard{
+
+        .fpCard {
           background:#fff;
           border-radius:24px;
           overflow:hidden;
           border:1px solid #e7e7e7;
           box-shadow:0 10px 25px rgba(0,0,0,.08);
-          position:relative;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
         }
-        .fpImgWrap{
+
+        .fpImgWrap {
           position:relative;
           background:#f7f7f7;
           height:280px;
           display:block;
           cursor:pointer;
+          flex-shrink: 0;
         }
-        .fpImg{
+
+        .fpImg {
           width:100%;
           height:100%;
           object-fit:contain;
           padding:20px;
         }
-        .fpSale{
-          position:absolute;
-          top:14px;
-          left:14px;
-          background:#e74b3c;
-          color:#fff;
-          font-weight:900;
-          font-size:12px;
-          padding:8px 14px;
-          border-radius:8px;
+
+        .fpBody {
+          padding:18px 18px 20px;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
         }
-        .fpEye{
-          position:absolute;
-          top:14px;
-          right:14px;
-          width:58px;
-          height:58px;
-          border-radius:999px;
-          background:#fff;
-          display:grid;
-          place-items:center;
-          color:#444;
-          box-shadow:0 8px 16px rgba(0,0,0,.12);
-          border:none;
-          cursor:pointer;
-        }
-        .fpBody{padding:18px 18px 20px}
-        .fpCat{
-          color:#9aa1aa;
-          font-size:12px;
-          font-weight:900;
-          margin-bottom:10px;
-          text-transform:uppercase;
-        }
-        .fpTitle{
+
+        .fpTitle {
           margin:0 0 14px;
           font-size:18px;
           font-weight:900;
           line-height:1.25;
           color:#1f2937;
-          min-height:68px;
           cursor:pointer;
+          word-break: break-word;
+          overflow-wrap: break-word;
+          white-space: normal;
+          overflow: visible;
         }
-        .fpPriceRow{
+
+        .fpPriceRow {
           display:flex;
           align-items:flex-end;
           gap:10px;
           margin-bottom:8px;
           flex-wrap:wrap;
         }
-        .fpOld{
+
+        .fpOld {
           color:#9aa1aa;
           text-decoration:line-through;
           font-weight:900;
           font-size:15px;
         }
-        .fpNow{
+
+        .fpNow {
           font-weight:900;
           font-size:20px;
           color:#111827;
         }
-        .fpOff{
+
+        .fpOff {
           font-size:12px;
           font-weight:900;
           background:#ffe9ea;
@@ -3107,39 +4568,54 @@ export default function Home() {
           padding:4px 8px;
           border-radius:6px;
         }
-        .fpGst{
+
+        .fpGst {
           font-size:14px;
           font-weight:800;
           color:#4b5563;
           margin-bottom:16px;
         }
-        .fpQtyWrap{
+
+        .fpCartRow {
+          display:flex;
+          align-items:center;
+          gap:12px;
+          margin-top: auto;
+        }
+
+        /* Smaller quantity controls */
+        .fpQtyWrap {
           display:flex;
           align-items:center;
           border:1px solid #d1d5db;
           border-radius:999px;
           overflow:hidden;
-          margin-bottom:14px;
           background:#fff;
+          flex-shrink:0;
+          height:36px;
         }
-        .fpQtyBtn{
-          width:36px;
+
+        .fpQtyBtn {
+          width:32px;
           height:36px;
           border:none;
           background:#f9fafb;
-          font-size:20px;
+          font-size:18px;
           font-weight:900;
           cursor:pointer;
           display:flex;
           align-items:center;
           justify-content:center;
           transition:background 0.2s;
+          color:#1f2937;
         }
+
         .fpQtyBtn:hover {
           background:#e5e7eb;
         }
+
         .fpQtyInput {
-          width: 50px;
+          width: 44px;
           text-align: center;
           font-weight: 900;
           font-size: 14px;
@@ -3149,32 +4625,49 @@ export default function Home() {
           background: transparent;
           -moz-appearance: textfield;
         }
+
         .fpQtyInput::-webkit-inner-spin-button,
         .fpQtyInput::-webkit-outer-spin-button {
           -webkit-appearance: none;
           margin: 0;
         }
-        .fpBtn{
-          width:100%;
-          background:linear-gradient(90deg,#4f86ff,#1d4ed8);
+
+        /* Prominent ADD TO CART button */
+        .fpBtn {
+          flex: 1;
+          min-width: 0;
+          background: linear-gradient(90deg,#4f86ff,#1d4ed8);
           color:#fff;
           border:none;
-          padding:16px 12px;
-          border-radius:14px;
-          font-weight:900;
-          cursor:pointer;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          gap:10px;
+          padding: 8px 12px;
+          border-radius: 999px;
+          font-weight: 900;
+          font-size: 14px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          line-height: 1.2;
+          text-align: center;
+          white-space: normal;
+          word-break: break-word;
+          overflow-wrap: break-word;
+          height: 36px;
+          transition: all 0.2s;
         }
-        .fpBtn:disabled{opacity:.7; cursor:not-allowed}
 
-        .specialBannerWrap{
+        .fpBtn:disabled {
+          opacity:.7;
+          cursor:not-allowed;
+        }
+
+        .specialBannerWrap {
           width:100%;
           padding:70px 40px;
         }
-        .specialBanner{
+
+        .specialBanner {
           border-radius:28px;
           overflow:hidden;
           min-height:430px;
@@ -3182,13 +4675,15 @@ export default function Home() {
           background-position:center;
           position:relative;
         }
-        .specialBanner::before{
+
+        .specialBanner::before {
           content:"";
           position:absolute;
           inset:0;
           background:linear-gradient(90deg, rgba(0,0,0,.68) 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.05) 100%);
         }
-        .specialContent{
+
+        .specialContent {
           position:absolute;
           left:60px;
           top:60px;
@@ -3196,27 +4691,119 @@ export default function Home() {
           color:#fff;
           z-index:2;
         }
-        .smallLabel{font-weight:900; opacity:.9; margin-bottom:12px; font-size:18px}
-        .specialH{margin:0 0 14px; font-size:52px; font-weight:900}
-        .specialP{margin:0 0 20px; line-height:1.8; opacity:.92; font-size:17px}
-        .specialStrong{margin:0 0 24px; font-weight:900; font-size:20px}
 
-        .features{background:#f3f5f7; padding:70px 0}
-        .featGrid{display:grid; grid-template-columns:repeat(4,1fr); gap:24px; text-align:center}
-        .featItem h4{margin:14px 0 10px; font-size:20px; font-weight:900}
-        .featItem p{margin:0; color:#555; line-height:1.8; max-width:280px; margin-inline:auto}
-        .featIcon{width:48px; height:48px; margin:0 auto; color:#111; opacity:.9}
+        .smallLabel {
+          font-weight:900;
+          opacity:.9;
+          margin-bottom:12px;
+          font-size:18px;
+        }
 
-        .reviews{padding:70px 0; background:#fff}
-        .reviewGrid{display:grid; grid-template-columns:repeat(4,1fr); gap:28px; margin-top:30px; text-align:center}
-        .avatar{width:90px; height:90px; border-radius:999px; object-fit:cover; margin-bottom:16px}
-        .rName{font-weight:900; margin:0 0 8px; font-size:18px}
-        .stars{display:flex; justify-content:center; gap:4px; margin-bottom:14px}
-        .star{font-size:18px; color:#e8b04d; opacity:.35}
-        .star.on{opacity:1}
-        .rText{margin:0; color:#444; line-height:2; padding:0 14px}
+        .specialH {
+          margin:0 0 14px;
+          font-size:52px;
+          font-weight:900;
+        }
 
-        .qvOverlay{
+        .specialP {
+          margin:0 0 20px;
+          line-height:1.8;
+          opacity:.92;
+          font-size:17px;
+        }
+
+        .specialStrong {
+          margin:0 0 24px;
+          font-weight:900;
+          font-size:20px;
+        }
+
+        .features {
+          background:#f3f5f7;
+          padding:70px 0;
+        }
+
+        .featGrid {
+          display:grid;
+          grid-template-columns:repeat(4,1fr);
+          gap:24px;
+          text-align:center;
+        }
+
+        .featItem h4 {
+          margin:14px 0 10px;
+          font-size:20px;
+          font-weight:900;
+        }
+
+        .featItem p {
+          margin:0;
+          color:#555;
+          line-height:1.8;
+          max-width:280px;
+          margin-inline:auto;
+        }
+
+        .featIcon {
+          width:48px;
+          height:48px;
+          margin:0 auto;
+          color:#111;
+          opacity:.9;
+        }
+
+        .reviews {
+          padding:70px 0;
+          background:#fff;
+        }
+
+        .reviewGrid {
+          display:grid;
+          grid-template-columns:repeat(4,1fr);
+          gap:28px;
+          margin-top:30px;
+          text-align:center;
+        }
+
+        .avatar {
+          width:90px;
+          height:90px;
+          border-radius:999px;
+          object-fit:cover;
+          margin-bottom:16px;
+        }
+
+        .rName {
+          font-weight:900;
+          margin:0 0 8px;
+          font-size:18px;
+        }
+
+        .stars {
+          display:flex;
+          justify-content:center;
+          gap:4px;
+          margin-bottom:14px;
+        }
+
+        .star {
+          font-size:18px;
+          color:#e8b04d;
+          opacity:.35;
+        }
+
+        .star.on {
+          opacity:1;
+        }
+
+        .rText {
+          margin:0;
+          color:#444;
+          line-height:2;
+          padding:0 14px;
+        }
+
+        .qvOverlay {
           position:fixed;
           inset:0;
           background:rgba(0,0,0,.55);
@@ -3225,7 +4812,8 @@ export default function Home() {
           place-items:center;
           padding:20px;
         }
-        .qvCard{
+
+        .qvCard {
           width:min(1380px, 96vw);
           background:#fff;
           position:relative;
@@ -3235,7 +4823,8 @@ export default function Home() {
           max-height:92vh;
           overflow:auto;
         }
-        .qvClose{
+
+        .qvClose {
           position:absolute;
           top:18px;
           right:18px;
@@ -3247,62 +4836,72 @@ export default function Home() {
           color:#1f2937;
           z-index:2;
         }
-        .qvGrid{
+
+        .qvGrid {
           display:grid;
           grid-template-columns:0.9fr 1.1fr;
           gap:28px;
           align-items:start;
         }
-        .qvMainImage{
+
+        .qvMainImage {
           width:100%;
           height:560px;
           object-fit:contain;
           background:#fff;
         }
-        .qvThumbRow{
+
+        .qvThumbRow {
           margin-top:18px;
           display:flex;
           justify-content:center;
         }
-        .qvThumb{
+
+        .qvThumb {
           width:110px;
           height:90px;
           object-fit:contain;
           background:#fff;
         }
-        .qvProductTitle{
+
+        .qvProductTitle {
           font-size:28px;
           font-weight:900;
           line-height:1.3;
           margin:0 0 16px;
           color:#111827;
         }
-        .qvPriceRow{
+
+        .qvPriceRow {
           display:flex;
           align-items:center;
           gap:10px;
           flex-wrap:wrap;
           margin-top:10px;
         }
-        .qvOld{
+
+        .qvOld {
           font-size:22px;
           color:#9ca3af;
           text-decoration:line-through;
           font-weight:900;
         }
-        .qvNow{
+
+        .qvNow {
           font-size:30px;
           font-weight:900;
           color:#1f2937;
         }
-        .qvActionRow{
+
+        .qvActionRow {
           display:flex;
           align-items:center;
           gap:16px;
           margin-top:18px;
           flex-wrap:wrap;
         }
-        .qvQty{
+
+        .qvQty {
           display:inline-flex;
           align-items:center;
           border:1px solid #d1d5db;
@@ -3311,7 +4910,8 @@ export default function Home() {
           overflow:hidden;
           background:#fff;
         }
-        .qvQtyBtn{
+
+        .qvQtyBtn {
           width:46px;
           height:40px;
           border:none;
@@ -3320,9 +4920,11 @@ export default function Home() {
           font-size:24px;
           transition:background 0.2s;
         }
+
         .qvQtyBtn:hover {
           background:#f3f4f6;
         }
+
         .qvQtyInput {
           width: 60px;
           text-align: center;
@@ -3333,12 +4935,14 @@ export default function Home() {
           outline: none;
           -moz-appearance: textfield;
         }
+
         .qvQtyInput::-webkit-inner-spin-button,
         .qvQtyInput::-webkit-outer-spin-button {
           -webkit-appearance: none;
           margin: 0;
         }
-        .qvAdd{
+
+        .qvAdd {
           min-width:390px;
           height:54px;
           border:none;
@@ -3350,20 +4954,23 @@ export default function Home() {
           cursor:pointer;
           padding:0 24px;
         }
-        .qvDivider{
+
+        .qvDivider {
           height:1px;
           background:#e5e7eb;
           margin-top:18px;
           margin-bottom:16px;
         }
-        .qvMeta{
+
+        .qvMeta {
           display:flex;
           gap:28px;
           flex-wrap:wrap;
           font-size:16px;
           color:#1f2937;
         }
-        .qvShare{
+
+        .qvShare {
           display:flex;
           align-items:center;
           gap:16px;
@@ -3372,169 +4979,506 @@ export default function Home() {
           color:#374151;
           flex-wrap:wrap;
         }
-        .qvShareIcon{
+
+        .qvShareIcon {
           font-weight:800;
           font-size:18px;
         }
 
         /* Responsive fixes */
-        @media (max-width:1400px){
-          .fpGrid{grid-template-columns:repeat(4,1fr)}
+        @media (max-width:1400px) {
+          .fpGrid {
+            grid-template-columns:repeat(4,1fr);
+          }
         }
 
-        @media (max-width:1180px){
-          .heroH1 { font-size: 48px; }
-          .title { font-size: 40px; }
-          .promoGrid { grid-template-columns:repeat(2,1fr); }
-          .fpGrid { grid-template-columns:repeat(3,1fr); }
-          .reviewGrid { grid-template-columns:repeat(2,1fr); }
-          .featGrid { grid-template-columns:repeat(2,1fr); }
-          .specialContent { left: 40px; top: 40px; max-width: 450px; }
-          .specialH { font-size: 40px; }
-          .qvGrid { grid-template-columns:1fr; }
-          .qvMainImage { height: 400px; }
-          .qvAdd { min-width: 250px; }
-          .brandsScroll { gap: 40px; }
-          .brandLogo { min-width: 180px; }
+        @media (max-width:1180px) {
+          .heroH1 {
+            font-size: 48px;
+          }
+          .title {
+            font-size: 40px;
+          }
+          .promoGrid {
+            grid-template-columns:repeat(2,1fr);
+          }
+          .fpGrid {
+            grid-template-columns:repeat(3,1fr);
+          }
+          .reviewGrid {
+            grid-template-columns:repeat(2,1fr);
+          }
+          .featGrid {
+            grid-template-columns:repeat(2,1fr);
+          }
+          .specialContent {
+            left: 40px;
+            top: 40px;
+            max-width: 450px;
+          }
+          .specialH {
+            font-size: 40px;
+          }
+          .qvGrid {
+            grid-template-columns:1fr;
+          }
+          .qvMainImage {
+            height: 400px;
+          }
+          .qvAdd {
+            min-width: 250px;
+          }
+          .brandsScroll {
+            gap: 40px;
+          }
+          .brandLogo {
+            min-width: 180px;
+          }
         }
 
-        @media (max-width:768px){
-          .container{
+        /* Prevent button text clipping on medium screens */
+        @media (max-width: 700px) {
+          .fpCartRow {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+          }
+          .fpQtyWrap {
+            width: 100%;
+            justify-content: space-between;
+          }
+          .fpQtyBtn {
+            width: 33.33%;
+          }
+          .fpBtn {
+            width: 100%;
+          }
+        }
+
+        @media (max-width:768px) {
+          .container {
             padding-left:18px !important;
             padding-right:18px !important;
           }
-          .hero{
+          .hero {
             height:420px;
             min-height:420px;
           }
-          .heroText{padding-top:30px}
-          .heroH1{font-size:36px}
-          .heroH3{font-size:18px}
-          .heroBtn{margin-top:10px}
-          .title{font-size:34px}
-          .section{padding:40px 0}
-          .promoGrid{grid-template-columns:1fr}
-          .promo{min-height:320px}
-          .promoBody{left:24px; right:24px; bottom:24px}
-          .promoH{font-size:28px}
-          .promoSub{font-size:15px}
-          .fpGrid{grid-template-columns:repeat(2,1fr); gap:18px}
-          .fpImgWrap{height:230px}
-          .fpTitle{font-size:16px; min-height:auto}
-          .fpNow{font-size:18px}
-          .brandsBox{padding:30px 0}
-          .brandsRow{gap:10px}
-          .brandsScroll{gap:20px; height:120px}
-          .brandLogo{min-width:140px; height:120px}
-          .brandLogo img{max-height:100px; max-width:140px}
-          .brandArrow{width:44px; height:44px}
-          .specialBannerWrap{padding:40px 0 10px}
-          .specialBanner{min-height:350px}
-          .specialContent{left:24px; top:24px; right:24px; max-width:100%}
-          .specialH{font-size:32px}
-          .specialP{font-size:15px}
-          .specialStrong{font-size:16px}
-          .features{padding:40px 0}
-          .featGrid{gap:16px}
-          .featItem h4{font-size:18px}
-          .featItem p{font-size:14px}
-          .reviews{padding:40px 0}
-          .reviewGrid{gap:20px}
-          .avatar{width:70px; height:70px}
-          .rName{font-size:16px}
-          .rText{font-size:14px; line-height:1.6}
-          .qvCard{padding:20px}
-          .qvMainImage{height:300px}
-          .qvClose{font-size:28px; top:12px; right:12px}
-          .qvProductTitle{font-size:22px}
-          .qvNow{font-size:24px}
-          .qvOld{font-size:18px}
-          .qvQtyBtn{width:40px; height:36px; font-size:20px}
-          .qvQtyInput{width:50px; font-size:16px}
-          .qvAdd{min-width:200px; height:48px; font-size:16px}
-          .qvMeta{gap:16px; font-size:14px}
+          .heroText {
+            padding-top:30px;
+          }
+          .heroH1 {
+            font-size:36px;
+          }
+          .heroH3 {
+            font-size:18px;
+          }
+          .heroBtn {
+            margin-top:10px;
+          }
+          .title {
+            font-size:34px;
+          }
+          .section {
+            padding:40px 0;
+          }
+          .promoGrid {
+            grid-template-columns:1fr;
+          }
+          .promo {
+            min-height:320px;
+          }
+          .promoBody {
+            left:24px;
+            right:24px;
+            bottom:24px;
+          }
+          .promoH {
+            font-size:28px;
+          }
+          .promoSub {
+            font-size:15px;
+          }
+          .fpGrid {
+            grid-template-columns:repeat(2,1fr);
+            gap:18px;
+          }
+          .fpImgWrap {
+            height:230px;
+          }
+          .fpTitle {
+            font-size:16px;
+          }
+          .fpNow {
+            font-size:18px;
+          }
+          .brandsBox {
+            padding:30px 0;
+          }
+          .brandsRow {
+            gap:10px;
+          }
+          .brandsScroll {
+            gap:20px;
+            height:120px;
+          }
+          .brandLogo {
+            min-width:140px;
+            height:120px;
+          }
+          .brandLogo img {
+            max-height:100px;
+            max-width:140px;
+          }
+          .brandArrow {
+            width:44px;
+            height:44px;
+          }
+          .specialBannerWrap {
+            padding:40px 0 10px;
+          }
+          .specialBanner {
+            min-height:350px;
+          }
+          .specialContent {
+            left:24px;
+            top:24px;
+            right:24px;
+            max-width:100%;
+          }
+          .specialH {
+            font-size:32px;
+          }
+          .specialP {
+            font-size:15px;
+          }
+          .specialStrong {
+            font-size:16px;
+          }
+          .features {
+            padding:40px 0;
+          }
+          .featGrid {
+            gap:16px;
+          }
+          .featItem h4 {
+            font-size:18px;
+          }
+          .featItem p {
+            font-size:14px;
+          }
+          .reviews {
+            padding:40px 0;
+          }
+          .reviewGrid {
+            gap:20px;
+          }
+          .avatar {
+            width:70px;
+            height:70px;
+          }
+          .rName {
+            font-size:16px;
+          }
+          .rText {
+            font-size:14px;
+            line-height:1.6;
+          }
+          .qvCard {
+            padding:20px;
+          }
+          .qvMainImage {
+            height:300px;
+          }
+          .qvClose {
+            font-size:28px;
+            top:12px;
+            right:12px;
+          }
+          .qvProductTitle {
+            font-size:22px;
+          }
+          .qvNow {
+            font-size:24px;
+          }
+          .qvOld {
+            font-size:18px;
+          }
+          .qvQtyBtn {
+            width:40px;
+            height:36px;
+            font-size:20px;
+          }
+          .qvQtyInput {
+            width:50px;
+            font-size:16px;
+          }
+          .qvAdd {
+            min-width:200px;
+            height:48px;
+            font-size:16px;
+          }
+          .qvMeta {
+            gap:16px;
+            font-size:14px;
+          }
         }
 
-        @media (max-width:480px){
-          .hero{
+        @media (max-width:480px) {
+          .hero {
             height:360px;
             min-height:360px;
           }
-          .heroH1{font-size:30px}
-          .heroH3{font-size:16px}
-          .heroBtn{padding:10px 18px; font-size:14px}
-          .title{font-size:28px}
-          .underline{width:120px}
-          .promo{min-height:280px}
-          .promoBody{left:18px; right:18px; bottom:18px}
-          .promoH{font-size:24px}
-          .promoSub{font-size:14px; margin-bottom:12px}
-          .promoBtn{padding:10px 18px; font-size:13px}
-          .fpGrid{grid-template-columns:repeat(2,1fr); gap:12px}
-          .fpCard{border-radius:16px}
-          .fpImgWrap{height:165px}
-          .fpImg{padding:12px}
-          .fpEye{width:38px; height:38px; top:10px; right:10px}
-          .fpSale{font-size:10px; padding:5px 9px; top:10px; left:10px}
-          .fpBody{padding:12px}
-          .fpCat{font-size:10px; margin-bottom:6px}
-          .fpTitle{font-size:13px; line-height:1.3; margin-bottom:10px}
-          .fpPriceRow{gap:6px}
-          .fpOld{font-size:11px}
-          .fpNow{font-size:14px}
-          .fpOff{font-size:10px; padding:3px 5px}
-          .fpGst{font-size:11px; margin-bottom:10px}
-          .fpQtyWrap{width:100%; justify-content:space-between; margin-bottom:10px}
-          .fpQtyBtn{width:32px; height:32px; font-size:18px}
-          .fpQtyInput{width:40px; font-size:12px}
-          .fpBtn{padding:12px 8px; font-size:12px; border-radius:10px}
-          .brandsBox{padding:20px 0}
-          .brandsScroll{gap:15px; height:100px}
-          .brandLogo{min-width:120px; height:100px}
-          .brandLogo img{max-height:80px; max-width:120px}
-          .brandArrow{width:38px; height:38px}
-          .specialBanner{min-height:300px}
-          .specialContent{left:18px; top:18px}
-          .smallLabel{font-size:14px}
-          .specialH{font-size:26px; margin-bottom:8px}
-          .specialP{font-size:13px; line-height:1.5; margin-bottom:12px}
-          .specialStrong{font-size:14px; margin-bottom:16px}
-          .featGrid{grid-template-columns:1fr; gap:20px}
-          .featIcon{width:40px; height:40px}
-          .featItem h4{font-size:16px; margin:8px 0 4px}
-          .featItem p{font-size:13px; max-width:100%}
-          .reviewGrid{grid-template-columns:1fr}
-          .avatar{width:60px; height:60px}
-          .star{font-size:16px}
-          .rText{font-size:13px}
-          .qvCard{padding:16px}
-          .qvMainImage{height:220px}
-          .qvProductTitle{font-size:18px}
-          .qvNow{font-size:22px}
-          .qvOld{font-size:16px}
-          .qvActionRow{gap:10px; flex-direction:column; align-items:stretch}
-          .qvQty{height:38px; width:100%; justify-content:space-between}
-          .qvQtyBtn{width:36px; height:36px; font-size:18px}
-          .qvQtyInput{width:50px; font-size:16px}
-          .qvAdd{min-width:100%; height:44px; font-size:15px; padding:0 16px}
-          .qvMeta{gap:10px; font-size:12px; flex-direction:column}
-          .qvShare{gap:10px; font-size:14px; margin-top:16px}
-          .qvShareIcon{font-size:16px}
+          .heroH1 {
+            font-size:30px;
+          }
+          .heroH3 {
+            font-size:16px;
+          }
+          .heroBtn {
+            padding:10px 18px;
+            font-size:14px;
+          }
+          .title {
+            font-size:28px;
+          }
+          .underline {
+            width:120px;
+          }
+          .promo {
+            min-height:280px;
+          }
+          .promoBody {
+            left:18px;
+            right:18px;
+            bottom:18px;
+          }
+          .promoH {
+            font-size:24px;
+          }
+          .promoSub {
+            font-size:14px;
+            margin-bottom:12px;
+          }
+          .promoBtn {
+            padding:10px 18px;
+            font-size:13px;
+          }
+          .fpGrid {
+            grid-template-columns:repeat(2,1fr);
+            gap:12px;
+          }
+          .fpCard {
+            border-radius:16px;
+          }
+          .fpImgWrap {
+            height:165px;
+          }
+          .fpImg {
+            padding:12px;
+          }
+          .fpBody {
+            padding:12px;
+          }
+          .fpTitle {
+            font-size:13px;
+            line-height:1.3;
+            margin-bottom:10px;
+          }
+          .fpPriceRow {
+            gap:6px;
+          }
+          .fpOld {
+            font-size:11px;
+          }
+          .fpNow {
+            font-size:14px;
+          }
+          .fpOff {
+            font-size:10px;
+            padding:3px 5px;
+          }
+          .fpGst {
+            font-size:11px;
+            margin-bottom:10px;
+          }
+          .fpCartRow {
+            gap:8px;
+          }
+          .fpQtyWrap {
+            height:32px;
+          }
+          .fpQtyBtn {
+            width:28px;
+            height:32px;
+            font-size:16px;
+          }
+          .fpQtyInput {
+            width:38px;
+            font-size:12px;
+          }
+          .fpBtn {
+            height:32px;
+            padding: 6px 8px;
+            font-size: 12px;
+          }
+          .brandsBox {
+            padding:20px 0;
+          }
+          .brandsScroll {
+            gap:15px;
+            height:100px;
+          }
+          .brandLogo {
+            min-width:120px;
+            height:100px;
+          }
+          .brandLogo img {
+            max-height:80px;
+            max-width:120px;
+          }
+          .brandArrow {
+            width:38px;
+            height:38px;
+          }
+          .specialBanner {
+            min-height:300px;
+          }
+          .specialContent {
+            left:18px;
+            top:18px;
+          }
+          .smallLabel {
+            font-size:14px;
+          }
+          .specialH {
+            font-size:26px;
+            margin-bottom:8px;
+          }
+          .specialP {
+            font-size:13px;
+            line-height:1.5;
+            margin-bottom:12px;
+          }
+          .specialStrong {
+            font-size:14px;
+            margin-bottom:16px;
+          }
+          .featGrid {
+            grid-template-columns:1fr;
+            gap:20px;
+          }
+          .featIcon {
+            width:40px;
+            height:40px;
+          }
+          .featItem h4 {
+            font-size:16px;
+            margin:8px 0 4px;
+          }
+          .featItem p {
+            font-size:13px;
+            max-width:100%;
+          }
+          .reviewGrid {
+            grid-template-columns:1fr;
+          }
+          .avatar {
+            width:60px;
+            height:60px;
+          }
+          .star {
+            font-size:16px;
+          }
+          .rText {
+            font-size:13px;
+          }
+          .qvCard {
+            padding:16px;
+          }
+          .qvMainImage {
+            height:220px;
+          }
+          .qvProductTitle {
+            font-size:18px;
+          }
+          .qvNow {
+            font-size:22px;
+          }
+          .qvOld {
+            font-size:16px;
+          }
+          .qvActionRow {
+            gap:10px;
+            flex-direction:column;
+            align-items:stretch;
+          }
+          .qvQty {
+            height:38px;
+            width:100%;
+            justify-content:space-between;
+          }
+          .qvQtyBtn {
+            width:36px;
+            height:36px;
+            font-size:18px;
+          }
+          .qvQtyInput {
+            width:50px;
+            font-size:16px;
+          }
+          .qvAdd {
+            min-width:100%;
+            height:44px;
+            font-size:15px;
+            padding:0 16px;
+          }
+          .qvMeta {
+            gap:10px;
+            font-size:12px;
+            flex-direction:column;
+          }
+          .qvShare {
+            gap:10px;
+            font-size:14px;
+            margin-top:16px;
+          }
+          .qvShareIcon {
+            font-size:16px;
+          }
         }
 
-        @media (max-width:360px){
-          .heroH1{font-size:26px}
-          .heroH3{font-size:15px}
-          .title{font-size:24px}
-          .brandLogo{min-width:100px}
-          .brandLogo img{max-width:90px}
-          .promoH{font-size:22px}
-          .fpGrid{grid-template-columns:1fr}
+        @media (max-width:360px) {
+          .heroH1 {
+            font-size:26px;
+          }
+          .heroH3 {
+            font-size:15px;
+          }
+          .title {
+            font-size:24px;
+          }
+          .brandLogo {
+            min-width:100px;
+          }
+          .brandLogo img {
+            max-width:90px;
+          }
+          .promoH {
+            font-size:22px;
+          }
+          .fpGrid {
+            grid-template-columns:1fr;
+          }
         }
 
         @media (max-height: 600px) and (orientation: landscape) {
-          .hero { min-height: 400px; }
-          .heroText { padding-top: 20px; }
+          .hero {
+            min-height: 400px;
+          }
+          .heroText {
+            padding-top: 20px;
+          }
         }
       `}</style>
 
@@ -3648,24 +5592,15 @@ export default function Home() {
                         alt={p.title}
                         loading="lazy"
                       />
-                      {p.is_sale ? (
-                        <span className="fpSale">SALE</span>
-                      ) : (
-                        <span className="fpSale" style={{ background: "#4b5563" }}>NEW</span>
-                      )}
                     </a>
 
                     <div className="fpBody">
-                      <div className="fpCat">
-                        {p.short_category_label || p.category_name || "UNCATEGORIZED"}
-                      </div>
-
                       <h3
                         className="fpTitle"
                         title={p.title}
                         onClick={() => navigate(`/product/${p.slug}`)}
                       >
-                        {p.title.toUpperCase()}
+                        {p.title}
                       </h3>
 
                       <div className="fpPriceRow">
@@ -3686,53 +5621,55 @@ export default function Home() {
                         GST ({p.gst_percent}%) Inclusive of tax
                       </div>
 
-                      <div className="fpQtyWrap">
+                      <div className="fpCartRow">
+                        <div className="fpQtyWrap">
+                          <button
+                            className="fpQtyBtn"
+                            onClick={() => setQty(p.id, qty - 1)}
+                            type="button"
+                          >
+                            −
+                          </button>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            className="fpQtyInput"
+                            value={tempQty}
+                            onChange={(e) => handleQtyInputChange(p.id, e.target.value)}
+                            onBlur={() => handleQtyBlur(p.id)}
+                            disabled={busyId === p.id}
+                          />
+                          <button
+                            className="fpQtyBtn"
+                            onClick={() => setQty(p.id, qty + 1)}
+                            type="button"
+                          >
+                            +
+                          </button>
+                        </div>
+
                         <button
-                          className="fpQtyBtn"
-                          onClick={() => setQty(p.id, qty - 1)}
+                          className="fpBtn"
                           type="button"
+                          disabled={busyId === p.id || !p.is_sale}
+                          onClick={() => {
+                            if (!p.is_sale) return;
+                            handleAddToCart(p, qty);
+                          }}
+                          style={{
+                            background: p.is_sale
+                              ? "linear-gradient(90deg,#4f86ff,#1d4ed8)"
+                              : "#9ca3af",
+                            cursor: p.is_sale ? "pointer" : "not-allowed",
+                          }}
                         >
-                          −
-                        </button>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          className="fpQtyInput"
-                          value={tempQty}
-                          onChange={(e) => handleQtyInputChange(p.id, e.target.value)}
-                          onBlur={() => handleQtyBlur(p.id)}
-                          disabled={busyId === p.id}
-                        />
-                        <button
-                          className="fpQtyBtn"
-                          onClick={() => setQty(p.id, qty + 1)}
-                          type="button"
-                        >
-                          +
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 10V8a6 6 0 0112 0v2" />
+                            <rect x="5" y="10" width="14" height="12" rx="2" strokeWidth="2" />
+                          </svg>
+                          {!p.is_sale ? "OUT OF STOCK" : busyId === p.id ? "ADDING..." : "ADD TO CART"}
                         </button>
                       </div>
-
-                      <button
-                        className="fpBtn"
-                        type="button"
-                        disabled={busyId === p.id || !p.is_sale}
-                        onClick={() => {
-                          if (!p.is_sale) return;
-                          handleAddToCart(p, qty);
-                        }}
-                        style={{
-                          background: p.is_sale
-                            ? "linear-gradient(90deg,#4f86ff,#1d4ed8)"
-                            : "#9ca3af",
-                          cursor: p.is_sale ? "pointer" : "not-allowed",
-                        }}
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                          <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 10V8a6 6 0 0112 0v2" />
-                          <rect x="5" y="10" width="14" height="12" rx="2" strokeWidth="2" />
-                        </svg>
-                        {!p.is_sale ? "OUT OF STOCK" : busyId === p.id ? "ADDING..." : "ADD TO CART"}
-                      </button>
                     </div>
                   </article>
                 );

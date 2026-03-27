@@ -7203,7 +7203,7 @@ export default function Store() {
                               minWidth: isMobile ? "100%" : 120, // reduced min-width and allow wrapping
                               height: isMobile ? 40 : 44,
                               fontSize: isMobile ? 12 : 14,
-                              background: p.is_sale ? "#0b0b0b" : "#9ca3af",
+                              background: p.is_sale ? "#4b2ef1" : "#9ca3af",
                               cursor: p.is_sale ? "pointer" : "not-allowed",
                               whiteSpace: "normal", // allow text wrapping
                               wordBreak: "break-word",
